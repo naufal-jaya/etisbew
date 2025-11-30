@@ -28,9 +28,14 @@ const config: Config = {
           500: '#003C7D', // Primary Navy
           600: '#003066',
           700: '#00244E',
-          800: '#001837',
+          800: '#0A1A2F', // Updated Base
           900: '#000C1F',
+          950: '#050C16',
         },
+        // New Design System Colors
+        'deep-navy': '#0A1A2F',
+        'mid-blue': '#134F9A',
+        'slate-blue': '#1E293B',
         // Supporting Accent Colors (from IEEE IPB branding)
         accent: {
           blue: '#00629B',

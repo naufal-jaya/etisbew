@@ -99,6 +99,16 @@ export const allServicesQuery = groq`
   }
 `;
 
+// Get all divisions
+export const allDivisionsQuery = groq`
+  *[_type == "division"] | order(order asc) {
+    _id,
+    name,
+    description,
+    icon
+  }
+`;
+
 // Get all team members
 export const allTeamMembersQuery = groq`
   *[_type == "teamMember"] | order(order asc) {
@@ -108,7 +118,12 @@ export const allTeamMembersQuery = groq`
     image,
     bio,
     email,
-    linkedin
+    linkedin,
+    "division": division->{
+      _id,
+      name
+    },
+    subdivision
   }
 `;
 

@@ -41,6 +41,18 @@ export default defineType({
       type: 'url',
     }),
     defineField({
+      name: 'division',
+      title: 'Division',
+      type: 'reference',
+      to: [{ type: 'division' }],
+    }),
+    defineField({
+      name: 'subdivision',
+      title: 'Subdivision',
+      type: 'string',
+      description: 'e.g., Academic, Project, Creative, etc.',
+    }),
+    defineField({
       name: 'order',
       title: 'Order',
       type: 'number',
