@@ -6,7 +6,11 @@ import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-const Navbar = () => {
+interface NavbarProps {
+  variant?: 'default' | 'light';
+}
+
+const Navbar = ({ variant = 'default' }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -21,11 +25,14 @@ const Navbar = () => {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
-    { href: '#services', label: 'Services' },
-    { href: '#team', label: 'Team' },
-    { href: '/blog', label: 'Blog' },
+    { href: '/news', label: 'News' },
     { href: '#contact', label: 'Contact' },
   ];
+
+  // Determine text colors based on scroll state and variant
+  // If variant is 'light' (for white pages) and not scrolled, use dark text.
+  // Otherwise (scrolled or default dark theme), use white text.
+  const useDarkText = variant === 'light' && !isScrolled;
 
   return (
     <nav
@@ -40,7 +47,10 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="text-2xl font-bold text-white tracking-tight">
+            <div className={cn(
+              "text-2xl font-bold tracking-tight transition-colors",
+              useDarkText ? "text-navy-900" : "text-white"
+            )}>
               IEEE <span className="text-blue-400 group-hover:text-cyan-400 transition-colors">IPB</span>
             </div>
           </Link>
@@ -51,7 +61,12 @@ const Navbar = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all"
+                className={cn(
+                  "px-4 py-2 text-sm font-medium rounded-full transition-all",
+                  useDarkText 
+                    ? "text-slate-600 hover:text-blue-600 hover:bg-blue-50" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                )}
               >
                 {link.label}
               </Link>
@@ -65,7 +80,10 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+            className={cn(
+              "md:hidden p-2 rounded-full transition-colors",
+              useDarkText ? "text-navy-900 hover:bg-slate-100" : "text-white hover:bg-white/10"
+            )}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >

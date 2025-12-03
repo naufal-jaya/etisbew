@@ -1,5 +1,5 @@
 import { client } from '@/sanity/lib/client';
-import { aboutPageQuery, divisionsQuery, allTeamMembersQuery } from '@/sanity/lib/queries';
+import { aboutPageQuery, divisionsWithMembersQuery } from '@/sanity/lib/queries';
 import { Metadata } from 'next';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/sections/Footer';
@@ -27,13 +27,73 @@ function blocksToText(blocks: any[] = []) {
     .join('\n\n');
 }
 
+export const revalidate = 60;
+
 export default async function AboutPage() {
   // Fetch all data in parallel
-  const [aboutData, divisions, members] = await Promise.all([
+  const [aboutData, fetchedDivisions] = await Promise.all([
     client.fetch(aboutPageQuery),
-    client.fetch(divisionsQuery),
-    client.fetch(allTeamMembersQuery)
+    client.fetch(divisionsWithMembersQuery)
   ]);
+
+  // Placeholder divisions if Sanity is empty
+  const placeholderDivisions = [
+    {
+      _id: 'exec',
+      name: 'Executives',
+      description: 'The core leadership team responsible for strategic direction, operations, and overall management of the student branch.',
+      subdivisions: ['President', 'Vice President of External', 'Vice President of Internal', 'Treasurer', 'Secretary'],
+      members: [
+        { _id: 'm1', name: 'Sarah Johnson', role: 'President', subdivision: 'President', image: null },
+        { _id: 'm2', name: 'Michael Chen', role: 'VP External', subdivision: 'Vice President of External', image: null },
+        { _id: 'm2b', name: 'Emily Davis', role: 'VP Internal', subdivision: 'Vice President of Internal', image: null },
+        { _id: 'm3', name: 'Jessica Pratama', role: 'Secretary', subdivision: 'Secretary', image: null },
+        { _id: 'm4', name: 'David Kim', role: 'Treasurer', subdivision: 'Treasurer', image: null },
+      ]
+    },
+    {
+      _id: 'edu',
+      name: 'Education',
+      description: 'Dedicated to organizing workshops, seminars, and study groups to enhance technical skills and academic knowledge.',
+      subdivisions: ['Project', 'Academic'],
+      members: [
+        { _id: 'm5', name: 'Alex Turner', role: 'Head of Project', subdivision: 'Project', image: null },
+        { _id: 'm6', name: 'Emily White', role: 'Head of Academic', subdivision: 'Academic', image: null },
+      ]
+    },
+    {
+      _id: 'hrd',
+      name: 'Human Resource Development',
+      description: 'Focuses on member recruitment, retention, and professional development activities to build a strong community.',
+      subdivisions: ['RnR', 'Internal Development'],
+      members: [
+        { _id: 'm8', name: 'Lisa Wong', role: 'Head of RnR', subdivision: 'RnR', image: null },
+        { _id: 'm9', name: 'Tom Holland', role: 'Head of Internal Dev', subdivision: 'Internal Development', image: null },
+      ]
+    },
+    {
+      _id: 'media',
+      name: 'Media & Information',
+      description: 'Manages the branch\'s online presence, content creation, and communication channels.',
+      subdivisions: ['Creative', 'Information'],
+      members: [
+        { _id: 'm10', name: 'Afdha', role: 'Officer', subdivision: 'Creative', image: '/team/Media & Information_Creative_Officer_Afdha.png' },
+        { _id: 'm11', name: 'Scarlett Jo', role: 'Information Officer', subdivision: 'Information', image: null },
+      ]
+    },
+    {
+      _id: 'rel',
+      name: 'Relations',
+      description: 'Builds and maintains partnerships with other student branches, industry partners, and the university administration.',
+      subdivisions: ['Marketing', 'Partnership'],
+      members: [
+        { _id: 'm13', name: 'Robert Downey', role: 'Head of Marketing', subdivision: 'Marketing', image: null },
+        { _id: 'm14', name: 'Elizabeth Olsen', role: 'Head of Partnership', subdivision: 'Partnership', image: null },
+      ]
+    }
+  ];
+
+  const divisions = fetchedDivisions.length > 0 ? fetchedDivisions : placeholderDivisions;
 
   // Fallback data if Sanity is empty
   const heroTitle = aboutData?.title || 'IEEE Student Branch IPB University';
@@ -48,54 +108,36 @@ export default async function AboutPage() {
     'Connect students with industry professionals and opportunities'
   ];
 
-  // Placeholder data for Divisions if Sanity is empty
-  const placeholderDivisions = [
-    { _id: '1', name: 'Executives', description: 'Leading the strategic direction and overall management of the student branch.', order: 1 },
-    { _id: '2', name: 'Education', description: 'Fostering academic growth and technical skills through workshops and projects.', order: 2 },
-    { _id: '3', name: 'Human Resource Development', description: 'Nurturing talent and building a strong, cohesive community within the branch.', order: 3 },
-    { _id: '4', name: 'Media & Information', description: 'Managing the brand identity and disseminating information creatively.', order: 4 },
-    { _id: '5', name: 'Relations', description: 'Building bridges with external partners, sponsors, and the global IEEE network.', order: 5 },
-  ];
-
-  // Placeholder data for Members if Sanity is empty
-  const placeholderMembers = [
-    { _id: 'm1', name: 'John Doe', role: 'Chairperson', division: { _id: '1', name: 'Executives' }, subdivision: '' },
-    { _id: 'm2', name: 'Jane Smith', role: 'Head of Education', division: { _id: '2', name: 'Education' }, subdivision: 'Academic' },
-    { _id: 'm3', name: 'Mike Johnson', role: 'Project Lead', division: { _id: '2', name: 'Education' }, subdivision: 'Project' },
-    { _id: 'm4', name: 'Sarah Williams', role: 'HR Director', division: { _id: '3', name: 'Human Resource Development' }, subdivision: 'Internal Development' },
-    { _id: 'm5', name: 'David Brown', role: 'Creative Lead', division: { _id: '4', name: 'Media & Information' }, subdivision: 'Creative' },
-    { _id: 'm6', name: 'Emily Davis', role: 'Partnership Manager', division: { _id: '5', name: 'Relations' }, subdivision: 'Partnership' },
-  ];
-
-  const displayDivisions = (divisions && divisions.length > 0) ? divisions : placeholderDivisions;
-  const displayMembers = (members && members.length > 0) ? members : placeholderMembers;
+  const timeline = aboutData?.timeline || [];
+  const stats = aboutData?.stats || {
+    activeMembers: 56,
+    divisionsCount: 5,
+    eventsHosted: 10,
+    awardsWon: 3
+  };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-deep-navy">
       <Navbar />
       
       <AboutHero 
         title={heroTitle}
-        introText={heroIntro}
-        logo={aboutData?.logo}
+        description={heroIntro}
       />
-      
+
       <VisionMission 
         vision={vision}
         mission={mission}
       />
-      
-      <RoadmapHistory />
-      
-      <StatsOverview />
-      
-      <DivisionsSection 
-        divisions={displayDivisions}
-        members={displayMembers}
-      />
-      
+
+      <RoadmapHistory timeline={timeline} />
+
+      <StatsOverview stats={stats} />
+
+      <DivisionsSection divisions={divisions} />
+
       <CTASection />
-      
+
       <Footer />
     </main>
   );

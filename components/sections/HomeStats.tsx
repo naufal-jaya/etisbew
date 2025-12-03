@@ -31,15 +31,6 @@ const stats = [
     bg: 'bg-accent-blue/10',
     border: 'border-accent-blue/20'
   },
-  {
-    label: 'Awards Won',
-    value: '3',
-    suffix: '',
-    icon: Trophy,
-    color: 'text-purple-400',
-    bg: 'bg-purple-500/10',
-    border: 'border-purple-500/20'
-  },
 ];
 
 const HomeStats = () => {
@@ -73,7 +64,7 @@ const HomeStats = () => {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}

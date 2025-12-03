@@ -160,7 +160,7 @@ const Hero = () => {
                       animate={{ rotate: 600 }}
                       transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
                    >
-                       <div className="absolute top-[25%] left-1/2 -translate-x-1/2 -translate-y-1/2">
+                       <div className="absolute top-[31.25%] left-1/2 -translate-x-1/2 -translate-y-1/2">
                           <motion.div 
                             initial={{ rotate: -240 }}
                             animate={{ rotate: -600 }} 

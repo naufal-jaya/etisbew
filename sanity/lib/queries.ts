@@ -175,7 +175,9 @@ export const aboutPageQuery = groq`
     logo,
     introText,
     vision,
-    mission
+    mission,
+    timeline,
+    stats
   }
 `;
 
@@ -186,6 +188,25 @@ export const divisionsQuery = groq`
     name,
     description,
     icon,
-    order
+    order,
+    subdivisions
+  }
+`;
+
+// Get Divisions with Members
+export const divisionsWithMembersQuery = groq`
+  *[_type == "division"] | order(order asc) {
+    _id,
+    name,
+    description,
+    subdivisions,
+    "members": *[_type == "teamMember" && references(^._id)] | order(order asc) {
+      _id,
+      name,
+      role,
+      image,
+      subdivision,
+      linkedin
+    }
   }
 `;

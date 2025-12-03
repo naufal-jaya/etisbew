@@ -5,7 +5,6 @@ import HomeAbout from '@/components/sections/HomeAbout';
 import HomeDivisions from '@/components/sections/HomeDivisions';
 import Services from '@/components/sections/Services';
 import HomeStats from '@/components/sections/HomeStats';
-import HomePartners from '@/components/sections/HomePartners';
 import HomeNews from '@/components/sections/HomeNews';
 import HomeCTA from '@/components/sections/HomeCTA';
 import Navbar from '@/components/layout/Navbar';
@@ -25,7 +24,6 @@ export default async function Home() {
       <HomeDivisions divisions={divisions} />
       <Services />
       <HomeStats />
-      <HomePartners />
       <HomeNews posts={posts} />
       <HomeCTA />
       <Footer />

@@ -40,5 +40,31 @@ export default defineType({
       of: [{ type: 'string' }],
       validation: (Rule) => Rule.required().min(3).max(5),
     }),
+    defineField({
+      name: 'timeline',
+      title: 'History / Roadmap',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'year', type: 'string', title: 'Year' },
+            { name: 'title', type: 'string', title: 'Title' },
+            { name: 'description', type: 'text', title: 'Description' },
+          ],
+        },
+      ],
+    }),
+    defineField({
+      name: 'stats',
+      title: 'Statistics',
+      type: 'object',
+      fields: [
+        { name: 'activeMembers', type: 'number', title: 'Active Members Count' },
+        { name: 'divisionsCount', type: 'number', title: 'Divisions Count' },
+        { name: 'eventsHosted', type: 'number', title: 'Events Hosted' },
+        { name: 'awardsWon', type: 'number', title: 'Awards Won' },
+      ],
+    }),
   ],
 });

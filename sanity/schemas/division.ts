@@ -30,6 +30,13 @@ export default defineType({
       type: 'number',
       validation: (Rule) => Rule.required(),
     }),
+    defineField({
+      name: 'subdivisions',
+      title: 'Subdivisions',
+      type: 'array',
+      of: [{ type: 'string' }],
+      description: 'List of subdivisions (e.g., "Academic", "Project")',
+    }),
   ],
   preview: {
     select: {

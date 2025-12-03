@@ -6,11 +6,12 @@ import Image from 'next/image';
 import { urlFor } from '@/sanity/lib/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-// Interfaces matching Sanity data
 interface Division {
   _id: string;
   name: string;
   description?: string;
+  subdivisions?: string[];
+  members?: TeamMember[];
 }
 
 interface TeamMember {
@@ -18,31 +19,12 @@ interface TeamMember {
   name: string;
   role: string;
   image: any;
-  division: {
-    _id: string;
-    name: string;
-  };
   subdivision?: string;
 }
 
 interface DivisionsSectionProps {
   divisions: Division[];
-  members: TeamMember[];
 }
-
-// Helper to group members by division
-const groupMembersByDivision = (members: TeamMember[], divisionName: string) => {
-  return members.filter(m => m.division?.name === divisionName);
-};
-
-// Subdivisions mapping based on instructions
-const SUBDIVISIONS: Record<string, string[]> = {
-  'Education': ['Academic', 'Project'],
-  'Human Resource Development': ['RnR', 'Internal Development'],
-  'Media & Information': ['Creative', 'Information'],
-  'Relations': ['Marketing', 'Partnership'],
-  'Executives': []
-};
 
 // Accent colors for divisions (Updated for Dark Theme)
 const DIVISION_ACCENTS: Record<string, string> = {
@@ -53,8 +35,8 @@ const DIVISION_ACCENTS: Record<string, string> = {
   'Relations': 'border-yellow-500 text-yellow-400',
 };
 
-const MemberCard = ({ member }: { member: TeamMember }) => {
-  const accentClass = DIVISION_ACCENTS[member.division?.name] || 'border-gray-500 text-gray-400';
+const MemberCard = ({ member, divisionName }: { member: TeamMember; divisionName: string }) => {
+  const accentClass = DIVISION_ACCENTS[divisionName] || 'border-gray-500 text-gray-400';
   const borderColor = accentClass.split(' ')[0];
   const textColor = accentClass.split(' ')[1];
 
@@ -64,9 +46,10 @@ const MemberCard = ({ member }: { member: TeamMember }) => {
       <div className="absolute inset-0">
         {member.image ? (
           <Image
-            src={urlFor(member.image).url()}
+            src={typeof member.image === 'string' ? member.image : urlFor(member.image).width(400).height(600).url()}
             alt={member.name}
             fill
+            sizes="(max-width: 768px) 100vw, 300px"
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (
@@ -99,25 +82,12 @@ const MemberCard = ({ member }: { member: TeamMember }) => {
   );
 };
 
-export default function DivisionsSection({ divisions, members }: DivisionsSectionProps) {
-  // Sort divisions to ensure Executives is first, or follow a specific order
-  const orderedDivisions = [
-    'Executives',
-    'Education',
-    'Human Resource Development',
-    'Media & Information',
-    'Relations'
-  ];
-
-  const sortedDivisions = divisions.sort((a, b) => {
-    return orderedDivisions.indexOf(a.name) - orderedDivisions.indexOf(b.name);
-  });
-
+export default function DivisionsSection({ divisions }: DivisionsSectionProps) {
   return (
     <div className="bg-deep-navy pb-20">
-      {sortedDivisions.map((division, index) => {
-        const divisionMembers = groupMembersByDivision(members, division.name);
-        const subdivisions = SUBDIVISIONS[division.name] || [];
+      {divisions.map((division, index) => {
+        const divisionMembers = division.members || [];
+        const subdivisions = division.subdivisions || [];
         const accentColor = (DIVISION_ACCENTS[division.name] || 'text-blue-400').split(' ')[1];
 
         return (
@@ -157,7 +127,7 @@ export default function DivisionsSection({ divisions, members }: DivisionsSectio
                   {divisionMembers.length > 0 ? (
                     divisionMembers.map((member) => (
                       <div key={member._id} className="snap-start">
-                        <MemberCard member={member} />
+                        <MemberCard member={member} divisionName={division.name} />
                       </div>
                     ))
                   ) : (
@@ -177,3 +147,5 @@ export default function DivisionsSection({ divisions, members }: DivisionsSectio
     </div>
   );
 }
+
+
