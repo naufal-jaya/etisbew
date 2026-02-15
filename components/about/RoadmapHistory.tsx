@@ -2,40 +2,58 @@
 
 import { motion } from 'framer-motion';
 
-const history = [
+type TimelineItem = {
+  year: string;
+  title: string;
+  description: string;
+};
+
+type RoadmapHistoryProps = {
+  timeline: TimelineItem[];
+};
+
+const history: TimelineItem[] = [
   {
     year: '2020',
     title: 'Establishment',
-    description: 'IEEE SB IPB University was officially founded, marking the beginning of a new era for technology enthusiasts at IPB.',
+    description:
+      'IEEE SB IPB University was officially founded, marking the beginning of a new era for technology enthusiasts at IPB.',
   },
   {
     year: '2021',
     title: 'First Major Event',
-    description: 'Hosted our first international webinar series, connecting students with global industry leaders.',
+    description:
+      'Hosted our first international webinar series, connecting students with global industry leaders.',
   },
   {
     year: '2022',
     title: 'Expansion',
-    description: 'Expanded our divisions to include Media & Information, growing our member base by 200%.',
+    description:
+      "Expanded our divisions to include Media & Information, growing our member base by 200%.",
   },
   {
     year: '2023',
     title: 'National Recognition',
-    description: 'Awarded "Best Student Branch" at the IEEE Indonesia Section gathering.',
+    description:
+      'Awarded "Best Student Branch" at the IEEE Indonesia Section gathering.',
   },
   {
     year: '2024',
     title: 'Innovation Hub',
-    description: 'Launched the Student Innovation Hub to foster startup ideas and technical projects.',
+    description:
+      'Launched the Student Innovation Hub to foster startup ideas and technical projects.',
   },
   {
     year: '2025',
     title: 'Future Vision',
-    description: 'Aiming to become a leading technological community in Southeast Asia.',
+    description:
+      'Aiming to become a leading technological community in Southeast Asia.',
   },
 ];
 
-export default function RoadmapHistory() {
+export default function RoadmapHistory({ timeline }: RoadmapHistoryProps) {
+  const items = timeline?.length ? timeline : history;
+
   return (
     <section className="py-20 bg-deep-navy relative overflow-hidden">
       {/* Background Grid */}
@@ -43,7 +61,9 @@ export default function RoadmapHistory() {
 
       <div className="container px-4 md:px-6 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Our Journey</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Our Journey
+          </h2>
           <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-cyan-400 mx-auto rounded-full" />
         </div>
 
@@ -52,9 +72,9 @@ export default function RoadmapHistory() {
           <div className="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-blue-500/20 via-blue-500/50 to-blue-500/20" />
 
           <div className="space-y-12">
-            {history.map((item, index) => (
+            {items.map((item, index) => (
               <motion.div
-                key={item.year}
+                key={`${item.year}-${index}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -69,7 +89,9 @@ export default function RoadmapHistory() {
                     <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mb-2 block">
                       {item.year}
                     </span>
-                    <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                    <h3 className="text-xl font-bold text-white mb-2">
+                      {item.title}
+                    </h3>
                     <p className="text-slate-400 text-sm">{item.description}</p>
                   </div>
                 </div>
