@@ -6,6 +6,7 @@ import {
 import { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/sections/Footer";
+import { Users, Layers, CalendarDays, Trophy } from "lucide-react";
 
 // import AboutHero from "@/components/about/AboutHero";
 // import VisionMission from "@/components/about/VisionMission";
@@ -236,14 +237,12 @@ export default async function AboutPage() {
 
   const timeline = Array.isArray(aboutData?.timeline) ? aboutData.timeline : [];
 
-  const stats = Array.isArray(aboutData?.stats)
-    ? aboutData.stats
-    : [
-        { label: "Active Members", value: "56" },
-        { label: "Divisions", value: "5" },
-        { label: "Events Hosted", value: "10" },
-        { label: "Awards Won", value: "3" },
-      ];
+  const stats = [
+    { label: "Active Members", value: "56", icon: "user" },
+    { label: "Divisions", value: "5", icon: "layer" },
+    { label: "Events Hosted", value: "10", icon: "calendar" },
+    { label: "Awards Won", value: "3", icon: "trophy" },
+  ];
 
   return (
     <main className="min-h-screen bg-deep-navy">

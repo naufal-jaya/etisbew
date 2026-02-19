@@ -1,12 +1,19 @@
 ﻿'use client';
 
 import { motion } from 'framer-motion';
-import { type LucideIcon } from 'lucide-react';
+import { Users, Layers, CalendarDays, Trophy} from 'lucide-react';
+
+const icons = {
+  user: Users,
+  layer: Layers,
+  calendar: CalendarDays,
+  trophy: Trophy,
+} as const;
 
 export type StatItem = {
   label: string;
   value: string;
-  icon: LucideIcon;
+  icon: string;
   suffix?: string;
 };
 
@@ -22,7 +29,7 @@ export default function StatsOverview({ stats }: StatsOverviewProps) {
       <div className="container mx-auto px-4 relative z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => {
-            const Icon = stat.icon;
+            const Icon = stat.icon ? icons[stat.icon as keyof typeof icons] : null;
 
             return (
               <motion.div
@@ -34,7 +41,7 @@ export default function StatsOverview({ stats }: StatsOverviewProps) {
                 className="text-center group p-6 rounded-2xl hover:bg-white/5 transition-colors"
               >
                 <div className="w-14 h-14 mx-auto bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400 mb-4 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300 backdrop-blur-sm border border-blue-500/20">
-                  <Icon size={28} />
+                  {Icon ? <Icon size={28} /> : null}
                 </div>
 
                 <div className="text-3xl md:text-5xl font-bold text-white mb-2 tracking-tight">
