@@ -6,7 +6,6 @@ import author from "./schemas/author";
 import category from "./schemas/category";
 import service from "./schemas/service";
 import teamMember from "./schemas/teamMember";
-import about from "./schemas/about";
 import siteSettings from "./schemas/siteSettings";
 import aboutPage from "./schemas/aboutPage";
 import division from "./schemas/division";
@@ -19,7 +18,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     blockContent,
     service,
     teamMember,
-    about,
     siteSettings,
     aboutPage,
     division,

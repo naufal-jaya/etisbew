@@ -1,4 +1,4 @@
-import { groq } from 'next-sanity';
+import { groq } from "next-sanity";
 
 // Get all blog posts
 export const allPostsQuery = groq`
@@ -167,9 +167,8 @@ export const relatedPostsQuery = groq`
   }
 `;
 
-// Get about page content
 export const aboutPageQuery = groq`
-  *[_type == "aboutPage"][0] {
+  *[_type == "aboutPage" && isActive == true][0] {
     _id,
     title,
     logo,
