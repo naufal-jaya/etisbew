@@ -6,7 +6,6 @@ import {
 import { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/sections/Footer";
-import { Users, Layers, CalendarDays, Trophy } from "lucide-react";
 
 // import AboutHero from "@/components/about/AboutHero";
 // import VisionMission from "@/components/about/VisionMission";
