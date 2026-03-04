@@ -8,7 +8,6 @@ import VisionMission from '@/components/about/VisionMission';
 import RoadmapHistory from '@/components/about/RoadmapHistory';
 import StatsOverview from '@/components/about/StatsOverview';
 import DivisionsSection from '@/components/about/DivisionsSection';
-import CTASection from '@/components/about/CTASection';
 
 export const metadata: Metadata = {
   title: 'About Us | IEEE Student Branch IPB',
@@ -136,7 +135,6 @@ export default async function AboutPage() {
 
       <DivisionsSection divisions={divisions} />
 
-      <CTASection />
 
       <Footer />
     </main>
