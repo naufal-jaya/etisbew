@@ -22,14 +22,6 @@ const HomeAbout = () => {
             transition={{ duration: 0.6 }}
             className="lg:col-span-4"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-navy-50 rounded-lg border border-navy-100">
-                <Cpu className="text-navy-700 w-5 h-5" />
-              </div>
-              <span className="text-accent-cyan font-bold tracking-widest uppercase text-xs">
-                Our Core Pillars
-              </span>
-            </div>
             
             <h2 className="text-4xl md:text-5xl font-bold text-navy-950 mb-6 leading-tight">
               Empowering <br />

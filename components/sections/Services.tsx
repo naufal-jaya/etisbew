@@ -70,9 +70,6 @@ const Services = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-cyan/10 text-accent-cyan text-xs font-bold uppercase tracking-widest mb-4">
-            What We Offer
-          </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-navy-950 mb-6">
             Empowering Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue">Journey</span>
           </h2>

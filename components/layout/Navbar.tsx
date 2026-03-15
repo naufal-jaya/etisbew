@@ -72,9 +72,6 @@ const Navbar = ({ variant = 'default' }: NavbarProps) => {
               </Link>
             ))}
             <div className="pl-4">
-                <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-500 font-bold rounded-full px-6 shadow-lg shadow-blue-500/20">
-                    Join Us
-                </Button>
             </div>
           </div>
 
@@ -106,9 +103,6 @@ const Navbar = ({ variant = 'default' }: NavbarProps) => {
                 </Link>
               ))}
               <div className="pt-4">
-                <Button className="w-full bg-blue-600 text-white hover:bg-blue-500 font-bold rounded-lg">
-                    Join Us
-                </Button>
               </div>
             </div>
           </div>
