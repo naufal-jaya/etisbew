@@ -13,7 +13,6 @@ export default function AboutHero({ title, description }: AboutHeroProps) {
       {/* Background Elements */}
       <div className="absolute inset-0 circuit-pattern opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-deep-navy/50 to-deep-navy" />
-
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
           {/* Left: Logo/Brand */}

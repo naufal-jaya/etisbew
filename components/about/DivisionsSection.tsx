@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -168,7 +168,6 @@ export default function DivisionsSection({ divisions }: DivisionsSectionProps) {
                     </div>
                   )}
                 </div>
-
                 {/* Fade effect on right */}
                 <div className="absolute right-0 top-0 bottom-8 w-24 bg-gradient-to-l from-deep-navy to-transparent pointer-events-none" />
               </div>
