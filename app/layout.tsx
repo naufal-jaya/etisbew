@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic"],
+});
 
 export const metadata: Metadata = {
   title: "IEEE Student Branch IPB | Innovation & Technology Excellence",

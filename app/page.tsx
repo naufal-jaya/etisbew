@@ -1,13 +1,14 @@
-import { client } from '@/sanity/lib/client';
-import { allDivisionsQuery, latestPostsQuery } from '@/sanity/lib/queries';
-import Hero from '@/components/sections/Hero';
-import HomeAbout from '@/components/sections/HomeAbout';
-import HomeDivisions from '@/components/sections/HomeDivisions';
-import Services from '@/components/sections/Services';
-import HomeStats from '@/components/sections/HomeStats';
-import HomeNews from '@/components/sections/HomeNews';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/sections/Footer';
+import { client } from "@/sanity/lib/client";
+import { allDivisionsQuery, latestPostsQuery } from "@/sanity/lib/queries";
+import Hero from "@/components/home/Hero";
+import HomeAbout from "@/components/home/HomeAbout";
+import HomeDivisions from "@/components/home/HomeDivisions";
+import Journey from "@/components/home/Journey";
+import HomeStats from "@/components/home/HomeStats";
+import HomeNews from "@/components/home/HomeNews";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/home/Footer";
+import Empowering from "@/components/home/Empowering";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
@@ -19,9 +20,9 @@ export default async function Home() {
     <main className="min-h-screen bg-white">
       <Navbar />
       <Hero />
-      <HomeAbout />
+      <Empowering />
       <HomeDivisions divisions={divisions} />
-      <Services />
+      <Journey />
       <HomeStats />
       <HomeNews posts={posts} />
       <Footer />

@@ -49,7 +49,7 @@ const HomeAbout = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="group"
             >
-              <div className="relative h-full bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+              <div className="relative h-full bg-white p-8 rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-cyan to-transparent" />
                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent-cyan/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
                 
@@ -62,9 +62,7 @@ const HomeAbout = () => {
                   Mastering cutting-edge technologies through hands-on workshops and resources.
                 </p>
                 
-                <div className="flex items-center text-accent-cyan text-sm font-semibold group-hover:translate-x-2 transition-transform">
-                  Learn More <ArrowRight className="ml-2 w-4 h-4" />
-                </div>
+              
               </div>
             </motion.div>
 
@@ -76,9 +74,8 @@ const HomeAbout = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="group"
             >
-              <div className="relative h-full bg-navy-900 p-8 rounded-2xl border border-navy-800 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+              <div className="relative h-full bg-navy-900 p-8 rounded-2xl border border-navy-800 shadow-xl overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-blue to-transparent" />
-                <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent-blue/10 rounded-full group-hover:scale-150 transition-transform duration-500" />
                 
                 <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-6 text-white group-hover:bg-accent-blue transition-colors">
                   <Globe className="w-6 h-6" />
@@ -88,10 +85,6 @@ const HomeAbout = () => {
                 <p className="text-gray-400 text-sm leading-relaxed mb-6">
                   Connecting students with industry leaders, alumni, and peers worldwide.
                 </p>
-                
-                <div className="flex items-center text-accent-blue text-sm font-semibold group-hover:translate-x-2 transition-transform">
-                  Learn More <ArrowRight className="ml-2 w-4 h-4" />
-                </div>
               </div>
             </motion.div>
 
@@ -103,7 +96,7 @@ const HomeAbout = () => {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="group"
             >
-              <div className="relative h-full bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+              <div className="relative h-full bg-white p-8 rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-gold to-transparent" />
                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-accent-gold/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
                 
@@ -115,10 +108,6 @@ const HomeAbout = () => {
                 <p className="text-gray-500 text-sm leading-relaxed mb-6">
                   Cultivating future leaders through project management and organizational experience.
                 </p>
-                
-                <div className="flex items-center text-accent-gold text-sm font-semibold group-hover:translate-x-2 transition-transform">
-                  Learn More <ArrowRight className="ml-2 w-4 h-4" />
-                </div>
               </div>
             </motion.div>
           </div>
