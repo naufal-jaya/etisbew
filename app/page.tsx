@@ -8,7 +8,7 @@ import HomeStats from "@/components/home/HomeStats";
 import HomeNews from "@/components/home/HomeNews";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/home/Footer";
-import Empowering from "@/components/home/Empowering";
+import Empowering from "@/components/home/FutureLeader";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
