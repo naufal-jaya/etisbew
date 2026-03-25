@@ -3,7 +3,7 @@ import { allDivisionsQuery, latestPostsQuery } from "@/sanity/lib/queries";
 import Hero from "@/components/home/Hero";
 import HomeAbout from "@/components/home/HomeAbout";
 import HomeDivisions from "@/components/home/HomeDivisions";
-import Journey from "@/components/home/Journey";
+import Journey from "@/components/home/Potential";
 import HomeStats from "@/components/home/HomeStats";
 import HomeNews from "@/components/home/HomeNews";
 import Navbar from "@/components/layout/Navbar";
