@@ -9,6 +9,9 @@ import teamMember from "./schemas/teamMember";
 import siteSettings from "./schemas/siteSettings";
 import aboutPage from "./schemas/aboutPage";
 import division from "./schemas/division";
+import impact from "./schemas/impact";
+import impactPartner from "./schemas/impactPartners";
+
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -21,5 +24,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     siteSettings,
     aboutPage,
     division,
+    impact,
+    impactPartner,
   ],
 };

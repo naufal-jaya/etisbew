@@ -209,3 +209,16 @@ export const divisionsWithMembersQuery = groq`
     }
   }
 `;
+
+// impact
+export const impactQuery = `*[_type == "impact"]{
+  label,
+  value,
+  suffix,
+  icon
+}`;
+
+export const impactPartnersQuery = `*[_type == "impactPartner"]{
+  name,
+  logo
+}`;
