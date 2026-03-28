@@ -22,7 +22,7 @@ const Empowering = () => {
       </div>
 
       <div className="w-full relative z-10">
-        <div className="flex flex-col gap-12">
+        <div className="flex flex-col gap-10">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -39,7 +39,7 @@ const Empowering = () => {
               </span>
             </h2>
 
-            {/* 🔥 Scribble Line */}
+            {/*Scribble Line */}
             <svg
               width="500"
               height="20"
@@ -78,7 +78,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[200px] bg-white shadow-sm overflow-hidden
+                className="relative h-[170px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -115,7 +115,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[200px] bg-white shadow-sm overflow-hidden
+                className="relative h-[170px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -152,7 +152,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[200px] bg-white shadow-sm overflow-hidden
+                className="relative h-[170px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
