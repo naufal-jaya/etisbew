@@ -155,10 +155,21 @@ const Services = () => {
     },
   ];
 
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
   return (
     <section
       id="services"
-      className="py-24 bg-navy-50/30 relative overflow-hidden"
+      className="py-24 bg-gray-50 relative overflow-hidden"
     >
       <div className="absolute inset-0 circuit-pattern opacity-5 pointer-events-none" />
 
@@ -183,13 +194,34 @@ const Services = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setPos({
+                  x: e.clientX - rect.left,
+                  y: e.clientY - rect.top,
+                });
+              }}
+              onMouseEnter={() => setActiveIndex(index)}
+              onMouseLeave={() => setActiveIndex(null)}
               className={`group w-fit justify-self-center ${
                 index % 2 === 0
                   ? "md:justify-self-end"
                   : "md:justify-self-start"
               }`}
             >
-              <Card className="h-full w-[400px] bg-white border-transparent hover:border-transparent hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
+              <Card className="h-full w-[400px] bg-white border-transparent shadow-md hover:border-transparent hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
+                <div
+                  className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500 mix-blend-soft-light"
+                  style={{
+                    opacity: activeIndex === index ? 1 : 0,
+                    background: `radial-gradient(
+                                250px circle at ${pos.x}px ${pos.y}px,
+                                rgba(255, 255, 255, 1),
+                                transparent 100%
+                              )`,
+                  }}
+                />
+
                 {/* ICON BACKGROUND */}
                 <div className="absolute inset-0 z-0 pointer-events-none">
                   <div

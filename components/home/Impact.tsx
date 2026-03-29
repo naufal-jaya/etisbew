@@ -167,6 +167,9 @@ const Impact = ({
 
   items.sort((a, b) => a.depth - b.depth);
 
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
   return (
     <section className="py-24 bg-navy-950 relative overflow-hidden">
       {/* Background Accents */}
@@ -199,6 +202,15 @@ const Impact = ({
             return (
               <motion.div
                 key={item.label}
+                onMouseMove={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setPos({
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top,
+                  });
+                }}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseLeave={() => setActiveIndex(null)}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -206,9 +218,21 @@ const Impact = ({
                 className="relative group"
               >
                 <div
-                  className={`h-full p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1`}
+                  className={`h-full p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300`}
                 >
-                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <div
+                    className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500 mix-blend-soft-light"
+                    style={{
+                      opacity: activeIndex === index ? 1 : 0,
+                      filter: "blur(40px)",
+                      background: `radial-gradient(
+                                  250px circle at ${pos.x}px ${pos.y}px,
+                                  rgba(255, 255, 255, 0.06),
+                                  transparent 100%
+                                )`,
+                    }}
+                  />
+                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-6 transition-transform duration-300">
                     <Icon className="w-7 h-7 text-white">{item.icon}</Icon>
                   </div>
 
