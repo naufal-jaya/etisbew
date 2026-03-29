@@ -14,7 +14,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden bg-deep-navy"
+      className="relative min-h-screen flex items-center overflow-hidden bg-deep-navy snap-start"
     >
       {/* Background Circuit Pattern */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">

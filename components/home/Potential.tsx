@@ -169,7 +169,7 @@ const Services = () => {
   return (
     <section
       id="services"
-      className="py-24 bg-gray-50 relative overflow-hidden"
+      className="py-24 bg-gray-50 relative overflow-hidden  snap-start"
     >
       <div className="absolute inset-0 circuit-pattern opacity-5 pointer-events-none" />
 

@@ -55,7 +55,7 @@ const HomeNews = ({ posts }: HomeNewsProps) => {
   ];
 
   return (
-    <section className="py-24 bg-white relative overflow-hidden">
+    <section className="py-24 bg-white relative overflow-hidden snap-start">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 -skew-x-12 translate-x-1/3 z-0" />
       

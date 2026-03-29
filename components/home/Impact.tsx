@@ -171,7 +171,7 @@ const Impact = ({
   const [pos, setPos] = useState({ x: 0, y: 0 });
 
   return (
-    <section className="py-24 bg-navy-950 relative overflow-hidden">
+    <section className="py-24 bg-navy-950 relative overflow-hidden  snap-start">
       {/* Background Accents */}
       <div className="absolute inset-0 circuit-pattern opacity-10 pointer-events-none" />
 
@@ -265,7 +265,7 @@ const Impact = ({
 
       {/* Title */}
       <div className="text-center mb-0 relative z-10">
-        <p className="font-bold text-3xl font-bold text-white">
+        <p className="font-bold mx-[10px] text-xl md:text-3xl lg:text-4xl font-normal text-white">
           Partners Throughout The Years
         </p>
       </div>
@@ -289,18 +289,18 @@ const Impact = ({
 
         {/* OVERLAY partners*/}
         <div
-          className="absolute top-0 left-[60px] pointer-events-none z-[999]"
+          className="hidden md:block absolute top-0 pointer-events-none z-[999]"
           style={{
-            width: (RX * 2) / 3,
+            width: "40%",
             height: "100%",
             background: "linear-gradient(to right, #050C16, transparent)",
           }}
         />
 
         <div
-          className="absolute top-0 right-[60px] pointer-events-none z-[999]"
+          className="hidden md:block absolute top-0 right-[0] pointer-events-none z-[999]"
           style={{
-            width: (RX * 2) / 3,
+            width: "40%",
             height: "100%",
             background: "linear-gradient(to left, #050C16, transparent)",
           }}
@@ -337,9 +337,6 @@ const Impact = ({
               <div className="absolute inset-2 rounded-full flex items-center justify-center">
                 {/* Glow background */}
                 <div className="absolute inset-0 rounded-full bg-[#A6D8E9] blur-[25px] opacity-100" />
-
-                {/* Optional: inner glass (biar masih ada feel lama dikit) */}
-                {/* <div className="absolute inset-0 rounded-full bg-white/10 backdrop-blur-sm border border-white/10" /> */}
 
                 {/* Logo */}
                 <div className="relative w-32 h-20 flex items-center justify-center z-10">

@@ -13,7 +13,7 @@ const playfair = Playfair_Display({
 
 const Empowering = () => {
   return (
-    <section className="pt-24 pb-0 bg-navy-950 relative overflow-hidden">
+    <section className="pt-24 pb-0 bg-navy-950 relative overflow-hidden snap-start">
       {/* <div className="absolute inset-0 bg-gradient-to-b from-deep-navy from-[0%] to-[#020617] to-[5%]" /> */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[100px]" />
