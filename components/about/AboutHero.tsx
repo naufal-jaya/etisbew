@@ -1,6 +1,7 @@
-﻿'use client';
+﻿"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 type AboutHeroProps = {
   title: string;
@@ -20,17 +21,18 @@ export default function AboutHero({ title, description }: AboutHeroProps) {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="flex justify-center lg:justify-start"
+            className="flex items-center justify-center"
           >
             <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
-              <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute inset-10 bg-blue-500/20 rounded-full blur-2xl animate-pulse" />
               <div className="relative z-10 text-center">
-                <div className="text-6xl font-bold text-white tracking-tighter border-4 border-white p-4 inline-block">
-                  IEEE
-                </div>
-                <div className="text-xl text-blue-400 mt-2 font-medium tracking-widest">
-                  SB IPB
-                </div>
+                <Image
+                  src="/images/layout/Logo IEEE IPB.png"
+                  alt="example"
+                  quality={100}
+                  width={300}
+                  height={200}
+                />
               </div>
             </div>
           </motion.div>

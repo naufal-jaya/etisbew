@@ -176,7 +176,7 @@ export default async function AboutPage() {
           name: "Afdha",
           role: "Officer",
           subdivision: "Creative",
-          image: "/team/Media & Information_Creative_Officer_Afdha.png",
+          image: "/images/Media & Information_Creative_Officer_Afdha.png",
         },
         {
           _id: "m11",
