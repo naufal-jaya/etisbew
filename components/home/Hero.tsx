@@ -84,7 +84,7 @@ const Hero = () => {
             >
               Advancing Technology
               <br />
-              <span className={`${playfair.className} italic font-normal`}>
+              <span className={`${playfair.className} italic font-normal bg-gradient-to-r from-[#3985CF] to-[#0B5195] bg-clip-text text-transparent`}>
                 for Humanity.
               </span>
             </h1>
@@ -94,16 +94,6 @@ const Hero = () => {
               researchers dedicated to shaping a sustainable and ethical
               technological future.
             </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Button
-                size="lg"
-                className="bg-white text-deep-navy hover:bg-gray-100 font-bold px-8 h-14 rounded-full text-base transition-all hover:scale-105"
-              >
-                Explore Our Mission
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </div>
           </motion.div>
 
           {/* Right Content - 3D/Abstract Visual */}
@@ -113,7 +103,7 @@ const Hero = () => {
             transition={{ duration: 1 }}
             className="relative hidden lg:block"
           >
-            <div className="relative w-full aspect-square max-w-[600px] mx-auto">
+            <div className="relative w-5/6 aspect-square max-w-[600px] mx-auto">
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 rounded-full blur-3xl animate-pulse" />
               <div className="relative z-10 w-full h-full border border-white/10 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center">
                 <div className="w-3/4 h-3/4 border border-white/20 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
