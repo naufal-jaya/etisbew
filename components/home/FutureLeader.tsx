@@ -83,7 +83,7 @@ const Empowering = () => {
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
                 <Image
-                  src="/team/images/home/emp_technical.png"
+                  src="/images/home/home_technical.png"
                   alt="example"
                   fill
                   className="object-cover"
@@ -120,7 +120,7 @@ const Empowering = () => {
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
                 <Image
-                  src="/team/images/home/emp_global.png"
+                  src="/images/home/home_global.png"
                   alt="emp global"
                   fill
                   className="object-cover"
@@ -157,7 +157,7 @@ const Empowering = () => {
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
                 <Image
-                  src="/team/images/home/emp_leadership.png"
+                  src="/images/home/home_leadership.png"
                   alt="emp leadership"
                   fill
                   className="object-cover"

@@ -13,7 +13,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-deep-navy text-white relative overflow-hidden border-t border-white/5">
+    <footer className="bg-deep-navy text-white relative overflow-hidden border-t snap-start border-white/5">
       {/* Background Pattern */}
       <div className="absolute inset-0 circuit-pattern opacity-5 pointer-events-none" />
 
