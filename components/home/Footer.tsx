@@ -8,6 +8,7 @@ import {
   Instagram,
   Twitter,
 } from "lucide-react";
+import Image from 'next/image';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -21,9 +22,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold">
-              IEEE <span className="text-blue-400">IPB</span>
-            </h3>
+            <Image
+                  src="/images/layout/Logo IEEE IPB.png"
+                  alt="example"
+                  quality={100}
+                  width={150}
+                  height={200}
+                />
             <p className="text-slate-400 leading-relaxed text-sm">
               Empowering students through technology and innovation at IPB University.
             </p>
