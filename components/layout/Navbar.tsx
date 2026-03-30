@@ -1,16 +1,16 @@
-﻿'use client';
+﻿"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Menu, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
-  variant?: 'default' | 'light';
+  variant?: "default" | "light";
 }
 
-const Navbar = ({ variant = 'default' }: NavbarProps) => {
+const Navbar = ({ variant = "default" }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -18,40 +18,38 @@ const Navbar = ({ variant = 'default' }: NavbarProps) => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/news', label: 'News' },
-    { href: '#contact', label: 'Contact' },
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/news", label: "News" },
+    { href: "#contact", label: "Contact" },
   ];
 
   // Determine text colors based on scroll state and variant
   // If variant is 'light' (for white pages) and not scrolled, use dark text.
   // Otherwise (scrolled or default dark theme), use white text.
-  const useDarkText = variant === 'light' && !isScrolled;
+  const useDarkText = variant === "light" && !isScrolled;
 
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent',
-        isScrolled
-          ? 'glass-nav py-3 border-white/10'
-          : 'bg-transparent py-5'
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent",
+        isScrolled ? "glass-nav py-3 border-white/10" : "bg-transparent py-5",
       )}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className={cn(
-              "text-2xl font-bold tracking-tight transition-colors",
-              useDarkText ? "text-navy-900" : "text-white"
-            )}>
-              IEEE <span className="text-blue-400 group-hover:text-cyan-400 transition-colors">IPB</span>
+            <div className="text-2xl font-bold tracking-tight transition-colors hover:text-white/70">
+              IEEE{" "}
+              <span className="text-blue-400 group-hover:text-blue-500 transition-colors">
+                IPB
+              </span>
             </div>
           </Link>
 
@@ -63,23 +61,24 @@ const Navbar = ({ variant = 'default' }: NavbarProps) => {
                 href={link.href}
                 className={cn(
                   "px-4 py-2 text-sm font-medium rounded-full transition-all",
-                  useDarkText 
-                    ? "text-slate-600 hover:text-blue-600 hover:bg-blue-50" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                  useDarkText
+                    ? "text-slate-600 hover:text-blue-600 hover:bg-blue-50"
+                    : "text-slate-300 hover:text-white hover:bg-white/5",
                 )}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pl-4">
-            </div>
+            <div className="pl-4"></div>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             className={cn(
               "md:hidden p-2 rounded-full transition-colors",
-              useDarkText ? "text-navy-900 hover:bg-slate-100" : "text-white hover:bg-white/10"
+              useDarkText
+                ? "text-navy-900 hover:bg-slate-100"
+                : "text-white hover:bg-white/10",
             )}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
@@ -102,8 +101,7 @@ const Navbar = ({ variant = 'default' }: NavbarProps) => {
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-4">
-              </div>
+              <div className="pt-4"></div>
             </div>
           </div>
         )}
