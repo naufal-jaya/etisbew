@@ -55,7 +55,7 @@ export default function RoadmapHistory({ timeline }: RoadmapHistoryProps) {
   const items = timeline?.length ? timeline : history;
 
   return (
-    <section className="py-20 bg-deep-navy relative overflow-hidden">
+    <section className="py-20 snap-start bg-deep-navy relative overflow-hidden">
       {/* Background Grid */}
       <div className="absolute inset-0 grid-pattern opacity-10 pointer-events-none" />
 

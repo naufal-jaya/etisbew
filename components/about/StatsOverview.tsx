@@ -23,7 +23,7 @@ type StatsOverviewProps = {
 
 export default function StatsOverview({ stats }: StatsOverviewProps) {
   return (
-    <section className="py-20 bg-deep-navy text-white relative overflow-hidden">
+    <section className="py-20 snap-start bg-deep-navy text-white relative overflow-hidden">
       <div className="absolute inset-0 circuit-pattern opacity-10 pointer-events-none" />
 
       <div className="container mx-auto px-4 relative z-10">

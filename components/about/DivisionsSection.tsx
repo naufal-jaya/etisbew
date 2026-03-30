@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -113,7 +113,7 @@ export default function DivisionsSection({ divisions }: DivisionsSectionProps) {
         return (
           <section
             key={division._id}
-            className="py-16 border-b border-white/5 last:border-0"
+            className="py-16 snap-start border-b border-white/5 last:border-0"
           >
             <div className="container px-4 md:px-6">
               {/* Header */}

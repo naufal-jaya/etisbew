@@ -9,7 +9,7 @@ type AboutHeroProps = {
 
 export default function AboutHero({ title, description }: AboutHeroProps) {
   return (
-    <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden bg-deep-navy pt-20">
+    <section className="relative snap-start min-h-[60vh] flex items-center justify-center overflow-hidden bg-deep-navy pt-20">
       {/* Background Elements */}
       <div className="absolute inset-0 circuit-pattern opacity-20" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-deep-navy/50 to-deep-navy" />

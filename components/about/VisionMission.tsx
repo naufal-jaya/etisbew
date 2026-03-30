@@ -11,7 +11,7 @@ type VisionMissionProps = {
 
 export default function VisionMission({ vision, mission }: VisionMissionProps) {
   return (
-    <section className="py-20 bg-deep-navy relative overflow-hidden">
+    <section className="py-20 snap-start bg-deep-navy relative overflow-hidden">
       <div className="container px-4 md:px-6 relative z-10">
         <div className="grid md:grid-cols-2 gap-8">
           {/* Vision */}
