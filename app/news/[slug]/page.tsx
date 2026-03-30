@@ -6,7 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { urlFor } from "@/sanity/lib/image";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/home/Footer";
+import Footer from "@/components/layout/Footer";
 import { Calendar, User, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

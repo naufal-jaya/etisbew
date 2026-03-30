@@ -5,7 +5,7 @@ import {
 } from "@/sanity/lib/queries";
 import { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/home/Footer";
+import Footer from "@/components/layout/Footer";
 
 // import AboutHero from "@/components/about/AboutHero";
 // import VisionMission from "@/components/about/VisionMission";

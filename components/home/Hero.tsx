@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Globe, Cpu, Zap } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 

@@ -2,7 +2,7 @@ import { client } from "@/sanity/lib/client";
 import { allPostsQuery } from "@/sanity/lib/queries";
 import NewsCard from "@/components/news/NewsCard";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/home/Footer";
+import Footer from "@/components/layout/Footer";
 
 export const revalidate = 60;
 

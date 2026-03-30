@@ -1,13 +1,13 @@
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import Hero from "@/components/home/Hero";
-import HomeAbout from "@/components/home/HomeAbout";
-import HomeDivisions from "@/components/home/HomeDivisions";
+import HomeAbout from "@/components/home/__archive/HomeAbout";
+import HomeDivisions from "@/components/home/__archive/HomeDivisions";
 import Journey from "@/components/home/Potential";
 import Impact from "@/components/home/Impact";
-import HomeNews from "@/components/home/HomeNews";
+import HomeNews from "@/components/home/__archive/HomeNews";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/home/Footer";
+import Footer from "@/components/layout/Footer";
 import Empowering from "@/components/home/FutureLeader";
 
 import {
