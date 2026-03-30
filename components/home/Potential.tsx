@@ -209,7 +209,7 @@ const Services = () => {
                   : "md:justify-self-start"
               }`}
             >
-              <Card className="h-full w-[400px] bg-white border-transparent shadow-md hover:border-transparent hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
+              <Card className="h-full w-full max-w-[400px] bg-white border-transparent shadow-md hover:border-transparent hover:shadow-2xl transition-all duration-500 relative overflow-hidden">
                 <div
                   className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500 mix-blend-soft-light"
                   style={{
