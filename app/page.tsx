@@ -1,9 +1,8 @@
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 import Hero from "@/components/home/Hero";
-import HomeAbout from "@/components/home/__archive/HomeAbout";
 import HomeDivisions from "@/components/home/__archive/HomeDivisions";
-import Journey from "@/components/home/Potential";
+import Potential from "@/components/home/Potential";
 import Impact from "@/components/home/Impact";
 import HomeNews from "@/components/home/__archive/HomeNews";
 import Navbar from "@/components/layout/Navbar";
@@ -36,7 +35,7 @@ export default async function Home() {
       <Hero />
       <Empowering />
       <HomeDivisions divisions={divisions} />
-      <Journey />
+      <Potential />
       <Impact impact={impacts} partner={partner} />
       <HomeNews posts={posts} />
       <Footer />

@@ -1,3 +1,4 @@
+/*UNUSED; Might delete later */
 import { defineType, defineArrayMember } from 'sanity';
 
 export default defineType({

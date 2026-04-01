@@ -9,30 +9,33 @@ import { Code, Users, Trophy, BookOpen, Lock } from "lucide-react";
 const UnlockingPotential = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const [phase, setPhase] = useState<"idle" | "sweeping" | "done">("idle");
-
-  const word = "Potential";
-
-  const sweepDuration = 1.6;
+  const [phase, setPhase] = useState<
+    "idle" | "unlocking" | "revealing" | "done"
+  >("idle");
 
   useEffect(() => {
-    if (isInView && phase === "idle") {
-      // small delay before starting
-      const t1 = setTimeout(() => setPhase("sweeping"), 400);
-      return () => clearTimeout(t1);
-    }
+    if (!isInView || phase !== "idle") return;
+    const t1 = setTimeout(() => setPhase("unlocking"), 400);
+    return () => clearTimeout(t1);
   }, [isInView, phase]);
 
   useEffect(() => {
-    if (phase === "sweeping") {
-      const t2 = setTimeout(() => setPhase("done"), sweepDuration * 1000 + 200);
-      return () => clearTimeout(t2);
-    }
+    if (phase !== "unlocking") return;
+    const t2 = setTimeout(() => setPhase("revealing"), 650);
+    return () => clearTimeout(t2);
   }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "revealing") return;
+    const t3 = setTimeout(() => setPhase("done"), 550);
+    return () => clearTimeout(t3);
+  }, [phase]);
+
+  const isRevealing = phase === "revealing" || phase === "done";
 
   return (
     <div ref={ref} className="relative inline-flex items-baseline gap-3">
-      {/* "Unlocking " plain text */}
+      {/* "Unlocking" plain text */}
       <motion.span
         initial={{ opacity: 0, y: 10 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -42,80 +45,97 @@ const UnlockingPotential = () => {
         Unlocking{" "}
       </motion.span>
 
-      {/* "Potential" with lock animation */}
+      {/* "Potential" word container */}
       <span className="relative inline-block">
         {/* Gradient text — always rendered underneath */}
         <span
           className="text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue select-none"
           aria-hidden="true"
         >
-          {word}
+          Potential
         </span>
 
-        {/* Cover blocks — one per character, slide away as lock passes */}
-        <span
-          className="absolute inset-0 flex items-stretch pointer-events-none"
-          aria-hidden="true"
-        >
-          {word.split("").map((char, i) => {
-            // When does this character's cover start fading?
-            // Distribute evenly: char i reveals at sweep progress (i / word.length)
-            const revealDelay = (i / word.length) * sweepDuration;
-
-            return (
-              <motion.span
-                key={i}
-                className="relative flex-1 bg-white rounded-[2px]"
-                style={{ transformOrigin: "top" }}
-                initial={{ scaleY: 1, opacity: 1 }}
-                animate={
-                  phase === "sweeping" || phase === "done"
-                    ? { scaleY: 0, opacity: 0 }
-                    : {}
-                }
-                transition={{
-                  delay: revealDelay,
-                  duration: 0.25,
-                  ease: "easeInOut",
-                }}
-              />
-            );
-          })}
-        </span>
-
-        {/* Lock icon — sweeps left → right, then disappears */}
-        {(phase === "sweeping" || phase === "idle") && (
+        {/* Single solid cover — fades + scales out on reveal */}
+        {phase !== "done" && (
           <motion.span
-            className="absolute top-1/2 -translate-y-[60%] pointer-events-none z-20"
-            initial={{ left: "-18px" }}
+            className="absolute inset-0 bg-gray-50 rounded-sm pointer-events-none z-10"
+            aria-hidden="true"
+            initial={{ opacity: 1, scale: 1 }}
             animate={
-              phase === "sweeping"
-                ? { left: "calc(100% + 4px)", opacity: [1, 1, 0] }
-                : {}
+              isRevealing
+                ? { opacity: 0, scale: 1.08 }
+                : { opacity: 1, scale: 1 }
             }
-            transition={{
-              duration: sweepDuration,
-              ease: "easeInOut",
-              opacity: { times: [0, 0.85, 1], duration: sweepDuration },
-            }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+          />
+        )}
+
+        {/* Lock icon — centered, unlocks then zooms out */}
+        {phase !== "done" && (
+          <motion.span
+            className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+            aria-hidden="true"
+            initial={{ opacity: 1, scale: 1 }}
+            animate={
+              isRevealing
+                ? { opacity: 0, scale: 2.0 }
+                : { opacity: 1, scale: 1 }
+            }
+            transition={{ duration: 0.45, ease: "easeOut" }}
           >
-            <Lock
-              className="text-accent-cyan drop-shadow-[0_0_8px_rgba(34,211,238,0.9)]"
-              style={{ width: "clamp(20px, 3vw, 36px)", height: "auto" }}
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               strokeWidth={2.5}
-            />
+              style={{
+                width: "clamp(20px, 3vw, 36px)",
+                height: "auto",
+                overflow: "visible",
+                filter: "drop-shadow(0 0 8px rgba(34,211,238,0.9))",
+              }}
+            >
+              {/* Lock body */}
+              <rect
+                x="3"
+                y="11"
+                width="18"
+                height="11"
+                rx="2"
+                ry="2"
+                stroke="currentColor"
+                className="text-accent-cyan"
+              />
+
+              {/* Shackle — pivots open from the right anchor point */}
+              <motion.path
+                d="M7 11V5a5 5 0 0 1 10 0v1"
+                stroke="currentColor"
+                className="text-accent-cyan"
+                style={{
+                  transformOrigin: "17px 11px",
+                }}
+                initial={{ rotate: 0, y: 0 }}
+                animate={
+                  phase === "unlocking" || phase === "revealing"
+                    ? { rotate: -0, y: -2.1 }
+                    : { rotate: 0, y: 0 }
+                }
+                transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+              />
+            </svg>
           </motion.span>
         )}
 
         {/* Screenreader text */}
-        <span className="sr-only">{word}</span>
+        <span className="sr-only">Potential</span>
       </span>
     </div>
   );
 };
 
-// ─── Services Section ──────────────────────────────────────────────────────────
-const Services = () => {
+const Potential = () => {
   const services = [
     {
       icon: Code,
@@ -157,14 +177,6 @@ const Services = () => {
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
 
   return (
     <section
@@ -269,4 +281,4 @@ const Services = () => {
   );
 };
 
-export default Services;
+export default Potential;
