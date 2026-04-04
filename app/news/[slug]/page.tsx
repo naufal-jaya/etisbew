@@ -316,7 +316,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
       <Navbar variant="light" />
 
       {/* Header Section */}
-      <div className="pt-32 pb-12 bg-white">
+      <div className="pt-32  snap-start pb-12 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Breadcrumb / Back */}
           <div className="mb-8">
@@ -385,7 +385,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
       </div>
 
       {/* Featured Image */}
-      <div className="container mx-auto px-4 max-w-5xl mb-16">
+      <div className="container  snap-start mx-auto px-4 max-w-5xl mb-16">
         <div className="relative aspect-[21/9] w-full rounded-2xl overflow-hidden bg-slate-100 shadow-lg">
           {post.coverImage ? (
             <Image
@@ -405,9 +405,9 @@ export default async function SingleNewsPage({ params }: PageProps) {
       </div>
 
       {/* Content Layout */}
-      <div className="container mx-auto px-4 max-w-6xl flex flex-col lg:flex-row-reverse gap-12 pb-24">
+      <div className="container  snap-start mx-auto px-4 max-w-6xl flex flex-col lg:flex-row-reverse gap-12 pb-24">
         {/* Main Content */}
-        <article className="lg:w-2/3">
+        <article className="w-full max-w-4xl mx-auto">
           <div className="prose prose-lg prose-slate max-w-none prose-headings:text-navy-900 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl text-slate-600">
             {post.body && post.body.length > 0 ? (
               <PortableText
@@ -469,67 +469,13 @@ export default async function SingleNewsPage({ params }: PageProps) {
               <p className="text-slate-500 italic">No content available.</p>
             )}
           </div>
-        </article>{" "}
-        {/* Sidebar / Table of Contents */}
-        <aside className="lg:w-1/3">
-          <div className="sticky top-32 space-y-8">
-            {/* Table of Contents (Mockup for now, ideally generated from headings) */}
-            <div className="bg-slate-50 rounded-xl p-6 border border-slate-100">
-              <h3 className="font-bold text-navy-900 mb-4 text-lg">
-                Table of Contents
-              </h3>
-              <nav className="space-y-2">
-                <a
-                  href="#"
-                  className="block text-sm text-slate-600 hover:text-blue-600 transition-colors"
-                >
-                  Introduction
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-slate-600 hover:text-blue-600 transition-colors"
-                >
-                  Key Highlights
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-slate-600 hover:text-blue-600 transition-colors"
-                >
-                  Impact on Community
-                </a>
-                <a
-                  href="#"
-                  className="block text-sm text-slate-600 hover:text-blue-600 transition-colors"
-                >
-                  Future Plans
-                </a>
-              </nav>
-            </div>
-
-            {/* Share / Tags */}
-            <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-sm">
-              <h3 className="font-bold text-navy-900 mb-4 text-sm uppercase tracking-wider">
-                Share this article
-              </h3>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="w-full">
-                  Twitter
-                </Button>
-                <Button variant="outline" size="sm" className="w-full">
-                  LinkedIn
-                </Button>
-                <Button variant="outline" size="sm" className="w-full">
-                  Facebook
-                </Button>
-              </div>
-            </div>
-          </div>
-        </aside>
+        </article>
+        
       </div>
 
       {/* Related Posts (if any) */}
       {post.relatedPosts && post.relatedPosts.length > 0 && (
-        <section className="bg-slate-50 py-24 border-t border-slate-200">
+        <section className="bg-slate-50  snap-start py-24 border-t border-slate-200">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-12">
               <h2 className="text-3xl font-bold text-navy-900">
