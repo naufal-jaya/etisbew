@@ -8,7 +8,8 @@ import { urlFor } from "@/sanity/lib/image";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Calendar, User, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import SharePost from "@/components/news/SharePost";
+import TableContents from "@/components/news/TableOfContents";
 
 export const revalidate = 60;
 
@@ -310,6 +311,19 @@ export default async function SingleNewsPage({ params }: PageProps) {
       notFound();
     }
   }
+  const levelMap: any = {
+    h1: 1,
+    h2: 2,
+    h3: 3,
+  };
+
+  const items = post.body
+    ?.filter((block: any) => ["h1", "h2", "h3"].includes(block.style))
+    .map((block: any) => ({
+      id: block._key,
+      title: block.children.map((child: any) => child.text).join(""),
+      level: levelMap[block.style],
+    }));
 
   return (
     <main className="min-h-screen bg-white">
@@ -335,7 +349,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
               post.categories.map((cat: any) => (
                 <span
                   key={cat.slug.current}
-                  className="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold tracking-wide uppercase"
+                  className="px-3 py-1 rounded-full bg-navy-50 text-navy-500 text-sm font-semibold tracking-wide uppercase"
                 >
                   {cat.title}
                 </span>
@@ -405,7 +419,19 @@ export default async function SingleNewsPage({ params }: PageProps) {
       </div>
 
       {/* Content Layout */}
-      <div className="container  snap-start mx-auto px-4 max-w-6xl flex flex-col lg:flex-row-reverse gap-12 pb-24">
+      <div className="container snap-start mx-auto px-4 max-w-6xl flex flex-col lg:flex-row gap-12 pb-24">
+        <aside className="w-full lg:w-72 shrink-0">
+          <div className="lg:sticky lg:top-32 space-y-8">
+            {/* Share */}
+            <SharePost
+              url={`https://ontalapar.vercel.app/news/${post.slug.current}`}
+              title={post.title}
+            />
+
+            {/* Table of Contents */}
+            <TableContents items={items} />
+          </div>
+        </aside>
         {/* Main Content */}
         <article className="w-full max-w-4xl mx-auto">
           <div className="prose prose-lg prose-slate max-w-none prose-headings:text-navy-900 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl text-slate-600">
@@ -417,18 +443,27 @@ export default async function SingleNewsPage({ params }: PageProps) {
                     normal: ({ children }) => (
                       <p className="mb-4 text-slate-600">{children}</p>
                     ),
-                    h1: ({ children }) => (
-                      <h1 className="text-3xl font-bold text-navy-900 mb-4">
+                    h1: ({ children, value }: any) => (
+                      <h1
+                        id={value._key}
+                        className="text-3xl font-bold text-navy-900 mb-4"
+                      >
                         {children}
                       </h1>
                     ),
-                    h2: ({ children }) => (
-                      <h2 className="text-2xl font-bold text-navy-900 mb-4">
+                    h2: ({ children, value }: any) => (
+                      <h2
+                        id={value._key}
+                        className="text-2xl font-bold text-navy-900 mb-4"
+                      >
                         {children}
                       </h2>
                     ),
-                    h3: ({ children }) => (
-                      <h3 className="text-xl font-bold text-navy-900 mb-4">
+                    h3: ({ children, value }: any) => (
+                      <h3
+                        id={value._key}
+                        className="text-xl font-bold text-navy-900 mb-4"
+                      >
                         {children}
                       </h3>
                     ),
@@ -470,7 +505,6 @@ export default async function SingleNewsPage({ params }: PageProps) {
             )}
           </div>
         </article>
-        
       </div>
 
       {/* Related Posts (if any) */}

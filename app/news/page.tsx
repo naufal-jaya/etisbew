@@ -77,13 +77,13 @@ export default async function NewsPage() {
             Latest News & Updates
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl">
-            Stay informed about our latest events, achievements, and
-            technological insights from the IEEE SB IPB community.
+            Stay informed about the latest events and technological insights
+            from our community
           </p>
         </div>
       </section>
 
-      <section className="py-10 snap-start container mx-auto  px-4">
+      <section className="py-10 container mx-auto  px-4">
         {/* Featured Post */}
         {featuredPost && (
           <div className="mb-16">
