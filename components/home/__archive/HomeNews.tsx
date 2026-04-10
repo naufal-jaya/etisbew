@@ -1,12 +1,11 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import Link from 'next/link';
-import Image from 'next/image';
-import { urlFor } from '@/sanity/lib/image';
-import { format } from 'date-fns';
-import { ArrowRight, Calendar, User } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowRight, Calendar, User } from "lucide-react";
+import NewsCard from "../../news/NewsCard";
+import post from "@/sanity/schemas/post";
 
 interface Post {
   _id: string;
@@ -19,46 +18,52 @@ interface Post {
 }
 
 interface HomeNewsProps {
-  posts: Post[];
+  posts: any;
 }
 
 const HomeNews = ({ posts }: HomeNewsProps) => {
   // Fallback data for development/preview if no posts exist
-  const displayPosts = posts?.length > 0 ? posts : [
-    {
-      _id: '1',
-      title: 'IEEE SB IPB Wins Regional Award',
-      slug: { current: '#' },
-      publishedAt: new Date().toISOString(),
-      excerpt: 'Our student branch has been recognized for outstanding performance in organizing technical workshops and community events.',
-      coverImage: null,
-      author: { name: 'Admin', image: null }
-    },
-    {
-      _id: '2',
-      title: 'Upcoming Workshop: AI & Machine Learning',
-      slug: { current: '#' },
-      publishedAt: new Date().toISOString(),
-      excerpt: 'Join us for a hands-on session exploring the fundamentals of Artificial Intelligence and its applications in modern engineering.',
-      coverImage: null,
-      author: { name: 'Admin', image: null }
-    },
-    {
-      _id: '3',
-      title: 'Tech Talk 2025: Future of Renewable Energy',
-      slug: { current: '#' },
-      publishedAt: new Date().toISOString(),
-      excerpt: 'Industry experts gather to discuss the latest trends and innovations in sustainable energy solutions.',
-      coverImage: null,
-      author: { name: 'Admin', image: null }
-    }
-  ];
+  const displayPosts =
+    posts?.length > 0
+      ? posts
+      : [
+          {
+            _id: "1",
+            title: "IEEE SB IPB Wins Regional Award",
+            slug: { current: "#" },
+            publishedAt: new Date().toISOString(),
+            excerpt:
+              "Our student branch has been recognized for outstanding performance in organizing technical workshops and community events.",
+            coverImage: null,
+            author: { name: "Admin", image: null },
+          },
+          {
+            _id: "2",
+            title: "Upcoming Workshop: AI & Machine Learning",
+            slug: { current: "#" },
+            publishedAt: new Date().toISOString(),
+            excerpt:
+              "Join us for a hands-on session exploring the fundamentals of Artificial Intelligence and its applications in modern engineering.",
+            coverImage: null,
+            author: { name: "Admin", image: null },
+          },
+          {
+            _id: "3",
+            title: "Tech Talk 2025: Future of Renewable Energy",
+            slug: { current: "#" },
+            publishedAt: new Date().toISOString(),
+            excerpt:
+              "Industry experts gather to discuss the latest trends and innovations in sustainable energy solutions.",
+            coverImage: null,
+            author: { name: "Admin", image: null },
+          },
+        ];
 
   return (
     <section className="py-24 bg-white relative overflow-hidden snap-start">
       {/* Background Elements */}
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 -skew-x-12 translate-x-1/3 z-0" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
           <div>
@@ -69,19 +74,26 @@ const HomeNews = ({ posts }: HomeNewsProps) => {
               </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-navy-950">
-              News & <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-cyan">Insights</span>
+              News &{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-cyan">
+                Insights
+              </span>
             </h2>
           </div>
-          
-          <Link 
-            href="/blog" 
+
+          <Link
+            href="/blog"
             className="hidden md:flex items-center gap-2 text-navy-600 hover:text-accent-cyan transition-colors font-medium group"
           >
-            View All News <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            View All News{" "}
+            <ArrowRight
+              size={16}
+              className="group-hover:translate-x-1 transition-transform"
+            />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayPosts.map((post, index) => (
             <motion.div
               key={post._id}
@@ -93,7 +105,6 @@ const HomeNews = ({ posts }: HomeNewsProps) => {
             >
               <Link href={post.slug.current !== '#' ? `/blog/${post.slug.current}` : '#'} className="block h-full">
                 <article className="h-full flex flex-col bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  {/* Image Container */}
                   <div className="relative h-56 overflow-hidden bg-navy-50">
                     {post.coverImage ? (
                       <Image
@@ -114,7 +125,6 @@ const HomeNews = ({ posts }: HomeNewsProps) => {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="flex-1 p-6 flex flex-col">
                     <div className="flex items-center gap-4 text-xs text-gray-400 mb-4">
                       <div className="flex items-center gap-1">
@@ -143,15 +153,17 @@ const HomeNews = ({ posts }: HomeNewsProps) => {
               </Link>
             </motion.div>
           ))}
-        </div>
-        
-        <div className="mt-10 text-center md:hidden">
-          <Link 
-            href="/blog" 
-            className="inline-flex items-center gap-2 text-navy-600 hover:text-accent-cyan transition-colors font-medium"
-          >
-            View All News <ArrowRight size={16} />
-          </Link>
+        </div> */}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[...displayPosts]
+            .sort((a, b) => Number(b.featured) - Number(a.featured))
+            .slice(0, 3)
+            .map((post) => (
+              <div key={post._id}>
+                <NewsCard post={post} />
+              </div>
+            ))}
         </div>
       </div>
     </section>

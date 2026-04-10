@@ -14,6 +14,7 @@ import {
   latestPostsQuery,
   impactQuery,
   impactPartnersQuery,
+  allPostsQuery
 } from "@/sanity/lib/queries";
 
 export const revalidate = 60; // Revalidate every 60 seconds
