@@ -1,18 +1,103 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Calendar, User } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { NormalCard } from "../news/NewsCard";
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
 
-interface Post {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  publishedAt: string;
-  excerpt: string;
-  coverImage: any;
-  author: { name: string; image: any };
-}
+const LINES = ["lorem ipsum sir dolor amet", "beli ikan di warung pak jamet"];
+
+const TYPING_SPEED = 36;
+const LINE_GAP = 120;
+
+const useTypingSequence = (lines: string[], start: boolean) => {
+  const [typed, setTyped] = useState<string[]>(Array(lines.length).fill(""));
+  const [currentLine, setCurrentLine] = useState(0);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!start) return;
+
+    if (currentLine >= lines.length) {
+      setTimeout(() => setDone(true), 300);
+      return;
+    }
+
+    const line = lines[currentLine];
+    let i = 0;
+
+    const tick = setInterval(() => {
+      i++;
+      setTyped((prev) => {
+        const next = [...prev];
+        next[currentLine] = line.slice(0, i);
+        return next;
+      });
+
+      if (i >= line.length) {
+        clearInterval(tick);
+        setTimeout(() => setCurrentLine((c) => c + 1), LINE_GAP);
+      }
+    }, TYPING_SPEED);
+
+    return () => clearInterval(tick);
+  }, [currentLine, start]);
+
+  return { typed, done };
+};
+
+const TypingTitle = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+
+  const { typed, done } = useTypingSequence(LINES, isInView);
+
+  const activeLine = LINES.findIndex(
+    (line, i) => typed[i]?.length < line.length,
+  );
+
+  return (
+    <div ref={ref} className="min-h-[72px]">
+      <div
+        className={cn(
+          "transition-all duration-300 space-y-1",
+          done ? "opacity-0 h-0 overflow-hidden" : "opacity-100",
+        )}
+      >
+        {LINES.map((_, i) => (
+          <div
+            key={i}
+            className="font-mono text-sm font-semibold leading-relaxed text-cyan-500 min-h-[1.5em] [text-shadow:0_0_6px_rgba(34,211,238,0.8)]"
+          >
+            {typed[i]}
+            {i === activeLine && (
+              <span className="inline-block w-[2px] h-[1em] bg-cyan-500 ml-[2px] align-text-bottom animate-[blink_0.7s_step-end_infinite]" />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div
+        className={cn(
+          "transition-all duration-500",
+          done
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-2 absolute",
+        )}
+      >
+        <h2 className="text-4xl md:text-5xl font-bold text-navy-950">
+          News &{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-cyan">
+            Insights
+          </span>
+        </h2>
+      </div>
+    </div>
+  );
+};
 
 interface NewsInsightProps {
   posts: any;
@@ -56,24 +141,11 @@ const NewsInsight = ({ posts }: NewsInsightProps) => {
         ];
 
   return (
-    <section className="py-24 bg-white relative overflow-hidden snap-start">
+    <section className="py-32 bg-white relative overflow-hidden snap-start">
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gray-50 -skew-x-12 translate-x-1/3 z-0" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-px w-12 bg-accent-blue" />
-              <span className="text-accent-blue font-bold tracking-widest uppercase text-xs">
-                Latest Updates
-              </span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-navy-950">
-              News &{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-blue to-accent-cyan">
-                Insights
-              </span>
-            </h2>
-          </div>
+          <TypingTitle />
 
           <Link
             href="/blog"
@@ -87,7 +159,7 @@ const NewsInsight = ({ posts }: NewsInsightProps) => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           {[...displayPosts]
             .sort((a, b) => Number(b.featured) - Number(a.featured))
             .slice(0, 3)

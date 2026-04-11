@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Code, Users, Trophy, BookOpen, Lock } from "lucide-react";
 
-// ─── Lock Unlock Heading ───────────────────────────────────────────────────────
 const UnlockingPotential = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -34,8 +33,7 @@ const UnlockingPotential = () => {
   const isRevealing = phase === "revealing" || phase === "done";
 
   return (
-    <div ref={ref} className="relative inline-flex items-baseline gap-3">
-      {/* "Unlocking" plain text */}
+    <div ref={ref} className="relative pt-4 inline-flex items-baseline gap-3">
       <motion.span
         initial={{ opacity: 0, y: 10 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -45,9 +43,7 @@ const UnlockingPotential = () => {
         Unlocking{" "}
       </motion.span>
 
-      {/* "Potential" word container */}
       <span className="relative inline-block">
-        {/* Gradient text — always rendered underneath */}
         <span
           className="text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue select-none"
           aria-hidden="true"
@@ -55,7 +51,6 @@ const UnlockingPotential = () => {
           Potential
         </span>
 
-        {/* Single solid cover — fades + scales out on reveal */}
         {phase !== "done" && (
           <motion.span
             className="absolute inset-0 bg-gray-50 rounded-sm pointer-events-none z-10"
@@ -70,7 +65,6 @@ const UnlockingPotential = () => {
           />
         )}
 
-        {/* Lock icon — centered, unlocks then zooms out */}
         {phase !== "done" && (
           <motion.span
             className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
@@ -183,8 +177,6 @@ const Potential = () => {
       id="services"
       className="py-24 bg-gray-50 relative overflow-hidden  snap-start"
     >
-      <div className="absolute inset-0 circuit-pattern opacity-5 pointer-events-none" />
-
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <motion.div
@@ -194,7 +186,7 @@ const Potential = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 flex justify-center"
         >
-          <UnlockingPotential />
+          <UnlockingPotential/>
         </motion.div>
 
         {/* Services Grid */}
