@@ -10,7 +10,6 @@ export const revalidate = 60;
 export default async function NewsPage() {
   const fetchedPosts = await client.fetch(allPostsQuery);
 
-  // Placeholder data for when Sanity is empty
   const placeholderPosts = [
     {
       _id: "1",
@@ -62,7 +61,6 @@ export default async function NewsPage() {
     <main className="min-h-screen bg-slate-50">
       <Navbar />
 
-      {/* Header */}
       <section className="pt-32 pb-12 snap-start bg-deep-navy relative overflow-hidden">
         <div className="absolute inset-0 circuit-pattern opacity-10" />
         <Image
@@ -74,7 +72,7 @@ export default async function NewsPage() {
         />
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Latest News & Updates
+            Latest News & Insights
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl">
             Stay informed about the latest events and technological insights
@@ -84,7 +82,6 @@ export default async function NewsPage() {
       </section>
 
       <section className="py-10 container mx-auto  px-4">
-        {/* Featured Post */}
         {featuredPost && (
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-navy-900 mb-8 flex items-center gap-2">
@@ -98,7 +95,6 @@ export default async function NewsPage() {
           </div>
         )}
 
-        {/* Recent Posts Grid */}
         <div>
           <h2 className="text-2xl font-bold text-navy-900 mb-8 flex items-center gap-2">
             <div
