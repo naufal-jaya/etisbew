@@ -4,7 +4,7 @@ import Hero from "@/components/home/Hero";
 import HomeDivisions from "@/components/home/__archive/HomeDivisions";
 import Potential from "@/components/home/Potential";
 import Impact from "@/components/home/Impact";
-import HomeNews from "@/components/home/__archive/HomeNews";
+import NewsInsight from "@/components/home/NewsInsight";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import Empowering from "@/components/home/FutureLeader";
@@ -14,14 +14,16 @@ import {
   latestPostsQuery,
   impactQuery,
   impactPartnersQuery,
-  allPostsQuery
+  allPostsQuery,
 } from "@/sanity/lib/queries";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function Home() {
   const divisions = await client.fetch(allDivisionsQuery);
-  const posts = await client.fetch(latestPostsQuery, { limit: 5 });
+  const posts = await client.fetch(allPostsQuery);
+  const featuredPost = posts.find((p: any) => p.featured);
+  const remainingPosts = posts.filter((p: any) => !p.featured);
   const impacts = await client.fetch(impactQuery);
   const partnersData = await client.fetch(impactPartnersQuery);
   const partner = (partnersData || []).map((p: any, i: number) => ({
@@ -38,7 +40,7 @@ export default async function Home() {
       <HomeDivisions divisions={divisions} />
       <Potential />
       <Impact impact={impacts} partner={partner} />
-      <HomeNews posts={posts} />
+      <NewsInsight posts={posts} />
       <Footer />
     </main>
   );
