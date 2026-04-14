@@ -1,92 +1,108 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ['class'],
+  darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   theme: {
     container: {
       center: true,
-      padding: '2rem',
+      padding: "2rem",
       screens: {
-        '2xl': '1400px',
+        "2xl": "1400px",
       },
     },
     extend: {
       colors: {
         // IEEE IPB Inspired Navy Blue Base Palette
         navy: {
-          50: '#E6EBF5',
-          100: '#CCD7EB',
-          200: '#99AFD7',
-          300: '#6687C3',
-          400: '#335FAF',
-          500: '#003C7D', // Primary Navy
-          600: '#003066',
-          700: '#00244E',
-          800: '#0A1A2F', // Updated Base
-          900: '#000C1F',
-          950: '#050C16',
+          50: "#E6EBF5",
+          100: "#CCD7EB",
+          200: "#99AFD7",
+          300: "#6687C3",
+          400: "#335FAF",
+          500: "#003C7D", // Primary Navy
+          600: "#003066",
+          700: "#00244E",
+          800: "#0A1A2F", // Updated Base
+          900: "#000C1F",
+          950: "#050C16",
         },
         // New Design System Colors
-        'deep-navy': '#0A1A2F',
-        'mid-blue': '#134F9A',
-        'slate-blue': '#1E293B',
+        "deep-navy": "#0A1A2F",
+        "mid-blue": "#134F9A",
+        "slate-blue": "#1E293B",
         // Supporting Accent Colors (from IEEE IPB branding)
         accent: {
-          blue: '#00629B',
-          cyan: '#00A9E0',
-          teal: '#0097A9',
-          gold: '#FFB81C',
+          blue: "#00629B",
+          cyan: "#00A9E0",
+          teal: "#0097A9",
+          gold: "#FFB81C",
         },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ['Inter', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ["Inter", "Helvetica", "Arial", "sans-serif"],
       },
       backdropBlur: {
-        xs: '2px',
+        xs: "2px",
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require("tailwindcss-animate")],
+  animation: {
+    "star-float": "star-float 2s ease-in-out forwards",
+    "glow-pulse": "glow-pulse 0.65s ease-in-out infinite",
+  },
+  keyframes: {
+    "star-float": {
+      "0%": { transform: "translate(0,0) scale(1)", opacity: "0" },
+      "15%": { opacity: "1" },
+      "70%": { opacity: "1" },
+      "100%": { transform: "translate(-20px,-20px) scale(0.2)", opacity: "0" },
+    },
+    "glow-pulse": {
+      "0%, 100%": { opacity: "0.35" },
+      "50%": { opacity: "0.9" },
+    },
+  },
 };
 
 export default config;

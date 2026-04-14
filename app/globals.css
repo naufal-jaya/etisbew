@@ -88,6 +88,18 @@
   }
 }
 
+@keyframes star-float {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  15%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translate(var(--star-dx, -20px), var(--star-dy, -20px)) scale(0.2); opacity: 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.9; }
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
