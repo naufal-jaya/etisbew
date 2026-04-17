@@ -1,7 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
-import "./globals.css";
+import {
+  Inter,
+  Playfair_Display,
+  Space_Grotesk,
+  DM_Mono,
+} from "next/font/google";
 import { cn } from "@/lib/utils";
+// @ts-ignore
+import "./globals.css";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space",
+});
+
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-mono",
+});
 
 const inter = Inter({ subsets: ["latin"] });
 
