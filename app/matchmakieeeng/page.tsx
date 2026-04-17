@@ -3,10 +3,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Member, Team, Competition, Notification } from "@/types/database";
+import { Menu, X } from "lucide-react";
 import TeamCard from "@/components/matchmakieeeng/TeamCard";
 import CompetitionCard from "@/components/matchmakieeeng/CompetitionCard";
 import JoinCompetitionForm from "@/components/matchmakieeeng/JoinCompetitionForm";
 import NotificationPanel from "@/components/matchmakieeeng/NotificationPanel";
+import Link from "next/link";
 
 export default function MatchmakingPage() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export default function MatchmakingPage() {
   const [showForm, setShowForm] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -85,7 +88,6 @@ export default function MatchmakingPage() {
     [currentUser?.id],
   );
 
-  // Realtime subscription
   useEffect(() => {
     if (!currentUser) return;
 
@@ -185,96 +187,67 @@ export default function MatchmakingPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#0f0f1a",
-        fontFamily: "'Space Grotesk', sans-serif",
+        background: "#F5F5F5",
       }}
     >
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 100px; }
-        input, select, button { font-family: 'Space Grotesk', sans-serif; }
-        input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
-      `}</style>
+      <nav className="sticky top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent glass-nav py-3 border-white/10">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center space-x-2 group">
+              <div className="text-2xl font-bold tracking-tight transition-colors hover:text-white/70">
+                IEEE{" "}
+                <span className="text-blue-400 group-hover:text-blue-500 transition-colors">
+                  IPB
+                </span>
+              </div>
+            </Link>
 
-      {/* Navbar */}
-      <nav
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-          background: "rgba(15,15,26,0.85)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-          padding: "0 24px",
-          height: "60px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "20px" }}>⚡</span>
-          <span style={{ color: "white", fontWeight: 700, fontSize: "16px" }}>
-            Matchmaking
-          </span>
-          <span
-            style={{
-              background: "rgba(99,102,241,0.15)",
-              border: "1px solid rgba(99,102,241,0.3)",
-              color: "#a5b4fc",
-              fontSize: "10px",
-              fontWeight: 700,
-              padding: "2px 8px",
-              borderRadius: "100px",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            IPB
-          </span>
-        </div>
+            <div className="hidden md:flex items-center gap-8">
+              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
+                @{currentUser.username}
+              </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button
-            onClick={() => setShowForm(true)}
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              border: "none",
-              borderRadius: "10px",
-              padding: "8px 16px",
-              color: "white",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
-          >
-            + Join a Competition
-          </button>
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "8px",
+                  padding: "6px 12px",
+                  color: "rgba(255,255,255,0.4)",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                }}
+              >
+                Logout
+              </button>
+            </div>
 
-          <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
-            @{currentUser.username}
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden p-2 rounded-full transition-colors text-black hover:bg-black/10"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
 
-          <button
-            onClick={handleLogout}
-            style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "8px",
-              padding: "6px 12px",
-              color: "rgba(255,255,255,0.4)",
-              fontSize: "12px",
-              cursor: "pointer",
-            }}
-          >
-            Logout
-          </button>
+          {isMobileMenuOpen && (
+            <div className="md:hidden absolute top-full left-0 right-0 bg-deep-navy/95 backdrop-blur-xl border-b border-black/10 shadow-xl animate-in slide-in-from-top-5">
+              <div className="flex flex-col p-4 space-y-2">
+                <Link
+                  key="/"
+                  href="/"
+                  className="block py-3 px-4 text-slate-300 hover:bg-black/5 hover:text-black rounded-lg transition-colors font-medium"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  bakso
+                </Link>
+                <div className="pt-4"></div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -300,7 +273,7 @@ export default function MatchmakingPage() {
                 marginBottom: "20px",
               }}
             >
-              <h2 style={{ color: "white", fontWeight: 700, fontSize: "20px" }}>
+              <h2 style={{ color: "black", fontWeight: 700, fontSize: "20px" }}>
                 My Teams
               </h2>
               <button
@@ -327,7 +300,7 @@ export default function MatchmakingPage() {
                       top: "-4px",
                       right: "-4px",
                       background: "#ef4444",
-                      color: "white",
+                      color: "black",
                       fontSize: "10px",
                       fontWeight: 700,
                       width: "16px",
@@ -407,7 +380,7 @@ export default function MatchmakingPage() {
           <div>
             <h2
               style={{
-                color: "white",
+                color: "black",
                 fontWeight: 700,
                 fontSize: "20px",
                 marginBottom: "20px",
@@ -467,7 +440,7 @@ export default function MatchmakingPage() {
           <div style={{ position: "sticky", top: "80px" }}>
             <h2
               style={{
-                color: "white",
+                color: "black",
                 fontWeight: 700,
                 fontSize: "20px",
                 marginBottom: "20px",
