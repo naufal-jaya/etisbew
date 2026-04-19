@@ -1,8 +1,6 @@
 # IEEE Student Branch IPB Website
 
-A modern, minimalist company-profile website built with Next.js (App Router), TypeScript, Tailwind CSS, and Sanity CMS. Features a clean, corporate, tech-inspired design with glassmorphism elements and a navy blue base palette inspired by IEEE IPB's branding.
-
-## 🚀 Features
+## Features
 
 - **Modern Tech Stack**: Next.js 14 with App Router, TypeScript, Tailwind CSS
 - **Headless CMS**: Sanity v3 for content management with rich text editing
@@ -13,28 +11,28 @@ A modern, minimalist company-profile website built with Next.js (App Router), Ty
 - **SEO Optimized**: Meta tags, semantic HTML, and optimized images
 - **Component Library**: shadcn-ui components with custom styling
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you begin, ensure you have installed:
 - Node.js 18.x or higher
 - npm, yarn, or pnpm package manager
 - Git
 
-## 🛠️ Installation
+## Installation
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd "Web IEEE"
+   cd <directory-name>
    ```
 
 2. **Install dependencies**
    ```bash
    npm install
    # or
-   yarn install
-   # or
    pnpm install
+   # or
+   bun install
    ```
 
 3. **Set up environment variables**
@@ -53,7 +51,7 @@ Before you begin, ensure you have installed:
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
    ```
 
-## 🎨 Sanity CMS Setup
+## Sanity CMS Setup
 
 1. **Create a Sanity account**
    - Go to [sanity.io](https://www.sanity.io/)
@@ -81,7 +79,7 @@ Before you begin, ensure you have installed:
    - Navigate to `http://localhost:3000/studio`
    - Log in with your Sanity credentials
 
-## 🏃 Running the Development Server
+## Running the Development Server
 
 ```bash
 npm run dev
@@ -95,7 +93,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the website.
 
 Access Sanity Studio at [http://localhost:3000/studio](http://localhost:3000/studio).
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Web IEEE/
@@ -135,11 +133,11 @@ Web IEEE/
 └── tsconfig.json           # TypeScript configuration
 ```
 
-## 🎨 Design System
+## Design System
 
 ### Color Palette
 
-Based on IEEE IPB's Instagram branding:
+Based on IEEE IPB's branding:
 
 - **Navy Blue (Primary)**: `#003C7D` - Main brand color
 - **Accent Colors**:
@@ -159,117 +157,6 @@ Three utility classes for glassmorphism effects:
 - `.glass` - Light glass effect
 - `.glass-card` - Card glass effect with more opacity
 - `.glass-dark` - Dark glass effect for hero sections
-
-## 📝 Content Management
-
-### Sanity Studio Access
-
-1. Navigate to `/studio` in your browser
-2. Log in with your Sanity credentials
-3. Manage content types:
-   - **Blog Posts**: Create and edit blog articles
-   - **Authors**: Manage author profiles
-   - **Categories**: Organize blog posts
-   - **Services**: Define company services
-   - **Team Members**: Add team member profiles
-   - **About**: Edit mission, vision, and values
-   - **Site Settings**: Configure site-wide settings
-
-### Creating Your First Blog Post
-
-1. Go to Sanity Studio (`/studio`)
-2. Click "Blog Post" in the sidebar
-3. Fill in:
-   - Title
-   - Slug (auto-generated from title)
-   - Author (select from authors)
-   - Cover Image
-   - Excerpt
-   - Categories
-   - Published Date
-   - Body content (rich text)
-4. Click "Publish"
-
-## 🚀 Deployment
-
-### Deploy to Vercel (Recommended)
-
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com)
-3. Import your repository
-4. Add environment variables
-5. Deploy
-
-### Environment Variables for Production
-
-Make sure to set all environment variables in your hosting platform:
-- `NEXT_PUBLIC_SANITY_PROJECT_ID`
-- `NEXT_PUBLIC_SANITY_DATASET`
-- `NEXT_PUBLIC_SANITY_API_VERSION`
-- `SANITY_API_TOKEN`
-- `NEXT_PUBLIC_SITE_URL`
-
-## 🔧 Customization
-
-### Changing Colors
-
-Edit `tailwind.config.ts` to modify the color palette:
-
-```typescript
-colors: {
-  navy: {
-    500: '#003C7D', // Change primary navy color
-    // ... other shades
-  },
-  accent: {
-    cyan: '#00A9E0', // Change accent colors
-    // ...
-  },
-}
-```
-
-### Adding New Sections
-
-1. Create a new component in `components/sections/`
-2. Import it in `app/page.tsx`
-3. Add it to the page structure
-
-### Modifying Content Schemas
-
-1. Edit or create schema files in `sanity/schemas/`
-2. Update `sanity/schema.ts` to include new schemas
-3. Restart the dev server
-
-## 📚 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-For questions or issues:
-- Open an issue on GitHub
-- Contact: contact@ieee.ipb.ac.id
-
-## 🙏 Acknowledgments
-
-- Design inspired by IEEE IPB Instagram (@ieeesbipb)
-- Built with Next.js, Sanity, and Tailwind CSS
-- UI components from shadcn-ui
 
 ---
 

@@ -1,30 +1,46 @@
-import { client } from '@/sanity/lib/client';
-import { allDivisionsQuery, latestPostsQuery } from '@/sanity/lib/queries';
-import Hero from '@/components/sections/Hero';
-import HomeAbout from '@/components/sections/HomeAbout';
-import HomeDivisions from '@/components/sections/HomeDivisions';
-import Services from '@/components/sections/Services';
-import HomeStats from '@/components/sections/HomeStats';
-import HomeNews from '@/components/sections/HomeNews';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/sections/Footer';
+import { client } from "@/sanity/lib/client";
+import { urlFor } from "@/sanity/lib/image";
+import Hero from "@/components/home/Hero";
+import HomeDivisions from "@/components/home/__archive/HomeDivisions";
+import Potential from "@/components/home/Potential";
+import Impact from "@/components/home/Impact";
+import NewsInsight from "@/components/home/NewsInsight";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import Empowering from "@/components/home/FutureLeader";
+
+import {
+  allDivisionsQuery,
+  latestPostsQuery,
+  impactQuery,
+  impactPartnersQuery,
+  allPostsQuery,
+} from "@/sanity/lib/queries";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function Home() {
   const divisions = await client.fetch(allDivisionsQuery);
-  const posts = await client.fetch(latestPostsQuery, { limit: 5 });
+  const posts = await client.fetch(allPostsQuery);
+  const featuredPost = posts.find((p: any) => p.featured);
+  const remainingPosts = posts.filter((p: any) => !p.featured);
+  const impacts = await client.fetch(impactQuery);
+  const partnersData = await client.fetch(impactPartnersQuery);
+  const partner = (partnersData || []).map((p: any, i: number) => ({
+    id: i + 1,
+    src: p.logo ? urlFor(p.logo).url() : "",
+    alt: p.name,
+  }));
 
   return (
     <main className="min-h-screen bg-white">
       <Navbar />
       <Hero />
-      <HomeAbout />
+      <Empowering />
       <HomeDivisions divisions={divisions} />
-      <Services />
-      <HomeStats />
-      <HomeNews posts={posts} />
-      
+      <Potential />
+      <Impact impact={impacts} partner={partner} />
+      <NewsInsight posts={posts} />
       <Footer />
     </main>
   );

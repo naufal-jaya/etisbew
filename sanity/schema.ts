@@ -1,15 +1,17 @@
-import { type SchemaTypeDefinition } from 'sanity';
+import { type SchemaTypeDefinition } from "sanity";
 
-import blockContent from './schemas/blockContent';
-import post from './schemas/post';
-import author from './schemas/author';
-import category from './schemas/category';
-import service from './schemas/service';
-import teamMember from './schemas/teamMember';
-import about from './schemas/about';
-import siteSettings from './schemas/siteSettings';
-import aboutPage from './schemas/aboutPage';
-import division from './schemas/division';
+import blockContent from "./schemas/blockContent";
+import post from "./schemas/post";
+import author from "./schemas/author";
+import category from "./schemas/category";
+import service from "./schemas/service";
+import teamMember from "./schemas/teamMember";
+import siteSettings from "./schemas/siteSettings";
+import aboutPage from "./schemas/aboutPage";
+import division from "./schemas/division";
+import impact from "./schemas/impact";
+import impactPartner from "./schemas/impactPartners";
+
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -19,9 +21,10 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     blockContent,
     service,
     teamMember,
-    about,
     siteSettings,
     aboutPage,
     division,
+    impact,
+    impactPartner,
   ],
 };

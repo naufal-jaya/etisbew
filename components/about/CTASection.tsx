@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 
 const CTASection = () => {
   return (
-    <section className="py-24 bg-deep-navy relative overflow-hidden">
+    <section className="py-24 snap-start bg-deep-navy relative overflow-hidden">
       {/* Background Accents */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />

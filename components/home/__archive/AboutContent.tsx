@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { urlFor } from '@/sanity/lib/image';
-import { PortableText } from '@portabletext/react';
-import { BookOpen, Users, Briefcase, Heart, Zap } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { urlFor } from "@/sanity/lib/image";
+import { PortableText } from "@portabletext/react";
+import { BookOpen, Users, Briefcase, Heart, Zap } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface AboutPageProps {
   aboutData: {
@@ -40,7 +40,7 @@ const AboutContent = ({ aboutData, divisions }: AboutPageProps) => {
         <div className="absolute inset-0">
           <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent-cyan/20 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -88,7 +88,7 @@ const AboutContent = ({ aboutData, divisions }: AboutPageProps) => {
               {/* Introduction Text */}
               <div className="glass-card rounded-2xl p-8 md:p-10">
                 <h2 className="text-3xl font-bold text-navy-700 mb-6">
-                  {aboutData.title || 'About IEEE SB IPB'}
+                  {aboutData.title || "About IEEE SB IPB"}
                 </h2>
                 <div className="prose prose-lg max-w-none text-gray-700">
                   <PortableText value={aboutData.introText} />
@@ -116,7 +116,9 @@ const AboutContent = ({ aboutData, divisions }: AboutPageProps) => {
                     <div className="w-12 h-12 bg-gradient-to-br from-navy-500 to-accent-cyan rounded-lg flex items-center justify-center">
                       <Zap className="text-white" size={24} />
                     </div>
-                    <CardTitle className="text-3xl text-navy-700">Vision</CardTitle>
+                    <CardTitle className="text-3xl text-navy-700">
+                      Vision
+                    </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -140,7 +142,9 @@ const AboutContent = ({ aboutData, divisions }: AboutPageProps) => {
                     <div className="w-12 h-12 bg-gradient-to-br from-navy-500 to-accent-cyan rounded-lg flex items-center justify-center">
                       <Heart className="text-white" size={24} />
                     </div>
-                    <CardTitle className="text-3xl text-navy-700">Mission</CardTitle>
+                    <CardTitle className="text-3xl text-navy-700">
+                      Mission
+                    </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -155,7 +159,9 @@ const AboutContent = ({ aboutData, divisions }: AboutPageProps) => {
                         className="flex items-start gap-3"
                       >
                         <div className="w-6 h-6 bg-accent-cyan rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                          <span className="text-white text-sm font-bold">{index + 1}</span>
+                          <span className="text-white text-sm font-bold">
+                            {index + 1}
+                          </span>
                         </div>
                         <p className="text-gray-700 leading-relaxed">{item}</p>
                       </motion.li>
@@ -183,14 +189,17 @@ const AboutContent = ({ aboutData, divisions }: AboutPageProps) => {
             </h2>
             <div className="w-20 h-1 bg-accent-cyan mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Our organizational structure is built on specialized divisions, each contributing to our mission of excellence.
+              Our organizational structure is built on specialized divisions,
+              each contributing to our mission of excellence.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {divisions.map((division, index) => {
-              const IconComponent = division.icon ? iconMap[division.icon] || Users : Users;
-              
+              const IconComponent = division.icon
+                ? iconMap[division.icon] || Users
+                : Users;
+
               return (
                 <motion.div
                   key={division._id}

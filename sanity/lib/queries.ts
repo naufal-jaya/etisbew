@@ -1,9 +1,10 @@
-import { groq } from 'next-sanity';
+import { groq } from "next-sanity";
 
 // Get all blog posts
 export const allPostsQuery = groq`
   *[_type == "post"] | order(publishedAt desc) {
     _id,
+    featured,
     title,
     slug,
     publishedAt,
@@ -167,9 +168,8 @@ export const relatedPostsQuery = groq`
   }
 `;
 
-// Get about page content
 export const aboutPageQuery = groq`
-  *[_type == "aboutPage"][0] {
+  *[_type == "aboutPage" && isActive == true][0] {
     _id,
     title,
     logo,
@@ -210,3 +210,16 @@ export const divisionsWithMembersQuery = groq`
     }
   }
 `;
+
+// impact
+export const impactQuery = `*[_type == "impact"]{
+  label,
+  value,
+  suffix,
+  icon
+}`;
+
+export const impactPartnersQuery = `*[_type == "impactPartner"]{
+  name,
+  logo
+}`;
