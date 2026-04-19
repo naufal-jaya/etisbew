@@ -1,58 +1,59 @@
 ﻿"use client";
 
-import { motion } from "framer-motion";
+import gsap from "gsap";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
-type AboutHeroProps = {
-  title: string;
-  description: string;
-};
+export default function AboutHero() {
+  const maskRef = useRef(null);
 
-export default function AboutHero({ title, description }: AboutHeroProps) {
+  useEffect(() => {
+    gsap.to(maskRef.current, {
+      keyframes: [
+        { WebkitMaskPosition: "20% 40%", maskPosition: "20% 40%" },
+        { WebkitMaskPosition: "40% 60%", maskPosition: "40% 60%" },
+        { WebkitMaskPosition: "50% 30%", maskPosition: "50% 30%" },
+      ],
+      duration: 2,
+      delay: 0.75,
+      ease: "power2.out",
+    });
+  }, []);
+
   return (
-    <section className="relative snap-start min-h-[60vh] flex items-center justify-center overflow-hidden bg-deep-navy pt-20">
-      {/* Background Elements */}
-      <div className="absolute inset-0 circuit-pattern opacity-20" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-deep-navy/50 to-deep-navy" />
-      <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-          {/* Left: Logo/Brand */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="flex items-center justify-center"
-          >
-            <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
-              <div className="absolute inset-10 bg-blue-500/20 rounded-full blur-2xl animate-pulse" />
-              <div className="relative z-10 text-center">
-                <Image
-                  src="/images/layout/Logo IEEE IPB.png"
-                  alt="example"
-                  quality={100}
-                  width={300}
-                  height={200}
-                />
-              </div>
-            </div>
-          </motion.div>
+    <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-12 ">
+      <div
+        ref={maskRef}
+        className="absolute inset-0 mask-brush flex items-center justify-center"
+        style={{ WebkitMaskPosition: "-20% 50%" }}
+      >
+        <Image
+          src="/images/about/hero-bg.png"
+          alt="hero-bg"
+          fill
+          className="object-contain scale-[1.3] lg:scale-100"
+        />
+      </div>
 
-          {/* Right: Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-center lg:text-left space-y-6"
-          >
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white">
-              {title}
-            </h1>
-
-            <p className="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              {description}
-            </p>
-          </motion.div>
+      <div className="relative z-10 max-w-3xl text-center text-white">
+        <div className="flex justify-center mb-4">
+          <Image
+            src="/images/about/IEEE-White.png"
+            alt="IEEE Logo"
+            width={120}
+            height={120}
+            className="sm:w-48 lg:w-64"
+          />
         </div>
+
+        <p className="text-sm sm:text-base lg:text-lg leading-relaxed">
+          lorem ipsum sir dolor amet lorem ipsum sir dolor amet advancing{" "}
+          <span className="italic lg:text-2xl sm:text-lg font-medium">
+            technology for humanity
+          </span>{" "}
+          dolot amet lorem ipsum sir dolor amet lorem ipsum sir dolor amet lorem
+          ipsum sir dolor amet lorem ipsum sir dolor amet lorem
+        </p>
       </div>
     </section>
   );
