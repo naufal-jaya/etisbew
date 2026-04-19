@@ -6,38 +6,12 @@ import {
 import { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-
-// import AboutHero from "@/components/about/AboutHero";
-// import VisionMission from "@/components/about/VisionMission";
-// import RoadmapHistory from "@/components/about/RoadmapHistory";
-// import StatsOverview from "@/components/about/StatsOverview";
-// import DivisionsSection from "@/components/about/DivisionsSection";
-// import CTASection from "@/components/about/CTASection";
-
-import dynamic from "next/dynamic";
-
-const AboutHero = dynamic(() => import("@/components/about/AboutHero"), {
-  ssr: false,
-});
-const VisionMission = dynamic(
-  () => import("@/components/about/VisionMission"),
-  { ssr: false },
-);
-const RoadmapHistory = dynamic(
-  () => import("@/components/about/RoadmapHistory"),
-  { ssr: false },
-);
-const StatsOverview = dynamic(
-  () => import("@/components/about/StatsOverview"),
-  { ssr: false },
-);
-const DivisionsSection = dynamic(
-  () => import("@/components/about/DivisionsSection"),
-  { ssr: false },
-);
-const CTASection = dynamic(() => import("@/components/about/CTASection"), {
-  ssr: false,
-});
+import AboutHero from "@/components/about/AboutHero";
+import VisionMission from "@/components/about/VisionMission";
+import RoadmapHistory from "@/components/about/RoadmapHistory";
+import StatsOverview from "@/components/about/StatsOverview";
+import DivisionsSection from "@/components/about/DivisionsSection";
+import CTASection from "@/components/about/CTASection";
 
 export const metadata: Metadata = {
   title: "About Us | IEEE Student Branch IPB",
