@@ -136,3 +136,15 @@ html {
   mask-repeat: no-repeat;
   mask-position: -20% 0%;
 }
+
+.mask-brush-shadow {
+  -webkit-mask-image-shadow: url("/images/about/hero-bg.png");
+  -webkit-mask-size-shadow: 400% 150%;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: 60% 80%;
+
+  mask-image: url("/images/about/hero-bg.png");
+  mask-size: 400% 150%;
+  mask-repeat: no-repeat;
+  mask-position: 60% 80%;
+}
