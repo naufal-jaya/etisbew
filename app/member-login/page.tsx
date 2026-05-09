@@ -1,10 +1,21 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { useRouter } from "next/navigation"
+import { createClient } from '@/utils/supabase/client'
+
+const particles = Array.from({ length: 20 }, (_, i) => {
+  const seed = i + 1
+  return {
+    left: `${(seed * 37) % 100}%`,
+    '--dur': `${4 + ((seed * 17) % 80) / 10}s`,
+    '--delay': `-${((seed * 29) % 100) / 10}s`,
+    '--drift': `${((seed * 53) % 100) - 50}px`,
+  } as React.CSSProperties
+})
 
 export default function MemberLoginPage() {
-  const router = useRouter()
+    const router = useRouter()
+  const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -187,13 +198,8 @@ export default function MemberLoginPage() {
 
       {/* Background particles */}
       <div className="particles">
-        {Array.from({length: 20}).map((_, i) => (
-          <div key={i} className="particle" style={{
-            left: `${Math.random() * 100}%`,
-            '--dur': `${4 + Math.random() * 8}s`,
-            '--delay': `-${Math.random() * 10}s`,
-            '--drift': `${(Math.random() - 0.5) * 100}px`,
-          } as any} />
+        {particles.map((style, i) => (
+          <div key={i} className="particle" style={style} />
         ))}
       </div>
 
