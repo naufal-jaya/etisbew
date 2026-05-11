@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 /* ─────────────────────────────────────────────
    DATA
@@ -113,7 +113,7 @@ const TEXT_SIDE: TextSide[] = [
 ];
 
 const badgeY = (i: number) => TOP_PAD + ROW_H * Math.floor(i / 2) + BPH;
-const SVG_H = TOP_PAD + ROW_H * historyData.length + 60;
+const SVG_H = ROW_H * historyData.length - 280;
 
 /* ─────────────────────────────────────────────
    SNAKE PATH via cardinal spline
@@ -202,15 +202,15 @@ export default function OurJourneyPage() {
 
   return (
     <main className="min-h-screen py-14 px-4 bg-gradient-to-b from-[#dce9f7] via-[#ccd8ef] to-[#bdd0ea]">
-      <h1 className="text-center text-6xl font-bold text-slate-700 mb-10 tracking-tight">
+      <h1 className="text-center text-3xl sm:text-6xl font-bold text-slate-700 mb-10 mt-20 tracking-tight">
         Our Journey
       </h1>
 
-      <div className="w-full px-12 mx-auto select-none">
+      <div className="w-full mx-auto select-none">
         <svg
           viewBox={`0 0 ${VW} ${SVG_H}`}
           width="100%"
-          className="overflow-visible block mt-48"
+          className="overflow-visible block mt-4"
         >
           {PATH_POINTS.map((p, i) => (
             <g key={i}>
@@ -300,15 +300,7 @@ export default function OurJourneyPage() {
             const charsPerLine = Math.max(12, Math.floor(maxW / 4.0));
             const descLines = wrapText(item.description, charsPerLine);
             const LINE_H = 13;
-            const blockH = 16 + descLines.length * LINE_H;
-
-            // vertical centering of the whole text block around badge center
-            let titleY: number;
-            if (side === "center") {
-              titleY = by + BPH + 16;
-            } else {
-              titleY = by - 100;
-            }
+            const titleY = by + 50;
 
             return (
               <g

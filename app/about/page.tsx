@@ -214,7 +214,7 @@ export default async function AboutPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-deep-navy">
+    <main className="min-h-screen overflow-x-hidden bg-deep-navy">
       <Navbar />
       <AboutHero />
       <VisionMission vision={vision} mission={mission} />

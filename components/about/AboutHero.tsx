@@ -36,7 +36,7 @@ export default function AboutHero() {
 
   return (
     <section>
-      <div className="relative min-h-screen overflow-visible flex justify-center px-4 sm:px-6 lg:px-12">
+      <div className="relative min-h-[760px] sm:min-h-[840px] lg:min-h-screen overflow-visible flex justify-center px-4 sm:px-6 lg:px-12">
         <div
           ref={bgRef}
           className="absolute inset-0 mask-brush flex items-center justify-center z-10"
@@ -63,7 +63,7 @@ export default function AboutHero() {
           />
         </div>
 
-        <div className="relative pt-48 sm:pt-[240px] md:pt-48 z-10 max-w-3xl flex items-center flex-col text-center text-white">
+        <div className="relative pt-72 lg:pt-64 z-10 max-w-3xl flex items-center flex-col text-center text-white">
           <div className="flex justify-center mb-4">
             <Image
               src="/images/about/IEEE-White.png"
