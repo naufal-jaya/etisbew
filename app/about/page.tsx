@@ -7,7 +7,8 @@ import { Metadata } from "next";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AboutHero from "@/components/about/AboutHero";
-import VisionMission from "@/components/about/VisionMission"
+import VisionMission from "@/components/about/VisionMission";
+import RoadmapHistory from "@/components/about/RoadmapHistory"
 
 export const metadata: Metadata = {
   title: "About Us | IEEE Student Branch IPB",
@@ -216,7 +217,8 @@ export default async function AboutPage() {
     <main className="min-h-screen bg-deep-navy">
       <Navbar />
       <AboutHero />
-      <VisionMission />
+      <VisionMission vision={vision} mission={mission} />
+      <RoadmapHistory />
       <Footer />
     </main>
   );

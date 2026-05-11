@@ -8,7 +8,7 @@ type VisionMissionProps = {
   mission: string[];
 };
 
-export default function VisionMission() {
+export default function VisionMission({ vision, mission }: VisionMissionProps) {
   return (
     <section className="py-32 bg-transparent relative overflow-hidden ">
       <div className="w-full max-w-[540px] mx-auto  mt-12">
@@ -21,9 +21,7 @@ export default function VisionMission() {
         </div>
 
         <p className="text-left ml-12 text-sm sm:text-base lg:text-lg max-w-2xl leading-relaxed text-gray-300">
-          lorem ipsum sir dolor amet lorem ipsum sir dolor amet dolot amet lorem
-          ipsum sir dolor amet lorem ipsum sir dolor amet lorem ipsum sir dolot
-          amet lorem
+          {vision}
         </p>
       </div>
 
@@ -36,9 +34,12 @@ export default function VisionMission() {
         </div>
 
         <ul className="text-left ml-12 space-y-2 text-sm sm:text-base lg:text-lg text-gray-300">
-          <li>• haihaihai</li>
-          <li>• haihiahiahai</li>
-          <li>• haihiahiah</li>
+          {mission.map((item, index) => (
+            <li key={index} className="flex gap-1">
+              <span>•</span>
+              <span>{item}</span>
+            </li>
+          ))}
         </ul>
       </div>
     </section>
