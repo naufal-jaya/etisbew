@@ -9,9 +9,7 @@ import { Calendar, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
-interface Props {
-  params: { slug: string };
-}
+
 
 interface Post {
   _id: string;
@@ -42,8 +40,10 @@ async function getRelatedPosts(slug: string) {
   return posts;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPost(params.slug);
+// @ts-ignore
+export async function generateMetadata(props: any): Promise<Metadata> {
+  const { slug } = await props.params;
+  const post = await getPost(slug);
 
   if (!post) {
     return {
@@ -121,14 +121,16 @@ const portableTextComponents = {
   },
 };
 
-export default async function BlogPostPage({ params }: Props) {
-  const post = await getPost(params.slug);
+// @ts-ignore
+export default async function BlogPostPage(props: any) {
+  const { slug } = await props.params;
+  const post = await getPost(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(params.slug);
+  const relatedPosts = await getRelatedPosts(slug);
 
   return (
     <main className="min-h-screen bg-white">
