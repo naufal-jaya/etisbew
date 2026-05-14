@@ -25,7 +25,6 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/news", label: "News" },
-    { href: "#contact", label: "Contact" },
   ];
 
   const useDarkText = variant === "light" && !isScrolled;

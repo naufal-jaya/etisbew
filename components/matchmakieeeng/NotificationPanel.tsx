@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Notification, Member } from "@/types/database";
+import type { Notification, Member } from "@/types/database";
 
 interface NotificationPanelProps {
   currentUser: Member;

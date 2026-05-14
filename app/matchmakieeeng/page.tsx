@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import MatchmakingClient from "@/components/matchmakieeeng/MatchmakingClient";
 import { createClient } from "@/utils/supabase/server";
-import { Competition, Member, Team } from "@/types/database";
+import type { Competition, Member, Team } from "@/types/database";
 
 export default async function MatchmakingPage() {
   const cookieStore = await cookies();

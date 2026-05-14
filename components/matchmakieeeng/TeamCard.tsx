@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Team, Member } from "@/types/database";
+import type { Team, Member } from "@/types/database";
 
 interface TeamCardProps {
   team: Team;

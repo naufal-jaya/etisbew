@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { Member, Team, Competition } from "@/types/database";
+import type { Member, Team, Competition } from "@/types/database";
 import { Menu, X } from "lucide-react";
 import TeamCard from "@/components/matchmakieeeng/TeamCard";
 import CompetitionCard from "@/components/matchmakieeeng/CompetitionCard";
@@ -68,7 +68,6 @@ export default function MatchmakingClient({
     setCompetitions(compsRes.data ?? []);
     setUnreadCount(notifsRes.data?.length ?? 0);
   }, [currentUser.id, supabase]);
-
 
   // Realtime subscriptions
   useEffect(() => {
