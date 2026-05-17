@@ -9,7 +9,6 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Calendar, User, ArrowLeft } from "lucide-react";
 import SharePost from "@/components/news/SharePost";
-import TableContents from "@/components/news/TableOfContents";
 
 export const revalidate = 60;
 
@@ -312,200 +311,184 @@ export default async function SingleNewsPage({ params }: PageProps) {
       notFound();
     }
   }
-  const levelMap: any = {
-    h1: 1,
-    h2: 2,
-    h3: 3,
-  };
-
-  const items = post.body
-    ?.filter((block: any) => ["h1", "h2", "h3"].includes(block.style))
-    .map((block: any) => ({
-      id: block._key,
-      title: block.children.map((child: any) => child.text).join(""),
-      level: levelMap[block.style],
-    }));
 
   return (
     <main className="min-h-screen bg-white">
       <Navbar variant="light" />
 
-      {/* Header Section */}
-      <div className="pt-32  snap-start pb-12 bg-white">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {/* Breadcrumb / Back */}
-          <div className="mb-8">
-            <Link
-              href="/news"
-              className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to News
-            </Link>
-          </div>
+      <div className="container mx-auto px-4 max-w-5xl lg:px-8">
+        {/* Header Section */}
+        <div className="pt-32 snap-start pb-12">
+          <div className=" ">
+            {/* Breadcrumb / Back */}
+            <div className="mb-8">
+              <Link
+                href="/news"
+                className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to News
+              </Link>
+            </div>
 
-          {/* Categories */}
-          <div className="flex items-center gap-3 mb-6">
-            {post.categories &&
-              post.categories.map((cat: any) => (
-                <span
-                  key={cat.slug.current}
-                  className="px-3 py-1 rounded-full bg-navy-50 text-navy-500 text-sm font-semibold tracking-wide uppercase"
-                >
-                  {cat.title}
-                </span>
-              ))}
-          </div>
+            {/* Categories */}
+            <div className="flex items-center gap-3 mb-6">
+              {post.categories &&
+                post.categories.map((cat: any) => (
+                  <span
+                    key={cat.slug.current}
+                    className="px-3 py-1 rounded-full bg-navy-50 text-navy-500 text-sm font-semibold tracking-wide uppercase"
+                  >
+                    {cat.title}
+                  </span>
+                ))}
+            </div>
 
-          {/* Title */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-navy-900 mb-8 leading-tight">
-            {post.title}
-          </h1>
+            {/* Title */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-navy-900 mb-8 leading-tight">
+              {post.title}
+            </h1>
 
-          {/* Meta Info */}
-          <div className="flex items-center justify-between border-b border-slate-100 pb-8 mb-8">
-            <div className="flex items-center gap-6">
-              {post.author && (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-navy-900">
-                      {post.author.name}
-                    </p>
-                    <p className="text-xs text-slate-500">{post.author.role}</p>
-                  </div>
-                </div>
-              )}
-              <div className="h-8 w-px bg-slate-200" />
-              <div>
-                <p className="text-sm font-medium text-slate-500">
-                  Published on
-                </p>
-                <time
-                  dateTime={post.publishedAt}
-                  className="text-sm font-bold text-navy-900"
-                >
-                  {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+            {/* Meta Info */}
+            <div className="flex items-center justify-between border-b border-slate-300 pb-8 mb-8 w-full">
+              <div className="text-[#888888] font-medium">
+                {post.author && (
+                  <>
+                    Authored by <span className="text-[#000C1F] text-lg font-normal">{post.author.name}</span>
+                  </>
+                )}
+              </div>
+
+              <div className="text-[#888888] font-medium text-right">
+                Published on{" "}
+                <time dateTime={post.publishedAt}>
+                  {(() => {
+                    const d = new Date(post.publishedAt);
+                    const day = d.getDate();
+                    const month = d.toLocaleDateString("en-US", { month: "long" });
+                    const year = d.getFullYear();
+
+                    let suffix = "th";
+                    if (day === 1 || day === 21 || day === 31) suffix = "st";
+                    else if (day === 2 || day === 22) suffix = "nd";
+                    else if (day === 3 || day === 23) suffix = "rd";
+
+                    return (
+                      <>
+                        {day}<sup>{suffix}</sup> {month} {year}
+                      </>
+                    );
+                  })()}
                 </time>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Featured Image */}
-      <div className="container  snap-start mx-auto px-4 max-w-5xl mb-16">
-        <div className="relative aspect-[21/9] w-full rounded-2xl overflow-hidden bg-slate-100 shadow-lg">
-          {post.coverImage ? (
-            <Image
-              src={urlFor(post.coverImage).width(1200).height(600).url()}
-              alt={post.title}
-              fill
-              sizes="100vw"
-              className="object-cover"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400">
-              <span className="text-lg font-medium">No Cover Image</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Content Layout */}
-      <div className="container snap-start mx-auto px-4 max-w-6xl flex flex-col lg:flex-row gap-12 pb-24">
-        <aside className="w-full lg:w-72 shrink-0">
-          <div className="lg:sticky lg:top-32 space-y-8">
-            {/* Share */}
-            <SharePost
-              url={`https://ontalapar.vercel.app/news/${post.slug.current}`}
-              title={post.title}
-            />
-
-            {/* Table of Contents */}
-            <TableContents items={items} />
-          </div>
-        </aside>
-        {/* Main Content */}
-        <article className="w-full max-w-4xl mx-auto">
-          <div className="prose prose-lg prose-slate max-w-none prose-headings:text-navy-900 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl text-slate-600">
-            {post.body && post.body.length > 0 ? (
-              <PortableText
-                value={post.body}
-                components={{
-                  block: {
-                    normal: ({ children }) => (
-                      <p className="mb-4 text-slate-600">{children}</p>
-                    ),
-                    h1: ({ children, value }: any) => (
-                      <h1
-                        id={value._key}
-                        className="text-3xl font-bold text-navy-900 mb-4"
-                      >
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children, value }: any) => (
-                      <h2
-                        id={value._key}
-                        className="text-2xl font-bold text-navy-900 mb-4"
-                      >
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children, value }: any) => (
-                      <h3
-                        id={value._key}
-                        className="text-xl font-bold text-navy-900 mb-4"
-                      >
-                        {children}
-                      </h3>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-blue-500 pl-4 italic text-slate-700 my-4">
-                        {children}
-                      </blockquote>
-                    ),
-                  },
-                  list: {
-                    bullet: ({ children }) => (
-                      <ul className="list-disc pl-5 mb-4 text-slate-600">
-                        {children}
-                      </ul>
-                    ),
-                    number: ({ children }) => (
-                      <ol className="list-decimal pl-5 mb-4 text-slate-600">
-                        {children}
-                      </ol>
-                    ),
-                  },
-                  types: {
-                    image: ({ value }: any) => (
-                      <div className="relative w-full h-96 my-8 rounded-xl overflow-hidden">
-                        <Image
-                          src={urlFor(value).width(800).url()}
-                          alt={value.alt || "Post image"}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 800px"
-                          className="object-cover"
-                        />
-                      </div>
-                    ),
-                  },
-                }}
+        {/* Featured Image */}
+        <div className="snap-start max-w-5xl mx-auto mb-16">
+          <div className="relative aspect-[21/9] w-full rounded-2xl overflow-hidden bg-slate-100 shadow-lg">
+            {post.coverImage ? (
+              <Image
+                src={urlFor(post.coverImage).width(1200).height(600).url()}
+                alt={post.title}
+                fill
+                sizes="100vw"
+                className="object-cover"
+                priority
               />
             ) : (
-              <p className="text-slate-500 italic">No content available.</p>
+              <div className="w-full h-full flex items-center justify-center bg-slate-100 text-slate-400">
+                <span className="text-lg font-medium">No Cover Image</span>
+              </div>
             )}
           </div>
-        </article>
+        </div>
+
+        {/* Content Layout */}
+        <div className="snap-start max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 pb-24">
+          <aside className="w-full lg:w-24 shrink-0">
+            <div className="lg:sticky lg:top-32">
+              <SharePost
+                url={`https://ontalapar.vercel.app/news/${post.slug.current}`}
+                title={post.title}
+              />
+            </div>
+          </aside>
+          {/* Main Content */}
+          <article className="w-full max-w-4xl mx-auto">
+            <div className="prose prose-lg prose-slate max-w-none prose-headings:text-navy-900 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl text-slate-600">
+              {post.body && post.body.length > 0 ? (
+                <PortableText
+                  value={post.body}
+                  components={{
+                    block: {
+                      normal: ({ children }) => (
+                        <p className="mb-4 text-slate-600">{children}</p>
+                      ),
+                      h1: ({ children, value }: any) => (
+                        <h1
+                          id={value._key}
+                          className="text-3xl font-bold text-navy-900 mb-4"
+                        >
+                          {children}
+                        </h1>
+                      ),
+                      h2: ({ children, value }: any) => (
+                        <h2
+                          id={value._key}
+                          className="text-2xl font-bold text-navy-900 mb-4"
+                        >
+                          {children}
+                        </h2>
+                      ),
+                      h3: ({ children, value }: any) => (
+                        <h3
+                          id={value._key}
+                          className="text-xl font-bold text-navy-900 mb-4"
+                        >
+                          {children}
+                        </h3>
+                      ),
+                      blockquote: ({ children }) => (
+                        <blockquote className="border-l-4 border-blue-500 pl-4 italic text-slate-700 my-4">
+                          {children}
+                        </blockquote>
+                      ),
+                    },
+                    list: {
+                      bullet: ({ children }) => (
+                        <ul className="list-disc pl-5 mb-4 text-slate-600">
+                          {children}
+                        </ul>
+                      ),
+                      number: ({ children }) => (
+                        <ol className="list-decimal pl-5 mb-4 text-slate-600">
+                          {children}
+                        </ol>
+                      ),
+                    },
+                    types: {
+                      image: ({ value }: any) => (
+                        <div className="relative w-full h-96 my-8 rounded-xl overflow-hidden">
+                          <Image
+                            src={urlFor(value).width(800).url()}
+                            alt={value.alt || "Post image"}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 800px"
+                            className="object-cover"
+                          />
+                        </div>
+                      ),
+                    },
+                  }}
+                />
+              ) : (
+                <p className="text-slate-500 italic">No content available.</p>
+              )}
+            </div>
+          </article>
+        </div>
       </div>
 
       {/* Related Posts (if any) */}
