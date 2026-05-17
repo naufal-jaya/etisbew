@@ -1,162 +1,126 @@
 # IEEE Student Branch IPB Website
 
+Official website for IEEE Student Branch IPB, built with Next.js, Tailwind CSS, and Sanity CMS.
+
 ## Features
 
-- **Modern Tech Stack**: Next.js 14 with App Router, TypeScript, Tailwind CSS
-- **Headless CMS**: Sanity v3 for content management with rich text editing
-- **Full Blog System**: Blog with categories, tags, and related posts
-- **Responsive Design**: Mobile-first, fully responsive layout
-- **Glassmorphism UI**: Modern semi-transparent design elements with blur effects
-- **Smooth Animations**: Framer Motion for elegant transitions
-- **SEO Optimized**: Meta tags, semantic HTML, and optimized images
-- **Component Library**: shadcn-ui components with custom styling
+- **Modern Tech Stack**: Next.js 15 with App Router, React, TypeScript, and Tailwind CSS
+- **Headless CMS**: Sanity v4 with embedded Studio at `/studio`
+- **Content Pages**: Home, About, News, Blog, and dynamic detail pages
+- **Responsive Design**: Mobile-first layout for desktop, tablet, and mobile screens
+- **Animations**: Framer Motion and GSAP for interactive page transitions and effects
+- **SEO Ready**: Metadata, semantic page structure, and optimized image handling
+- **Reusable Components**: Shared layout, UI, home, about, and news components
 
 ## Prerequisites
 
-Before you begin, ensure you have installed:
+Before you begin, make sure you have installed:
+
 - Node.js 18.x or higher
-- npm, yarn, or pnpm package manager
+- npm
 - Git
 
 ## Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd <directory-name>
-   ```
+1. Install dependencies:
 
-2. **Install dependencies**
    ```bash
    npm install
-   # or
-   pnpm install
-   # or
-   bun install
    ```
 
-3. **Set up environment variables**
-   
-   Copy the `.env.example` file to `.env.local`:
+2. Create a local environment file:
+
    ```bash
    cp .env.example .env.local
    ```
 
-   Update the following environment variables:
+3. Fill in the required Sanity values in `.env.local`:
+
    ```env
    NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id
    NEXT_PUBLIC_SANITY_DATASET=production
-   NEXT_PUBLIC_SANITY_API_VERSION=2024-01-01
-   SANITY_API_TOKEN=your_token_here
-   NEXT_PUBLIC_SITE_URL=http://localhost:3000
    ```
 
-## Sanity CMS Setup
-
-1. **Create a Sanity account**
-   - Go to [sanity.io](https://www.sanity.io/)
-   - Sign up or log in
-
-2. **Create a new project**
-   ```bash
-   npm create sanity@latest
-   ```
-   
-   Or use the Sanity dashboard to create a new project
-
-3. **Get your Project ID**
-   - Find it in your Sanity dashboard
-   - Add it to your `.env.local` file
-
-4. **Create an API token**
-   - Go to your Sanity project settings
-   - Navigate to API → Tokens
-   - Create a new token with "Editor" permissions
-   - Add it to your `.env.local` file
-
-5. **Access Sanity Studio**
-   - Run the development server
-   - Navigate to `http://localhost:3000/studio`
-   - Log in with your Sanity credentials
+   Other values may exist in `.env.example`, but they are not required for the current README setup flow.
 
 ## Running the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the website.
 
-Access Sanity Studio at [http://localhost:3000/studio](http://localhost:3000/studio).
+Sanity Studio is available at [http://localhost:3000/studio](http://localhost:3000/studio).
+
+## Available Scripts
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+## Routes
+
+- `/` - Home page
+- `/about` - About page
+- `/news` - News listing page
+- `/news/[slug]` - News detail page
+- `/blog` - Blog listing page
+- `/blog/[slug]` - Blog detail page
+- `/studio` - Sanity Studio
 
 ## Project Structure
 
-```
-Web IEEE/
-├── app/                      # Next.js App Router pages
-│   ├── blog/                # Blog pages
-│   │   ├── [slug]/         # Dynamic blog post pages
-│   │   └── page.tsx        # Blog listing page
-│   ├── globals.css         # Global styles
-│   ├── layout.tsx          # Root layout
-│   └── page.tsx            # Home page
-├── components/              # React components
-│   ├── layout/             # Layout components (Navbar)
-│   ├── sections/           # Page sections (Hero, About, Services, etc.)
-│   └── ui/                 # UI components (Button, Card, Input, etc.)
-├── lib/                     # Utility functions
-│   └── utils.ts            # Helper functions
-├── sanity/                  # Sanity CMS configuration
-│   ├── lib/                # Sanity client and utilities
-│   │   ├── client.ts       # Sanity client setup
-│   │   ├── image.ts        # Image URL builder
-│   │   └── queries.ts      # GROQ queries
-│   └── schemas/            # Content schemas
-│       ├── about.ts        # About schema
-│       ├── author.ts       # Author schema
-│       ├── blockContent.ts # Rich text schema
-│       ├── category.ts     # Category schema
-│       ├── post.ts         # Blog post schema
-│       ├── service.ts      # Service schema
-│       ├── siteSettings.ts # Site settings schema
-│       └── teamMember.ts   # Team member schema
-├── .env.example            # Environment variables template
-├── next.config.ts          # Next.js configuration
-├── package.json            # Dependencies
-├── postcss.config.js       # PostCSS configuration
-├── sanity.config.ts        # Sanity Studio configuration
-├── tailwind.config.ts      # Tailwind CSS configuration
-└── tsconfig.json           # TypeScript configuration
+```text
+ieeesbipb/
+|-- app/                    # Next.js App Router pages
+|   |-- about/              # About page
+|   |-- blog/               # Blog listing and detail pages
+|   |-- news/               # News listing and detail pages
+|   |-- studio/             # Embedded Sanity Studio route
+|   |-- globals.css         # Global styles and utility classes
+|   |-- layout.tsx          # Root layout and metadata
+|   `-- page.tsx            # Home page
+|-- components/             # React components
+|   |-- about/              # About page sections
+|   |-- home/               # Home page sections
+|   |-- layout/             # Navbar and Footer
+|   |-- news/               # News-specific components
+|   `-- ui/                 # Shared UI primitives
+|-- lib/                    # Shared utilities
+|-- public/                 # Static assets
+|-- sanity/                 # Sanity client, schemas, structure, and config
+|-- types/                  # Shared TypeScript types
+|-- .env.example            # Environment variable template
+|-- next.config.mjs         # Next.js configuration
+|-- package.json            # Scripts and dependencies
+|-- postcss.config.mjs      # PostCSS configuration
+|-- sanity.config.ts        # Sanity Studio configuration
+|-- tailwind.config.ts      # Tailwind CSS configuration
+`-- tsconfig.json           # TypeScript configuration
 ```
 
-## Design System
+## Sanity CMS
 
-### Color Palette
+The project already includes Sanity configuration and schemas. To connect the site to a Sanity project:
 
-Based on IEEE IPB's branding:
+1. Create or open a Sanity project from the Sanity dashboard.
+2. Copy the project ID into `NEXT_PUBLIC_SANITY_PROJECT_ID`.
+3. Set `NEXT_PUBLIC_SANITY_DATASET`, usually `production`.
+4. Run the development server and open `/studio`.
 
-- **Navy Blue (Primary)**: `#003C7D` - Main brand color
-- **Accent Colors**:
-  - Cyan: `#00A9E0`
-  - Blue: `#00629B`
-  - Teal: `#0097A9`
-  - Gold: `#FFB81C`
+The Sanity API version defaults to `2026-01-15` in `sanity/env.ts` when `NEXT_PUBLIC_SANITY_API_VERSION` is not provided.
 
-### Typography
+## Design Notes
 
-- **Font Family**: Inter (fallback: Helvetica, Arial, sans-serif)
-- **Font Weights**: 400 (Regular), 500 (Medium), 600 (Semibold), 700 (Bold)
-
-### Glassmorphism
-
-Three utility classes for glassmorphism effects:
-- `.glass` - Light glass effect
-- `.glass-card` - Card glass effect with more opacity
-- `.glass-dark` - Dark glass effect for hero sections
+- Primary brand color: `#003C7D`
+- Accent colors include cyan `#00A9E0`, blue `#00629B`, teal `#0097A9`, and gold `#FFB81C`
+- Main font: Inter
+- Decorative display font: Playfair Display
+- Global glass utilities are defined in `app/globals.css`
 
 ---
 

@@ -1,56 +1,45 @@
-﻿'use client';
-
-import { motion } from 'framer-motion';
-import { Target, Lightbulb } from 'lucide-react';
+"use client";
 
 type VisionMissionProps = {
   vision: string;
   mission: string[];
 };
 
-
 export default function VisionMission({ vision, mission }: VisionMissionProps) {
   return (
-    <section className="py-20 snap-start bg-deep-navy relative overflow-hidden">
-      <div className="container px-4 md:px-6 relative z-10">
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Vision */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="glass-card-premium p-8 rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent"
-          >
-            <div className="h-12 w-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6">
-              <Target className="w-6 h-6 text-blue-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-4">Our Vision</h3>
-            <p className="text-slate-300 leading-relaxed">{vision}</p>
-          </motion.div>
+    <section className="snap-start relative min-h-screen overflow-hidden bg-transparent px-4 py-48 sm:px-6 sm:py-12 lg:px-8 lg:py-48 flex items-center">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-14 sm:gap-16">
+        <div className="w-full">
+          <div className="relative mb-5 inline-block sm:mb-6">
+            <span className="absolute inset-0 z-0 w-24 bg-gradient-to-r from-[#517CEB] via-[#7694F5]/50 via-[23%] to-transparent sm:w-32"></span>
 
-          {/* Mission */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass-card-premium p-8 rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-transparent"
-          >
-            <div className="h-12 w-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mb-6">
-              <Lightbulb className="w-6 h-6 text-cyan-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-4">Our Mission</h3>
+            <h1 className="relative z-10 px-3 py-2 text-3xl font-extrabold text-white sm:px-4 sm:text-5xl lg:text-6xl">
+              Vision
+            </h1>
+          </div>
 
-            <ul className="space-y-3 text-slate-300">
-              {mission.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 mt-2.5" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+          <p className="max-w-2xl text-left text-sm leading-relaxed text-gray-300 sm:ml-8 sm:text-base lg:ml-12 lg:text-lg">
+            {vision}
+          </p>
+        </div>
+
+        <div className="w-full">
+          <div className="relative mb-5 inline-block sm:mb-6">
+            <span className="absolute inset-0 z-0 w-24 bg-gradient-to-r from-[#517CEB] via-[#7694F5]/50 via-[23%] to-transparent sm:w-32"></span>
+
+            <h1 className="relative z-10 px-3 py-2 text-3xl font-extrabold text-white sm:px-4 sm:text-5xl lg:text-6xl">
+              Mission
+            </h1>
+          </div>
+
+          <ul className="max-w-2xl space-y-3 text-left text-sm leading-relaxed text-gray-300 sm:ml-8 sm:text-base lg:ml-12 lg:text-lg">
+            {mission.map((item, index) => (
+              <li key={index} className="flex items-start gap-3">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#7694F5]" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
