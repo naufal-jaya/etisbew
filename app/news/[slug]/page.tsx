@@ -14,13 +14,14 @@ import TableContents from "@/components/news/TableOfContents";
 export const revalidate = 60;
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function SingleNewsPage({ params }: PageProps) {
-  let post = await client.fetch(postBySlugQuery, { slug: params.slug });
+  const resolvedParams = await params;
+  let post = await client.fetch(postBySlugQuery, { slug: resolvedParams.slug });
 
   if (!post) {
     // Placeholder data for when Sanity is empty
@@ -305,7 +306,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
       },
     ];
 
-    post = placeholderPosts.find((p) => p.slug.current === params.slug);
+    post = placeholderPosts.find((p) => p.slug.current === resolvedParams.slug);
 
     if (!post) {
       notFound();

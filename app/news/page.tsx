@@ -4,6 +4,7 @@ import Image from "next/image";
 import NewsCard from "@/components/news/NewsCard";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import FilteredRecentPosts from "@/components/news/FilteredRecentPosts";
 
 export const revalidate = 60;
 
@@ -85,30 +86,16 @@ export default async function NewsPage() {
         {featuredPost && (
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-navy-900 mb-8 flex items-center gap-2">
-              <div
-                className="w-6 h-8
-                           bg-[radial-gradient(circle_at_100%_120%,#4594E8,transparent_60%),radial-gradient(circle_at_0%_0%,#728EB0,transparent_60%)] bg-navy-800"
-              />
+              <div className="w-6 h-8 bg-[radial-gradient(circle_at_100%_120%,#4594E8,transparent_60%),radial-gradient(circle_at_0%_0%,#728EB0,transparent_60%)] bg-navy-800" />
               Featured Post
             </h2>
             <NewsCard post={featuredPost} />
           </div>
         )}
 
-        <div>
-          <h2 className="text-2xl font-bold text-navy-900 mb-8 flex items-center gap-2">
-            <div
-              className="w-6 h-8
-                           bg-[radial-gradient(circle_at_100%_120%,#4594E8,transparent_60%),radial-gradient(circle_at_0%_0%,#728EB0,transparent_60%)] bg-navy-800"
-            />
-            Recent Posts
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {remainingPosts.map((post: any) => (
-              <NewsCard key={post._id} post={post} />
-            ))}
-          </div>
-        </div>
+        <hr className="border-slate-300 my-8" />
+
+        <FilteredRecentPosts posts={remainingPosts} />
       </section>
 
       <Footer />

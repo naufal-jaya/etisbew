@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 interface Post {
@@ -43,7 +43,8 @@ async function getRelatedPosts(slug: string) {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPost(params.slug);
+  const resolvedParams = await params;
+  const post = await getPost(resolvedParams.slug);
 
   if (!post) {
     return {
@@ -122,13 +123,14 @@ const portableTextComponents = {
 };
 
 export default async function BlogPostPage({ params }: Props) {
-  const post = await getPost(params.slug);
+  const resolvedParams = await params;
+  const post = await getPost(resolvedParams.slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(params.slug);
+  const relatedPosts = await getRelatedPosts(resolvedParams.slug);
 
   return (
     <main className="min-h-screen bg-white">
