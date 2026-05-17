@@ -62,14 +62,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const portableTextComponents = {
   types: {
     image: ({ value }: any) => (
-      <div className="my-8">
-        <Image
-          src={urlFor(value).width(800).url()}
+      <div className="my-8 flex flex-col items-center w-full">
+        <img
+          src={urlFor(value).url()}
           alt={value.alt || 'Blog post image'}
-          width={800}
-          height={600}
-          className="rounded-lg"
+          className="w-full h-auto max-h-[900px] object-contain rounded-lg"
+          loading="lazy"
         />
+        {value.label && (
+          <span className="text-[#7D7D7D] text-sm mt-3 text-center">{value.label}</span>
+        )}
       </div>
     ),
   },

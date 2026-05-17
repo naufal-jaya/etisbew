@@ -324,7 +324,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
             <div className="mb-8">
               <Link
                 href="/news"
-                className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+                className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-navy-500 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to News
@@ -337,7 +337,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
                 post.categories.map((cat: any) => (
                   <span
                     key={cat.slug.current}
-                    className="px-3 py-1 rounded-full bg-navy-50 text-navy-500 text-sm font-semibold tracking-wide uppercase"
+                    className="text-navy-500 text-xl font-bold tracking-wide uppercase"
                   >
                     {cat.title}
                   </span>
@@ -350,11 +350,14 @@ export default async function SingleNewsPage({ params }: PageProps) {
             </h1>
 
             {/* Meta Info */}
-            <div className="flex items-center justify-between border-b border-slate-300 pb-8 mb-8 w-full">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-8 mb-2 w-full">
               <div className="text-[#888888] font-medium">
                 {post.author && (
                   <>
-                    Authored by <span className="text-[#000C1F] text-lg font-normal">{post.author.name}</span>
+                    Authored by{" "}
+                    <span className="text-[#000C1F] text-lg font-normal">
+                      {post.author.name}
+                    </span>
                   </>
                 )}
               </div>
@@ -365,7 +368,9 @@ export default async function SingleNewsPage({ params }: PageProps) {
                   {(() => {
                     const d = new Date(post.publishedAt);
                     const day = d.getDate();
-                    const month = d.toLocaleDateString("en-US", { month: "long" });
+                    const month = d.toLocaleDateString("en-US", {
+                      month: "long",
+                    });
                     const year = d.getFullYear();
 
                     let suffix = "th";
@@ -375,7 +380,8 @@ export default async function SingleNewsPage({ params }: PageProps) {
 
                     return (
                       <>
-                        {day}<sup>{suffix}</sup> {month} {year}
+                        {day}
+                        <sup>{suffix}</sup> {month} {year}
                       </>
                     );
                   })()}
@@ -405,18 +411,14 @@ export default async function SingleNewsPage({ params }: PageProps) {
           </div>
         </div>
 
+        <SharePost
+          url={`https://ontalapar.vercel.app/news/${post.slug.current}`}
+          title={post.title}
+        />
         {/* Content Layout */}
-        <div className="snap-start max-w-6xl mx-auto flex flex-col lg:flex-row gap-8 lg:gap-12 pb-24">
-          <aside className="w-full lg:w-24 shrink-0">
-            <div className="lg:sticky lg:top-32">
-              <SharePost
-                url={`https://ontalapar.vercel.app/news/${post.slug.current}`}
-                title={post.title}
-              />
-            </div>
-          </aside>
+        <div className="snap-start max-w-4xl mx-auto pb-24">
           {/* Main Content */}
-          <article className="w-full max-w-4xl mx-auto">
+          <article className="w-full">
             <div className="prose prose-lg prose-slate max-w-none prose-headings:text-navy-900 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl text-slate-600">
               {post.body && post.body.length > 0 ? (
                 <PortableText
@@ -470,14 +472,16 @@ export default async function SingleNewsPage({ params }: PageProps) {
                     },
                     types: {
                       image: ({ value }: any) => (
-                        <div className="relative w-full h-96 my-8 rounded-xl overflow-hidden">
-                          <Image
-                            src={urlFor(value).width(800).url()}
+                        <div className="my-8 flex flex-col items-center w-full">
+                          <img
+                            src={urlFor(value).url()}
                             alt={value.alt || "Post image"}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 800px"
-                            className="object-cover"
+                            className="w-full h-auto max-h-[900px] object-contain rounded-xl"
+                            loading="lazy"
                           />
+                          {value.label && (
+                            <span className="text-[#7D7D7D] text-sm mt-3 text-center">{value.label}</span>
+                          )}
                         </div>
                       ),
                     },
@@ -490,66 +494,6 @@ export default async function SingleNewsPage({ params }: PageProps) {
           </article>
         </div>
       </div>
-
-      {/* Related Posts (if any) */}
-      {post.relatedPosts && post.relatedPosts.length > 0 && (
-        <section className="bg-slate-50  snap-start py-24 border-t border-slate-200">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <h2 className="text-3xl font-bold text-navy-900">
-                More Like This
-              </h2>
-              <Link
-                href="/news"
-                className="text-blue-600 font-medium hover:underline"
-              >
-                View All News
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Reuse NewsCard or simple links */}
-              {post.relatedPosts.map((related: any) => (
-                <Link
-                  key={related._id}
-                  href={`/news/${related.slug.current}`}
-                  className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                >
-                  <div className="relative h-56">
-                    {related.coverImage ? (
-                      <Image
-                        src={urlFor(related.coverImage)
-                          .width(600)
-                          .height(400)
-                          .url()}
-                        alt={related.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 mb-3">
-                      <Calendar className="w-3 h-3" />
-                      <time>
-                        {new Date(related.publishedAt).toLocaleDateString()}
-                      </time>
-                    </div>
-                    <h3 className="font-bold text-xl text-navy-900 group-hover:text-blue-600 transition-colors mb-2 line-clamp-2">
-                      {related.title}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       <Footer />
     </main>

@@ -40,7 +40,7 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
         </span>
       )}
 
-      <h3 className="font-bold text-navy-900 mb-1 leading-tight text-3xl md:text-4xl">
+      <h3 className="font-bold text-navy-900 mb-1 leading-tight text-3xl md:text-4xl line-clamp-2 md:line-clamp-3">
         {post.title}
       </h3>
 
@@ -80,9 +80,9 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
 export const NormalCard = ({ post, href }: NewsCardProps) => (
   <motion.div
     viewport={{ once: true }}
-    className="group relative bg-white max-h-[350px] grid grid-rows-[4fr_5fr] overflow-hidden border border-slate-100 shadow-[0_0_5px_rgba(0,0,0,0.08)] hover:shadow-lg transition-all duration-300 rounded-[20px] h-full"
+    className="group relative bg-white flex flex-col overflow-hidden border border-slate-100 shadow-[0_0_5px_rgba(0,0,0,0.08)] hover:shadow-lg transition-all duration-300 rounded-[20px] h-full"
   >
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden h-[180px] shrink-0 w-full">
       {post.coverImage ? (
         <Image
           src={urlFor(post.coverImage).width(800).height(450).url()}
@@ -106,7 +106,7 @@ export const NormalCard = ({ post, href }: NewsCardProps) => (
       )}
 
       <Link href={href}>
-        <h3 className="font-bold text-navy-900 leading-tight text-xl">
+        <h3 className="font-bold text-navy-900 leading-tight text-xl line-clamp-2">
           {post.title}
         </h3>
       </Link>

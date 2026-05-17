@@ -42,8 +42,8 @@ export default function FilteredRecentPosts({ posts }: { posts: any[] }) {
               onClick={() => setSelectedCategory(category)}
               className={`flex-shrink-0 whitespace-nowrap border-b-[3px] px-0 pb-[2px] text-lg font-normal leading-none transition-colors ${
                 selectedCategory === category
-                  ? "border-[#65A7ED]  text-black"
-                  : "border-transparent text-black hover:text-[#65A7ED]"
+                  ? "border-[#28588C]  text-black"
+                  : "border-transparent text-black hover:text-[#28588C]"
               }`}
             >
               {category}

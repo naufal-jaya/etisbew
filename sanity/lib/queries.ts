@@ -8,7 +8,7 @@ export const allPostsQuery = groq`
     title,
     slug,
     publishedAt,
-    excerpt,
+    "excerpt": pt::text(body),
     coverImage,
     "author": author->{
       name,
@@ -29,7 +29,7 @@ export const postBySlugQuery = groq`
     title,
     slug,
     publishedAt,
-    excerpt,
+    "excerpt": pt::text(body),
     coverImage,
     body,
     "author": author->{
@@ -51,7 +51,7 @@ export const latestPostsQuery = groq`
     title,
     slug,
     publishedAt,
-    excerpt,
+    "excerpt": pt::text(body),
     coverImage,
     "author": author->{
       name,
@@ -77,7 +77,7 @@ export const postsByCategoryQuery = groq`
     title,
     slug,
     publishedAt,
-    excerpt,
+    "excerpt": pt::text(body),
     coverImage,
     "author": author->{
       name,
@@ -159,7 +159,7 @@ export const relatedPostsQuery = groq`
     title,
     slug,
     publishedAt,
-    excerpt,
+    "excerpt": pt::text(body),
     coverImage,
     "author": author->{
       name,

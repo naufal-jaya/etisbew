@@ -52,6 +52,12 @@ export default defineType({
           type: 'string',
           title: 'Alternative Text',
         },
+        {
+          name: 'label',
+          type: 'string',
+          title: 'Label',
+          description: 'Text displayed below the image',
+        },
       ],
     }),
   ],
