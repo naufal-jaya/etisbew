@@ -175,7 +175,7 @@ const Potential = () => {
   return (
     <section
       id="services"
-      className="py-24 bg-gray-50 relative overflow-hidden  snap-start"
+      className="pt-24 pb-32 bg-gray-50 relative overflow-hidden  snap-start"
     >
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
