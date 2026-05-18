@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     "Engineering",
   ],
   authors: [{ name: "IEEE Student Branch IPB" }],
+  icons: {
+    icon: "/images/layout/Logo_IEEE_IPB_Icon.png",
+    shortcut: "/images/layout/Logo_IEEE_IPB_Icon.png",
+    apple: "/images/layout/Logo_IEEE_IPB_Icon.png",
+  },
   openGraph: {
     title: "IEEE Student Branch IPB",
     description:
