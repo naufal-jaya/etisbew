@@ -15,7 +15,7 @@ const Footer = () => {
         <div className="space-y-6 lg:col-span-2 lg:pr-12">
           <div className="flex items-center gap-3 text-white">
             <Image
-              src="/images/layout/Logo IEEE IPB Icon.png"
+              src="/images/layout/Logo_IEEE_IPB_Icon.png"
               alt="IEEE Student Branch IPB University Logo"
               width={40}
               height={40}

@@ -42,18 +42,16 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className={cn(
-              "text-2xl font-bold tracking-tight transition-colors",
-              useDarkText ? "text-navy-900 hover:text-navy-700" : "text-white hover:text-white/70"
-            )}>
-              IEEE{" "}
-              <span className={cn(
-                "transition-colors",
-                useDarkText ? "text-navy-900 group-hover:text-navy-700" : "text-blue-400 group-hover:text-blue-500"
-              )}>
-                IPB
-              </span>
-            </div>
+            <span
+              aria-label="IEEE IPB Student Branch"
+              role="img"
+              className={cn(
+                "block aspect-[679/116] w-32 shrink-0 bg-current sm:w-40",
+                "[mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [mask-position:left_center] [mask-repeat:no-repeat] [mask-size:contain]",
+                "[-webkit-mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [-webkit-mask-position:left_center] [-webkit-mask-repeat:no-repeat] [-webkit-mask-size:contain]",
+                useDarkText ? "text-black" : "text-white",
+              )}
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -64,9 +62,9 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
                 href={link.href}
                 className={cn(
                   "px-4 py-2 text-sm font-medium rounded-full transition-all",
-                  useDarkText 
-                    ? "text-slate-700 hover:text-black hover:bg-black/5" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                  useDarkText
+                    ? "text-slate-700 hover:text-black hover:bg-black/5"
+                    : "text-slate-300 hover:text-white hover:bg-white/5",
                 )}
               >
                 {link.label}
@@ -91,10 +89,14 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
         </div>
 
         {isMobileMenuOpen && (
-          <div className={cn(
-            "md:hidden absolute top-full left-0 right-0 backdrop-blur-xl border-b shadow-xl animate-in slide-in-from-top-5",
-            useDarkText ? "bg-white/95 border-slate-200" : "bg-deep-navy/95 border-white/10"
-          )}>
+          <div
+            className={cn(
+              "md:hidden absolute top-full left-0 right-0 backdrop-blur-xl border-b shadow-xl animate-in slide-in-from-top-5",
+              useDarkText
+                ? "bg-white/95 border-slate-200"
+                : "bg-deep-navy/95 border-white/10",
+            )}
+          >
             <div className="flex flex-col p-4 space-y-2">
               {navLinks.map((link) => (
                 <Link
@@ -102,9 +104,9 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
                   href={link.href}
                   className={cn(
                     "block py-3 px-4 rounded-lg transition-colors font-medium",
-                    useDarkText 
-                      ? "text-navy-900 hover:bg-slate-100" 
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    useDarkText
+                      ? "text-navy-900 hover:bg-slate-100"
+                      : "text-slate-300 hover:bg-white/5 hover:text-white",
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
