@@ -201,7 +201,7 @@ export default function OurJourneyPage() {
   }, []);
 
   return (
-    <main className="min-h-screen py-14 px-4 bg-gradient-to-b from-[#dce9f7] via-[#ccd8ef] to-[#bdd0ea]">
+    <main className="snap-start min-h-screen py-14 px-4 bg-gradient-to-b from-[#dce9f7] via-[#ccd8ef] to-[#bdd0ea]">
       <h1 className="text-center text-3xl sm:text-6xl font-bold text-slate-700 mb-10 mt-20 tracking-tight">
         Our Journey
       </h1>
