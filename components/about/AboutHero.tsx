@@ -2,8 +2,14 @@
 
 import gsap from "gsap";
 import Image from "next/image";
+import { Playfair_Display } from "next/font/google";
 import { useEffect, useRef } from "react";
 import VisionMission from "./VisionMission";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  style: ["italic"],
+});
 
 export default function AboutHero() {
   const shadowRef = useRef(null);
@@ -74,13 +80,15 @@ export default function AboutHero() {
             />
           </div>
 
-          <p className="text-sm sm:text-base lg:text-lg leading-relaxed">
-            lorem ipsum sir dolor amet lorem ipsum sir dolor amet advancing{" "}
-            <span className="italic lg:text-2xl sm:text-lg font-medium">
-              technology for humanity
+          <p className="text-sm max-w-[450px] sm:text-base lg:text-lg leading-relaxed">
+            We are a student-led community at IPB University {" "}
+            <span
+              className={`italic lg:text-2xl sm:text-lg font-medium`}
+            >
+              advancing technology for humanity
             </span>{" "}
-            dolot amet lorem ipsum sir dolor amet lorem ipsum sir dolor amet
-            lorem ipsum sir dolor amet lorem ipsum sir dolor amet lorem
+            through innovation, collaboration, and meaningful engineering
+            experiences.
           </p>
         </div>
       </div>
