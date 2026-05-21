@@ -62,7 +62,7 @@ export default function AboutHero() {
           style={{ WebkitMaskPosition: "120% 0%" }}
         >
           <Image
-            src="/images/about/hero-shadow.png"
+            src="/images/about/hero-shadow2.png"
             alt="hero-shadow"
             fill
             className="object-contain scale-[1.3] lg:scale-125"
