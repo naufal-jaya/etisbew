@@ -12,6 +12,14 @@ import SharePost from "@/components/news/SharePost";
 
 export const revalidate = 60;
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000");
+
 interface PageProps {
   params: Promise<{
     slug: string;
@@ -412,7 +420,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
         </div>
 
         <SharePost
-          url={`https://ontalapar.vercel.app/news/${post.slug.current}`}
+          url={`${siteUrl}/news/${post.slug.current}`}
           title={post.title}
         />
         {/* Content Layout */}
