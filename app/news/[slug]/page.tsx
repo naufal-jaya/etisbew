@@ -1,4 +1,4 @@
-import { client } from "@/sanity/lib/client";
+import { sanityFetch } from "@/sanity/lib/fetch";
 import { postBySlugQuery } from "@/sanity/lib/queries";
 import { PortableText } from "@portabletext/react";
 import Image from "next/image";
@@ -10,7 +10,8 @@ import Footer from "@/components/layout/Footer";
 import { Calendar, User, ArrowLeft } from "lucide-react";
 import SharePost from "@/components/news/SharePost";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -28,7 +29,9 @@ interface PageProps {
 
 export default async function SingleNewsPage({ params }: PageProps) {
   const resolvedParams = await params;
-  let post = await client.fetch(postBySlugQuery, { slug: resolvedParams.slug });
+  let post = await sanityFetch<any>(postBySlugQuery, {
+    slug: resolvedParams.slug,
+  });
 
   if (!post) {
     // Placeholder data for when Sanity is empty

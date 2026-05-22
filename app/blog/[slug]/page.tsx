@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client';
+import { sanityFetch } from '@/sanity/lib/fetch';
 import { postBySlugQuery, relatedPostsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
 import { PortableText } from '@portabletext/react';
@@ -12,6 +12,9 @@ import { notFound } from 'next/navigation';
 interface Props {
   params: Promise<{ slug: string }>;
 }
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface Post {
   _id: string;
@@ -33,12 +36,12 @@ interface Post {
 }
 
 async function getPost(slug: string): Promise<Post | null> {
-  const post = await client.fetch(postBySlugQuery, { slug });
+  const post = await sanityFetch<Post | null>(postBySlugQuery, { slug });
   return post;
 }
 
 async function getRelatedPosts(slug: string) {
-  const posts = await client.fetch(relatedPostsQuery, { slug });
+  const posts = await sanityFetch(relatedPostsQuery, { slug });
   return posts;
 }
 
