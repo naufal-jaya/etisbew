@@ -40,8 +40,8 @@ async function getPost(slug: string): Promise<Post | null> {
   return post;
 }
 
-async function getRelatedPosts(slug: string) {
-  const posts = await sanityFetch(relatedPostsQuery, { slug });
+async function getRelatedPosts(slug: string): Promise<Post[]> {
+  const posts = await sanityFetch<Post[]>(relatedPostsQuery, { slug });
   return posts;
 }
 

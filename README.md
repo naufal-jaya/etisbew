@@ -53,6 +53,42 @@ Open [http://localhost:3000](http://localhost:3000) to view the website.
 
 Sanity Studio is available at [http://localhost:3000/studio](http://localhost:3000/studio).
 
+## Docker Deployment
+
+Create a Docker environment file:
+
+```bash
+cp .env.example .env
+```
+
+Fill in the Sanity values in `.env`, then run:
+
+```bash
+docker compose --env-file .env up -d --build
+```
+
+The site will be available at [http://localhost:3000](http://localhost:3000).
+
+You can also build and run the image directly:
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_SANITY_PROJECT_ID=your_project_id \
+  --build-arg NEXT_PUBLIC_SANITY_DATASET=production \
+  --build-arg NEXT_PUBLIC_SANITY_API_VERSION=2026-01-15 \
+  --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain.com \
+  -t ieee-sb-ipb-web .
+
+docker run -d \
+  --name ieee-sb-ipb-web \
+  -p 3000:3000 \
+  --env-file .env \
+  --restart unless-stopped \
+  ieee-sb-ipb-web
+```
+
+The app is configured for Next.js standalone output, so the runtime container only ships the production server and required files. Because the content pages use SSR with uncached Sanity fetches, Sanity updates are read on each request as long as the host runs this Node server container.
+
 ## Available Scripts
 
 ```bash
@@ -68,8 +104,6 @@ npm run lint
 - `/about` - About page
 - `/news` - News listing page
 - `/news/[slug]` - News detail page
-- `/blog` - Blog listing page
-- `/blog/[slug]` - Blog detail page
 - `/studio` - Sanity Studio
 
 ## Project Structure
