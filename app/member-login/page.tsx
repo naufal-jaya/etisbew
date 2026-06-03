@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from "next/navigation"
 import { createClient } from '@/utils/supabase/client'
 
@@ -174,6 +175,16 @@ export default function MemberLoginPage() {
           margin-top: 24px;
         }
 
+        .forgot-link {
+          display: inline-block;
+          color: #a5b4fc;
+          font-size: 13px;
+          text-decoration: none;
+          margin-top: 2px;
+        }
+
+        .forgot-link:hover { text-decoration: underline; }
+
         .particles {
           position: fixed; inset: 0;
           pointer-events: none;
@@ -237,6 +248,10 @@ export default function MemberLoginPage() {
                 required
               />
             </div>
+
+            <Link href="/reset-password" className="forgot-link">
+              Lupa password?
+            </Link>
 
             <button type="submit" className="btn-login" disabled={loading}>
               {loading ? 'Masuk...' : 'Masuk ke Matchmaking →'}

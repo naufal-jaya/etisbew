@@ -137,12 +137,19 @@ export default function MatchmakingClient({
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F5F5F5" }}>
-      <nav className="sticky top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-transparent glass-nav py-3 border-white/10">
+    <div style={{ minHeight: "100vh", background: "#121820", color: "white" }}>
+      <nav
+        className="sticky top-0 left-0 right-0 z-50 transition-all duration-500 py-3"
+        style={{
+          background: "rgba(18,24,32,0.92)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(18px)",
+        }}
+      >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2 group">
-              <div className="text-2xl font-bold tracking-tight transition-colors hover:text-white/70">
+              <div className="text-2xl font-bold tracking-tight text-white transition-colors hover:text-white/70">
                 IEEE{" "}
                 <span className="text-blue-400 group-hover:text-blue-500 transition-colors">
                   IPB
@@ -151,17 +158,17 @@ export default function MatchmakingClient({
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
-              <div style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px" }}>
+              <div style={{ color: "rgba(255,255,255,0.72)", fontSize: "13px" }}>
                 @{currentUser.username}
               </div>
               <button
                 onClick={handleLogout}
                 style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "#1A2234",
+                  border: "1px solid rgba(255,255,255,0.12)",
                   borderRadius: "8px",
                   padding: "6px 12px",
-                  color: "rgba(255,255,255,0.4)",
+                  color: "rgba(255,255,255,0.78)",
                   fontSize: "12px",
                   cursor: "pointer",
                 }}
@@ -171,7 +178,7 @@ export default function MatchmakingClient({
             </div>
 
             <button
-              className="md:hidden p-2 rounded-full transition-colors text-black hover:bg-black/10"
+              className="md:hidden p-2 rounded-full transition-colors text-white hover:bg-white/10"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -180,11 +187,17 @@ export default function MatchmakingClient({
           </div>
 
           {isMobileMenuOpen && (
-            <div className="md:hidden absolute top-full left-0 right-0 bg-deep-navy/95 backdrop-blur-xl border-b border-black/10 shadow-xl animate-in slide-in-from-top-5">
+            <div
+              className="md:hidden absolute top-full left-0 right-0 backdrop-blur-xl shadow-xl animate-in slide-in-from-top-5"
+              style={{
+                background: "rgba(26,34,52,0.98)",
+                borderBottom: "1px solid rgba(255,255,255,0.1)",
+              }}
+            >
               <div className="flex flex-col p-4 space-y-2">
                 <Link
                   href="/"
-                  className="block py-3 px-4 text-slate-300 hover:bg-black/5 hover:text-black rounded-lg transition-colors font-medium"
+                  className="block py-3 px-4 text-slate-200 hover:bg-white/10 hover:text-white rounded-lg transition-colors font-medium"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Home
@@ -218,15 +231,15 @@ export default function MatchmakingClient({
                 marginBottom: "20px",
               }}
             >
-              <h2 style={{ color: "black", fontWeight: 700, fontSize: "20px" }}>
+              <h2 style={{ color: "white", fontWeight: 700, fontSize: "20px" }}>
                 My Teams
               </h2>
               <button
                 onClick={() => setShowNotifs(true)}
                 style={{
                   position: "relative",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  background: "#1A2234",
+                  border: "1px solid rgba(255,255,255,0.12)",
                   borderRadius: "10px",
                   width: "36px",
                   height: "36px",
@@ -245,7 +258,7 @@ export default function MatchmakingClient({
                       top: "-4px",
                       right: "-4px",
                       background: "#ef4444",
-                      color: "black",
+                      color: "white",
                       fontSize: "10px",
                       fontWeight: 700,
                       width: "16px",
@@ -260,13 +273,30 @@ export default function MatchmakingClient({
                   </span>
                 )}
               </button>
+              <button
+                onClick={() => setShowForm(true)}
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(99,102,241,0.24), rgba(139,92,246,0.24))",
+                  border: "1px solid rgba(99,102,241,0.36)",
+                  borderRadius: "10px",
+                  padding: "8px 16px",
+                  color: "#c7d2fe",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                + Join Competition
+              </button>
             </div>
 
             {myActiveTeams.length === 0 ? (
               <div
                 style={{
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px dashed rgba(255,255,255,0.1)",
+                  background: "#1A2234",
+                  border: "1px dashed rgba(255,255,255,0.14)",
                   borderRadius: "16px",
                   padding: "40px",
                   textAlign: "center",
@@ -275,7 +305,7 @@ export default function MatchmakingClient({
                 <div style={{ fontSize: "32px", marginBottom: "12px" }}>🏁</div>
                 <p
                   style={{
-                    color: "rgba(255,255,255,0.35)",
+                    color: "rgba(255,255,255,0.72)",
                     fontSize: "14px",
                     marginBottom: "16px",
                   }}
@@ -325,7 +355,7 @@ export default function MatchmakingClient({
           <div>
             <h2
               style={{
-                color: "black",
+                color: "white",
                 fontWeight: 700,
                 fontSize: "20px",
                 marginBottom: "20px",
@@ -334,7 +364,7 @@ export default function MatchmakingClient({
               Available Teams
               <span
                 style={{
-                  color: "rgba(255,255,255,0.25)",
+                  color: "rgba(255,255,255,0.55)",
                   fontWeight: 400,
                   fontSize: "14px",
                   marginLeft: "10px",
@@ -347,14 +377,14 @@ export default function MatchmakingClient({
             {availableTeams.length === 0 ? (
               <div
                 style={{
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px dashed rgba(255,255,255,0.1)",
+                  background: "#1A2234",
+                  border: "1px dashed rgba(255,255,255,0.14)",
                   borderRadius: "16px",
                   padding: "40px",
                   textAlign: "center",
                 }}
               >
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "14px" }}>
+                <p style={{ color: "rgba(255,255,255,0.68)", fontSize: "14px" }}>
                   Belum ada tim yang tersedia
                 </p>
               </div>
@@ -385,7 +415,7 @@ export default function MatchmakingClient({
           <div style={{ position: "sticky", top: "80px" }}>
             <h2
               style={{
-                color: "black",
+                color: "white",
                 fontWeight: 700,
                 fontSize: "20px",
                 marginBottom: "20px",
@@ -397,14 +427,14 @@ export default function MatchmakingClient({
             {competitions.length === 0 ? (
               <div
                 style={{
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px dashed rgba(255,255,255,0.1)",
+                  background: "#1A2234",
+                  border: "1px dashed rgba(255,255,255,0.14)",
                   borderRadius: "16px",
                   padding: "32px",
                   textAlign: "center",
                 }}
               >
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "13px" }}>
+                <p style={{ color: "rgba(255,255,255,0.68)", fontSize: "13px" }}>
                   Belum ada lomba aktif
                 </p>
               </div>

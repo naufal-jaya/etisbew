@@ -174,14 +174,15 @@ export default function JoinCompetitionForm({
 
   const inputStyle = {
     width: "100%",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "#1A2234",
+    border: "1px solid rgba(255,255,255,0.14)",
     borderRadius: "10px",
     padding: "10px 14px",
     color: "white",
     fontSize: "14px",
     outline: "none",
     fontFamily: "inherit",
+    colorScheme: "dark" as const,
   };
 
   const selectStyle = {
@@ -191,7 +192,7 @@ export default function JoinCompetitionForm({
 
   const labelStyle = {
     display: "block" as const,
-    color: "rgba(255,255,255,0.5)",
+    color: "rgba(255,255,255,0.7)",
     fontSize: "12px",
     fontWeight: 600 as const,
     textTransform: "uppercase" as const,
@@ -218,7 +219,7 @@ export default function JoinCompetitionForm({
           width: "100%",
           maxWidth: "640px",
           margin: "0 auto",
-          background: "#12121f",
+          background: "#121820",
           borderRadius: "24px 24px 0 0",
           border: "1px solid rgba(255,255,255,0.08)",
           borderBottom: "none",
@@ -251,7 +252,7 @@ export default function JoinCompetitionForm({
             </h2>
             <p
               style={{
-                color: "rgba(255,255,255,0.35)",
+                color: "rgba(255,255,255,0.68)",
                 fontSize: "13px",
                 margin: 0,
               }}
@@ -262,12 +263,12 @@ export default function JoinCompetitionForm({
           <button
             onClick={handleClose}
             style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              background: "#1A2234",
+              border: "1px solid rgba(255,255,255,0.14)",
               borderRadius: "10px",
               width: "36px",
               height: "36px",
-              color: "rgba(255,255,255,0.5)",
+              color: "rgba(255,255,255,0.72)",
               cursor: "pointer",
               fontSize: "18px",
             }}
@@ -315,7 +316,7 @@ export default function JoinCompetitionForm({
                       ? "rgba(99,102,241,0.2)"
                       : "transparent",
                     border: `1px solid ${!isCustomComp ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`,
-                    color: !isCustomComp ? "#a5b4fc" : "rgba(255,255,255,0.4)",
+                    color: !isCustomComp ? "#a5b4fc" : "rgba(255,255,255,0.72)",
                   }}
                 >
                   Dari daftar
@@ -332,7 +333,7 @@ export default function JoinCompetitionForm({
                       ? "rgba(99,102,241,0.2)"
                       : "transparent",
                     border: `1px solid ${isCustomComp ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`,
-                    color: isCustomComp ? "#a5b4fc" : "rgba(255,255,255,0.4)",
+                    color: isCustomComp ? "#a5b4fc" : "rgba(255,255,255,0.72)",
                   }}
                 >
                   + Tambah sendiri
@@ -523,7 +524,7 @@ export default function JoinCompetitionForm({
                   }}
                 />
                 <span
-                  style={{ color: "rgba(255,255,255,0.7)", fontSize: "14px" }}
+                  style={{ color: "rgba(255,255,255,0.78)", fontSize: "14px" }}
                 >
                   Saya sudah punya anggota tim
                 </span>
@@ -542,7 +543,7 @@ export default function JoinCompetitionForm({
                 {filteredMembers.length > 0 && (
                   <div
                     style={{
-                      background: "#1a1a2e",
+                      background: "#1A2234",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "10px",
                       marginTop: "4px",
@@ -573,7 +574,7 @@ export default function JoinCompetitionForm({
                           background: "none",
                           border: "none",
                           borderBottom: "1px solid rgba(255,255,255,0.05)",
-                          color: "rgba(255,255,255,0.7)",
+                          color: "rgba(255,255,255,0.78)",
                           cursor: "pointer",
                           textAlign: "left",
                           fontSize: "13px",
@@ -582,7 +583,7 @@ export default function JoinCompetitionForm({
                         <span>@{m.username}</span>
                         <span
                           style={{
-                            color: "rgba(255,255,255,0.3)",
+                            color: "rgba(255,255,255,0.62)",
                             fontSize: "12px",
                           }}
                         >
@@ -778,7 +779,7 @@ export default function JoinCompetitionForm({
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: "12px",
                   padding: "12px",
-                  color: "rgba(255,255,255,0.6)",
+                  color: "rgba(255,255,255,0.78)",
                   cursor: "pointer",
                   fontSize: "14px",
                 }}

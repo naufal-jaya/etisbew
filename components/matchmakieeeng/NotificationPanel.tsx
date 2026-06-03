@@ -86,7 +86,7 @@ export default function NotificationPanel({
           width: "360px",
           maxWidth: "100vw",
           height: "100vh",
-          background: "#12121f",
+          background: "#121820",
           borderLeft: "1px solid rgba(255,255,255,0.08)",
           padding: "24px",
           overflowY: "auto",
@@ -121,7 +121,7 @@ export default function NotificationPanel({
             style={{
               background: "none",
               border: "none",
-              color: "rgba(255,255,255,0.4)",
+              color: "rgba(255,255,255,0.72)",
               fontSize: "20px",
               cursor: "pointer",
             }}
@@ -133,7 +133,7 @@ export default function NotificationPanel({
         {loading ? (
           <div
             style={{
-              color: "rgba(255,255,255,0.3)",
+              color: "rgba(255,255,255,0.68)",
               textAlign: "center",
               padding: "40px 0",
             }}
@@ -143,7 +143,7 @@ export default function NotificationPanel({
         ) : notifs.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0" }}>
             <div style={{ fontSize: "40px", marginBottom: "12px" }}>📭</div>
-            <p style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p style={{ color: "rgba(255,255,255,0.68)" }}>
               Belum ada notifikasi
             </p>
           </div>
@@ -161,9 +161,9 @@ export default function NotificationPanel({
                   key={n.id}
                   style={{
                     background: n.is_read
-                      ? "rgba(255,255,255,0.02)"
+                      ? "#1A2234"
                       : "rgba(99,102,241,0.08)",
-                    border: `1px solid ${n.is_read ? "rgba(255,255,255,0.06)" : "rgba(99,102,241,0.2)"}`,
+                    border: `1px solid ${n.is_read ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.24)"}`,
                     borderRadius: "14px",
                     padding: "14px",
                   }}
@@ -192,7 +192,7 @@ export default function NotificationPanel({
                     </span>
                     <span
                       style={{
-                        color: "rgba(255,255,255,0.25)",
+                        color: "rgba(255,255,255,0.55)",
                         fontSize: "11px",
                         fontFamily: "DM Mono, monospace",
                       }}

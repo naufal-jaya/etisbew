@@ -42,9 +42,9 @@ export default function TeamCard({
     <div
       style={{
         background: isMyTeam
-          ? "rgba(99,102,241,0.08)"
-          : "rgba(255,255,255,0.03)",
-        border: `1px solid ${isMyTeam ? "rgba(99,102,241,0.25)" : "rgba(255,255,255,0.08)"}`,
+          ? "linear-gradient(135deg, rgba(99,102,241,0.18), #1A2234)"
+          : "#1A2234",
+        border: `1px solid ${isMyTeam ? "rgba(99,102,241,0.32)" : "rgba(255,255,255,0.1)"}`,
         borderRadius: "16px",
         padding: "16px",
         position: "relative",
@@ -58,7 +58,7 @@ export default function TeamCard({
         .username-tooltip .tooltip {
           visibility: hidden;
           opacity: 0;
-          background: rgba(15,15,26,0.95);
+          background: rgba(18,24,32,0.98);
           border: 1px solid rgba(99,102,241,0.3);
           color: white  ;
           border-radius: 8px;
@@ -93,7 +93,7 @@ export default function TeamCard({
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <h3
               style={{
-                color: "black",
+                color: "white",
                 fontWeight: 600,
                 fontSize: "15px",
                 margin: 0,
@@ -135,7 +135,7 @@ export default function TeamCard({
           </div>
           <p
             style={{
-              color: "rgba(0, 0, 0, 0.77)",
+              color: "rgba(255,255,255,0.68)",
               fontSize: "12px",
               margin: "2px 0 0",
             }}
@@ -169,7 +169,7 @@ export default function TeamCard({
       <div style={{ marginBottom: "12px" }}>
         <p
           style={{
-            color: "rgba(0, 0, 0, 0.77)",
+            color: "rgba(255,255,255,0.62)",
             fontSize: "11px",
             fontWeight: 600,
             textTransform: "uppercase",
@@ -191,7 +191,7 @@ export default function TeamCard({
                   background:
                     m.member_id === team.leader_id
                       ? "rgba(99,102,241,0.2)"
-                      : "rgba(255,255,255,0.07)",
+                      : "rgba(255,255,255,0.08)",
                   border: `1px solid ${m.member_id === team.leader_id ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`,
                   borderRadius: "8px",
                   padding: "3px 10px",
@@ -199,7 +199,7 @@ export default function TeamCard({
                   color:
                     m.member_id === team.leader_id
                       ? "#a5b4fc"
-                      : "rgba(255,255,255,0.7)",
+                      : "rgba(255,255,255,0.78)",
                   cursor: "default",
                   userSelect: "none",
                 }}
@@ -217,7 +217,7 @@ export default function TeamCard({
         <div style={{ marginBottom: "12px" }}>
           <p
             style={{
-              color: "rgba(255,255,255,0.3)",
+              color: "rgba(255,255,255,0.62)",
               fontSize: "11px",
               fontWeight: 600,
               textTransform: "uppercase",
@@ -313,7 +313,7 @@ export default function TeamCard({
         >
           <div
             style={{
-              background: "#1a1a2e",
+              background: "#1A2234",
               border: "1px solid rgba(99,102,241,0.3)",
               borderRadius: "20px",
               padding: "32px",
@@ -325,13 +325,13 @@ export default function TeamCard({
           >
             <div style={{ fontSize: "40px", marginBottom: "12px" }}>🤝</div>
             <h3
-              style={{ color: "black", fontWeight: 700, marginBottom: "8px" }}
+              style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}
             >
               Yakin mau join?
             </h3>
             <p
               style={{
-                color: "rgba(255,255,255,0.5)",
+                color: "rgba(255,255,255,0.72)",
                 fontSize: "14px",
                 marginBottom: "24px",
                 lineHeight: 1.5,
@@ -342,7 +342,7 @@ export default function TeamCard({
                 {team.leader?.username}
               </strong>{" "}
               untuk join tim{" "}
-              <strong style={{ color: "black" }}>{team.name}</strong>. Link WA
+              <strong style={{ color: "white" }}>{team.name}</strong>. Link WA
               akan dibuka otomatis.
             </p>
             <div style={{ display: "flex", gap: "10px" }}>
@@ -354,7 +354,7 @@ export default function TeamCard({
                   border: "1px solid rgba(255,255,255,0.1)",
                   borderRadius: "12px",
                   padding: "10px",
-                  color: "rgba(255,255,255,0.6)",
+                  color: "rgba(255,255,255,0.78)",
                   cursor: "pointer",
                   fontSize: "14px",
                   fontWeight: 500,
@@ -370,7 +370,7 @@ export default function TeamCard({
                   border: "none",
                   borderRadius: "12px",
                   padding: "10px",
-                  color: "black",
+                  color: "white",
                   cursor: "pointer",
                   fontSize: "14px",
                   fontWeight: 600,

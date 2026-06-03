@@ -16,8 +16,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   return (
     <div
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        background: "#1A2234",
+        border: "1px solid rgba(255,255,255,0.1)",
         borderRadius: "14px",
         overflow: "hidden",
         transition: "all 0.2s",
@@ -74,7 +74,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
         </h3>
         <p
           style={{
-            color: "rgba(255,255,255,0.4)",
+            color: "rgba(255,255,255,0.68)",
             fontSize: "12px",
             margin: "0 0 10px",
           }}
@@ -92,7 +92,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           <span
             style={{
               fontSize: "11px",
-              color: isUrgent ? "#f87171" : "rgba(255,255,255,0.4)",
+              color: isUrgent ? "#f87171" : "rgba(255,255,255,0.68)",
               fontFamily: "DM Mono, monospace",
             }}
           >
