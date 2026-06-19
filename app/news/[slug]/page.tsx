@@ -19,7 +19,7 @@ const siteUrl =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000");
+      : "https://ieee-orm.ipb.ac.id");
 
 interface PageProps {
   params: Promise<{
@@ -29,9 +29,14 @@ interface PageProps {
 
 export default async function SingleNewsPage({ params }: PageProps) {
   const resolvedParams = await params;
-  let post = await sanityFetch<any>(postBySlugQuery, {
-    slug: resolvedParams.slug,
-  });
+  let post = null;
+  try {
+    post = await sanityFetch<any>(postBySlugQuery, {
+      slug: resolvedParams.slug,
+    });
+  } catch (error) {
+    console.error("Error fetching post from Sanity:", error);
+  }
 
   if (!post) {
     // Placeholder data for when Sanity is empty
@@ -423,7 +428,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
         </div>
 
         <SharePost
-          url={`${siteUrl}/news/${post.slug.current}`}
+          url={`https://ieee-orm.ipb.ac.id/news/${post.slug.current}`}
           title={post.title}
         />
         {/* Content Layout */}

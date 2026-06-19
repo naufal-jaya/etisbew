@@ -10,7 +10,12 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function NewsPage() {
-  const fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+  let fetchedPosts: any[] = [];
+  try {
+    fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+  } catch (error) {
+    console.error("Error fetching posts from Sanity:", error);
+  }
 
   const placeholderPosts = [
     {
