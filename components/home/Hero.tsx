@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Globe, Cpu, Zap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
 
 const playfair = Playfair_Display({
@@ -103,16 +104,16 @@ const Hero = () => {
             className="relative hidden lg:block"
           >
             <div className="relative w-5/6 aspect-square max-w-[600px] mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 rounded-full blur-3xl animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/30 to-cyan-500/30 rounded-full blur-3xl animate-pulse [animation-duration:10s]" />
               <div className="relative z-10 w-full h-full border border-white/10 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center">
-                <div className="w-3/4 h-3/4 border border-white/20 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite]">
-                  <div className="w-1/2 h-1/2 border border-white/30 rounded-full flex items-center justify-center">
-                    <Globe className="w-16 h-16 text-cyan-400" />
+                <div className="w-3/4 h-3/4 border border-white/20 rounded-full flex items-center justify-center">
+                  <div className="w-1/2 h-1/2 border border-white/30 rounded-full flex items-center justify-center relative">
+                    <Image src="/images/home/trieee.png" alt="IEEE Logo" width={64} height={64} className="object-contain drop-shadow-2xl" />
                   </div>
                 </div>
                 {/* Orbiting Elements */}
 
-                {/* Outer Orbit - Cpu (0 deg start) */}
+                {/* Outer Orbit - Globe (0 deg start) */}
                 <motion.div
                   className="absolute inset-0 z-20"
                   animate={{ rotate: 360 }}
@@ -130,14 +131,14 @@ const Hero = () => {
                         repeat: Infinity,
                         ease: "linear",
                       }}
-                      className="bg-deep-navy p-3 rounded-xl border border-white/10 shadow-xl"
+                      className="flex items-center justify-center"
                     >
-                      <Cpu className="w-8 h-8 text-blue-400" />
+                      <Image src="/images/home/globe.png" alt="Globe" width={72} height={72} className="object-contain drop-shadow-xl" />
                     </motion.div>
                   </div>
                 </motion.div>
 
-                {/* Middle Orbit - Zap (120 deg start, Counter-Clockwise) */}
+                {/* Middle Orbit - Lightning (120 deg start, Counter-Clockwise) */}
                 <motion.div
                   className="absolute inset-0 z-20"
                   initial={{ rotate: 120 }}
@@ -157,14 +158,14 @@ const Hero = () => {
                         repeat: Infinity,
                         ease: "linear",
                       }}
-                      className="bg-deep-navy p-3 rounded-xl border border-white/10 shadow-xl"
+                      className="flex items-center justify-center"
                     >
-                      <Zap className="w-8 h-8 text-yellow-400" />
+                      <Image src="/images/home/cpu.png" alt="CPU" width={64} height={64} className="object-contain drop-shadow-xl" />
                     </motion.div>
                   </div>
                 </motion.div>
 
-                {/* Inner Orbit - Sparkles (240 deg start, Clockwise) */}
+                {/* Inner Orbit - CPU (240 deg start, Clockwise) */}
                 <motion.div
                   className="absolute inset-0 z-20"
                   initial={{ rotate: 240 }}
@@ -184,9 +185,9 @@ const Hero = () => {
                         repeat: Infinity,
                         ease: "linear",
                       }}
-                      className="bg-deep-navy p-3 rounded-xl border border-white/10 shadow-xl"
+                      className="flex items-center justify-center"
                     >
-                      <Sparkles className="w-8 h-8 text-purple-400" />
+                      <Image src="/images/home/lightning.png" alt="Lightning" width={72} height={72} className="object-contain drop-shadow-xl" />
                     </motion.div>
                   </div>
                 </motion.div>
