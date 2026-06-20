@@ -134,7 +134,16 @@ const NewsCard = ({ post }: { post: any }) => {
   const href = `/news/${post.slug.current}`;
 
   if (post.featured) {
-    return <FeaturedCard post={post} href={href} />;
+    return (
+      <>
+        <div className="hidden md:block">
+          <FeaturedCard post={post} href={href} />
+        </div>
+        <div className="block md:hidden">
+          <NormalCard post={post} href={href} />
+        </div>
+      </>
+    );
   }
 
   return <NormalCard post={post} href={href} />;
