@@ -113,7 +113,7 @@ const TEXT_SIDE: TextSide[] = [
 ];
 
 const badgeY = (i: number) => TOP_PAD + ROW_H * Math.floor(i / 2) + BPH;
-const SVG_H = ROW_H * historyData.length - 280;
+const SVG_H = badgeY(historyData.length - 1) + 140;
 
 /* ─────────────────────────────────────────────
    SNAKE PATH via cardinal spline
@@ -201,12 +201,17 @@ export default function OurJourneyPage() {
   }, []);
 
   return (
-    <main className="min-h-screen py-14 px-4 bg-gradient-to-b from-[#dce9f7] via-[#ccd8ef] to-[#bdd0ea]">
-      <h1 className="text-center text-3xl sm:text-6xl font-bold text-slate-700 mb-10 mt-20 tracking-tight">
+    <section className="snap-start relative min-h-screen overflow-hidden bg-gradient-to-b from-[#AFC4E9] to-white px-4 pt-28">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 right-0 top-0 z-0 h-20 rounded-b-[2rem] bg-deep-navy shadow-[0_14px_18px_rgba(10,26,47,0.28)] sm:h-24 sm:rounded-b-[2.5rem]"
+      />
+
+      <h1 className="relative z-10 text-center text-3xl sm:text-7xl font-bold text-[#0A1A2F] mb-10 mt-20 tracking-tight">
         Our Journey
       </h1>
 
-      <div className="w-full mx-auto select-none">
+      <div className="relative z-10 w-full mx-auto select-none">
         <svg
           viewBox={`0 0 ${VW} ${SVG_H}`}
           width="100%"
@@ -369,6 +374,6 @@ export default function OurJourneyPage() {
           })}
         </svg>
       </div>
-    </main>
+    </section>
   );
 }

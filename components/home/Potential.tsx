@@ -175,7 +175,7 @@ const Potential = () => {
   return (
     <section
       id="services"
-      className="py-24 bg-gray-50 relative overflow-hidden  snap-start"
+      className="pt-24 pb-32 bg-gray-50 relative overflow-hidden  snap-start"
     >
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
@@ -186,7 +186,7 @@ const Potential = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16 flex justify-center"
         >
-          <UnlockingPotential/>
+          <UnlockingPotential />
         </motion.div>
 
         {/* Services Grid */}
@@ -251,7 +251,7 @@ const Potential = () => {
                 {/* CONTENT */}
                 <CardHeader className="relative z-10 p-4">
                   <CardTitle
-                    className={`text-xl ml-3 text-2xl font-bold text-navy-900 text-left ${service.textDark}`}
+                    className={`text-2xl ml-3 font-bold text-navy-900 text-left ${service.textDark}`}
                   >
                     {service.title}
                   </CardTitle>

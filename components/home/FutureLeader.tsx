@@ -27,9 +27,9 @@ const Empowering = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="lg:col-spa n-4 flex flex-col items-center"
+            className="lg:col-spa n-4 mt-12 mb-[55px] sm:mt-0 sm:mb-0 flex flex-col items-center"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-2 leading-tight text-center">
+            <h2 className="text-3xl  md:text-5xl font-bold text-white mb-2 leading-tight text-center">
               Empowering{" "}
               <span className={`${playfair.className} tracking-wide italic`}>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue">
@@ -44,7 +44,7 @@ const Empowering = () => {
               height="20"
               viewBox="0 0 500 20"
               fill="none"
-              className="mt-2"
+              className="mt-2 w-[250px] sm:w-[400px] md:w-[500px]"
             >
               <motion.path
                 d="M50 10 L450 10"
@@ -77,7 +77,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[170px] bg-white shadow-sm overflow-hidden
+                className="relative h-[175px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -92,15 +92,15 @@ const Empowering = () => {
                 {/* overlay gelap */}
                 <div
                   className="
-        absolute inset-0 bg-black/60 z-0
+        absolute inset-0 bg-black/20 sm:bg-black/50 z-0
         transition-opacity duration-500
         group-hover:opacity-0
       "
                 />
 
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <h2 className="text-white text-2xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
-                    <Zap className="w-6 h-6 sm:w-8 sm:h-8 md:w-[3rem] md:h-[3rem] text-white" />
+                  <h2 className="text-white text-4xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
+                    <Zap className="w-8 h-8 md:w-[3rem] md:h-[3rem] text-white" />
                     Technical Excellence
                   </h2>
                 </div>
@@ -114,7 +114,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[170px] bg-white shadow-sm overflow-hidden
+                className="relative h-[175px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -129,15 +129,15 @@ const Empowering = () => {
                 {/* overlay */}
                 <div
                   className="
-        absolute inset-0 bg-black/60 z-0
+        absolute inset-0 bg-black/20 sm:bg-black/50 z-0
         transition-opacity duration-500
         group-hover:opacity-0
       "
                 />
 
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <h2 className="text-white text-2xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
-                    <Globe className="w-6 h-6 sm:w-8 sm:h-8 md:w-[3rem] md:h-[3rem] text-white" />
+                  <h2 className="text-white text-4xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
+                    <Globe className="w-8 h-8 md:w-[3rem] md:h-[3rem] text-white" />
                     Global Network
                   </h2>
                 </div>
@@ -151,7 +151,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[170px] bg-white shadow-sm overflow-hidden
+                className="relative h-[175px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -166,15 +166,15 @@ const Empowering = () => {
                 {/* overlay */}
                 <div
                   className="
-        absolute inset-0 bg-black/50 z-0
+        absolute inset-0 bg-black/20 sm:bg-black/50 z-0
         transition-opacity duration-500
         group-hover:opacity-0
       "
                 />
 
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <h2 className="text-white text-2xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
-                    <Target className="w-6 h-6 sm:w-8 sm:h-8 md:w-[3rem] md:h-[3rem] text-white" />
+                  <h2 className="text-white text-4xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
+                    <Target className="w-8 h-8 md:w-[3rem] md:h-[3rem] text-white" />
                     Leadership
                   </h2>
                 </div>

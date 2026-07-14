@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client';
+import { sanityFetch } from '@/sanity/lib/fetch';
 import { postBySlugQuery, relatedPostsQuery } from '@/sanity/lib/queries';
 import { urlFor } from '@/sanity/lib/image';
 import { PortableText } from '@portabletext/react';
@@ -10,8 +10,11 @@ import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface Post {
   _id: string;
@@ -33,17 +36,18 @@ interface Post {
 }
 
 async function getPost(slug: string): Promise<Post | null> {
-  const post = await client.fetch(postBySlugQuery, { slug });
+  const post = await sanityFetch<Post | null>(postBySlugQuery, { slug });
   return post;
 }
 
-async function getRelatedPosts(slug: string) {
-  const posts = await client.fetch(relatedPostsQuery, { slug });
+async function getRelatedPosts(slug: string): Promise<Post[]> {
+  const posts = await sanityFetch<Post[]>(relatedPostsQuery, { slug });
   return posts;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPost(params.slug);
+  const resolvedParams = await params;
+  const post = await getPost(resolvedParams.slug);
 
   if (!post) {
     return {
@@ -61,14 +65,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const portableTextComponents = {
   types: {
     image: ({ value }: any) => (
-      <div className="my-8">
-        <Image
-          src={urlFor(value).width(800).url()}
+      <div className="my-8 flex flex-col items-center w-full">
+        <img
+          src={urlFor(value).url()}
           alt={value.alt || 'Blog post image'}
-          width={800}
-          height={600}
-          className="rounded-lg"
+          className="w-full h-auto max-h-[900px] object-contain rounded-lg"
+          loading="lazy"
         />
+        {value.label && (
+          <span className="text-[#7D7D7D] text-sm mt-3 text-center">{value.label}</span>
+        )}
       </div>
     ),
   },
@@ -122,13 +128,14 @@ const portableTextComponents = {
 };
 
 export default async function BlogPostPage({ params }: Props) {
-  const post = await getPost(params.slug);
+  const resolvedParams = await params;
+  const post = await getPost(resolvedParams.slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(params.slug);
+  const relatedPosts = await getRelatedPosts(resolvedParams.slug);
 
   return (
     <main className="min-h-screen bg-white">

@@ -49,13 +49,7 @@ export default defineType({
         },
       ],
     }),
-    defineField({
-      name: "excerpt",
-      title: "Excerpt",
-      type: "text",
-      rows: 4,
-      validation: (Rule) => Rule.max(200),
-    }),
+
     defineField({
       name: "categories",
       title: "Categories",

@@ -66,7 +66,7 @@ const NewsInsight = ({ posts }: NewsInsightProps) => {
           </div>
 
           <Link
-            href="/blog"
+            href="/news"
             className="hidden md:flex items-center gap-2 text-navy-600 hover:text-accent-cyan transition-colors font-medium group"
           >
             View All News{" "}

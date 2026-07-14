@@ -1,16 +1,22 @@
-import { client } from "@/sanity/lib/client";
+import { sanityFetch } from "@/sanity/lib/fetch";
 import { allPostsQuery } from "@/sanity/lib/queries";
 import Image from "next/image";
 import NewsCard from "@/components/news/NewsCard";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import FilteredRecentPosts from "@/components/news/FilteredRecentPosts";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function NewsPage() {
-  const fetchedPosts = await client.fetch(allPostsQuery);
+  let fetchedPosts: any[] = [];
+  try {
+    fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+  } catch (error) {
+    console.error("Error fetching posts from Sanity:", error);
+  }
 
-  // Placeholder data for when Sanity is empty
   const placeholderPosts = [
     {
       _id: "1",
@@ -62,7 +68,6 @@ export default async function NewsPage() {
     <main className="min-h-screen bg-slate-50">
       <Navbar />
 
-      {/* Header */}
       <section className="pt-32 pb-12 snap-start bg-deep-navy relative overflow-hidden">
         <div className="absolute inset-0 circuit-pattern opacity-10" />
         <Image
@@ -74,7 +79,7 @@ export default async function NewsPage() {
         />
         <div className="container mx-auto px-4 relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Latest News & Updates
+            Latest News & Insights
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl">
             Stay informed about the latest events and technological insights
@@ -84,35 +89,19 @@ export default async function NewsPage() {
       </section>
 
       <section className="py-10 container mx-auto  px-4">
-        {/* Featured Post */}
         {featuredPost && (
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-navy-900 mb-8 flex items-center gap-2">
-              <div
-                className="w-6 h-8
-                           bg-[radial-gradient(circle_at_100%_120%,#4594E8,transparent_60%),radial-gradient(circle_at_0%_0%,#728EB0,transparent_60%)] bg-navy-800"
-              />
+              <div className="w-6 h-8 bg-[radial-gradient(circle_at_100%_120%,#4594E8,transparent_60%),radial-gradient(circle_at_0%_0%,#728EB0,transparent_60%)] bg-navy-800" />
               Featured Post
             </h2>
             <NewsCard post={featuredPost} />
           </div>
         )}
 
-        {/* Recent Posts Grid */}
-        <div>
-          <h2 className="text-2xl font-bold text-navy-900 mb-8 flex items-center gap-2">
-            <div
-              className="w-6 h-8
-                           bg-[radial-gradient(circle_at_100%_120%,#4594E8,transparent_60%),radial-gradient(circle_at_0%_0%,#728EB0,transparent_60%)] bg-navy-800"
-            />
-            Recent Posts
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {remainingPosts.map((post: any) => (
-              <NewsCard key={post._id} post={post} />
-            ))}
-          </div>
-        </div>
+        <hr className="border-slate-300 my-8" />
+
+        <FilteredRecentPosts posts={remainingPosts} />
       </section>
 
       <Footer />
