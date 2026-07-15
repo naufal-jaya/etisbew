@@ -351,7 +351,7 @@ export default function JoinCompetitionForm({
                   <option value="">-- Pilih lomba --</option>
                   {competitions.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name} • {c.organizer}
+                      [{c.competition_type?.name || "Lainnya"}] {c.name} • {c.organizer}
                     </option>
                   ))}
                 </select>

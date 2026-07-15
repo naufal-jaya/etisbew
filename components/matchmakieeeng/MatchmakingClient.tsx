@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { Member, Team, Competition } from "@/types/database";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, Pencil } from "lucide-react";
 import TeamCard from "@/components/matchmakieeeng/TeamCard";
 import CompetitionCard from "@/components/matchmakieeeng/CompetitionCard";
 import JoinCompetitionForm from "@/components/matchmakieeeng/JoinCompetitionForm";
@@ -26,6 +26,12 @@ export default function MatchmakingClient({
 }: Props) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
+
+  const [userState, setUserState] = useState<Member>(currentUser);
+  const [showProfile, setShowProfile] = useState(false);
+  const [editUsername, setEditUsername] = useState(currentUser.username);
+  const [editWhatsapp, setEditWhatsapp] = useState(currentUser.wa_number || "");
+  const [updatingProfile, setUpdatingProfile] = useState(false);
 
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [competitions, setCompetitions] =
@@ -66,14 +72,14 @@ export default function MatchmakingClient({
       supabase
         .from("notifications")
         .select("id")
-        .eq("member_id", currentUser.id)
+        .eq("member_id", userState.id)
         .eq("is_read", false),
     ]);
 
     setTeams(teamsRes.data ?? []);
     setCompetitions(compsRes.data ?? []);
     setUnreadCount(notifsRes.data?.length ?? 0);
-  }, [currentUser.id, supabase]);
+  }, [userState.id, supabase]);
 
   // Realtime subscriptions
   useEffect(() => {
@@ -95,7 +101,7 @@ export default function MatchmakingClient({
           event: "*",
           schema: "public",
           table: "notifications",
-          filter: `member_id=eq.${currentUser.id}`,
+          filter: `member_id=eq.${userState.id}`,
         },
         fetchData,
       )
@@ -104,7 +110,7 @@ export default function MatchmakingClient({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [currentUser.id, fetchData, supabase]);
+  }, [userState.id, fetchData, supabase]);
 
   const handleAskToJoin = async (teamId: string) => {
     try {
@@ -113,7 +119,7 @@ export default function MatchmakingClient({
         .from("join_requests")
         .select("id")
         .eq("team_id", teamId)
-        .eq("requester_id", currentUser.id);
+        .eq("requester_id", userState.id);
 
       if (findError) throw findError;
 
@@ -144,7 +150,7 @@ export default function MatchmakingClient({
         // Otherwise create a new request
         const { error: insertError } = await supabase.from("join_requests").insert({
           team_id: teamId,
-          requester_id: currentUser.id,
+          requester_id: userState.id,
           status: "pending",
         });
 
@@ -162,7 +168,7 @@ export default function MatchmakingClient({
       .from("join_requests")
       .update({ status: "cancelled" })
       .eq("team_id", teamId)
-      .eq("requester_id", currentUser.id);
+      .eq("requester_id", userState.id);
     fetchData();
   };
 
@@ -171,7 +177,7 @@ export default function MatchmakingClient({
       .from("team_members")
       .delete()
       .eq("team_id", teamId)
-      .eq("member_id", currentUser.id);
+      .eq("member_id", userState.id);
 
     if (error) console.error("Error leaving team:", error);
     fetchData();
@@ -212,6 +218,37 @@ export default function MatchmakingClient({
     fetchData();
   };
 
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editUsername.trim()) {
+      alert("Username tidak boleh kosong");
+      return;
+    }
+    setUpdatingProfile(true);
+    try {
+      const { error } = await supabase
+        .from("members")
+        .update({
+          username: editUsername.trim(),
+          wa_number: editWhatsapp.trim() || null,
+        })
+        .eq("id", userState.id);
+
+      if (error) throw error;
+
+      setUserState({
+        ...userState,
+        username: editUsername.trim(),
+        wa_number: editWhatsapp.trim() || null,
+      });
+      setShowProfile(false);
+    } catch (err: any) {
+      alert("Gagal memperbarui profil: " + (err.message || "Terjadi kesalahan"));
+    } finally {
+      setUpdatingProfile(false);
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/member-login");
@@ -220,13 +257,13 @@ export default function MatchmakingClient({
   // Categorize teams
   const myActiveTeams = teams.filter((t) =>
     t.members?.some(
-      (m) => m.member_id === currentUser.id && m.status === "active",
+      (m) => m.member_id === userState.id && m.status === "active",
     ),
   );
   const availableTeams = teams.filter(
     (t) =>
       !t.members?.some(
-        (m) => m.member_id === currentUser.id && m.status === "active",
+        (m) => m.member_id === userState.id && m.status === "active",
       ),
   );
 
@@ -252,9 +289,31 @@ export default function MatchmakingClient({
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
-              <div style={{ color: "rgba(255,255,255,0.72)", fontSize: "13px" }}>
-                @{currentUser.username}
-              </div>
+              <button
+                onClick={() => {
+                  setEditUsername(userState.username);
+                  setEditWhatsapp(userState.wa_number || "");
+                  setShowProfile(true);
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  color: "rgba(255,255,255,0.72)",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  padding: "4px 8px",
+                  borderRadius: "8px",
+                  transition: "background 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+              >
+                <User size={16} strokeWidth={2} style={{ color: "rgba(255,255,255,0.6)" }} />
+                <span>@{userState.username}</span>
+              </button>
               <button
                 onClick={handleLogout}
                 style={{
@@ -296,7 +355,29 @@ export default function MatchmakingClient({
                 >
                   Home
                 </Link>
-                <div className="pt-4" />
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setEditUsername(userState.username);
+                    setEditWhatsapp(userState.wa_number || "");
+                    setShowProfile(true);
+                  }}
+                  className="w-full text-left flex items-center gap-2 py-3 px-4 text-slate-200 hover:bg-white/10 hover:text-white rounded-lg transition-colors font-medium"
+                  style={{ background: "transparent", border: "none" }}
+                >
+                  <User size={16} style={{ color: "rgba(255,255,255,0.6)" }} />
+                  <span>@{userState.username} (Profil)</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-left py-3 px-4 text-red-400 hover:bg-white/10 rounded-lg transition-colors font-medium"
+                  style={{ background: "transparent", border: "none" }}
+                >
+                  Logout
+                </button>
               </div>
             </div>
           )}
@@ -435,7 +516,7 @@ export default function MatchmakingClient({
                   <TeamCard
                     key={team.id}
                     team={team}
-                    currentUser={currentUser}
+                    currentUser={userState}
                     isMyTeam={true}
                     onAskToJoin={(t) => setConfirmJoinTeam(teams.find((x) => x.id === t) || null)}
                     onCancelRequest={handleCancelRequest}
@@ -495,13 +576,13 @@ export default function MatchmakingClient({
                 }}
               >
                 {availableTeams.map((team) => {
-                  const isPending = (team as any).join_requests?.some((jr: any) => jr.requester_id === currentUser.id && jr.status === 'pending');
+                  const isPending = (team as any).join_requests?.some((jr: any) => jr.requester_id === userState.id && jr.status === 'pending');
 
                   return (
                     <TeamCard
                       key={team.id}
                       team={team}
-                      currentUser={currentUser}
+                      currentUser={userState}
                       isPending={isPending}
                       onAskToJoin={(t) => setConfirmJoinTeam(teams.find((x) => x.id === t) || null)}
                       onCancelRequest={handleCancelRequest}
@@ -564,7 +645,7 @@ export default function MatchmakingClient({
 
       {showForm && (
         <JoinCompetitionForm
-          currentUser={currentUser}
+          currentUser={userState}
           onClose={() => setShowForm(false)}
           onSuccess={fetchData}
         />
@@ -572,7 +653,7 @@ export default function MatchmakingClient({
 
       {showNotifs && (
         <NotificationPanel
-          currentUser={currentUser}
+          currentUser={userState}
           onClose={() => {
             setShowNotifs(false);
             fetchData();
@@ -890,6 +971,166 @@ export default function MatchmakingClient({
                 Ya, Keluarkan
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showProfile && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setShowProfile(false)}
+        >
+          <div
+            style={{
+              background: "#1A2234",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "20px",
+              padding: "32px",
+              maxWidth: "400px",
+              width: "90%",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ textAlign: "center", marginBottom: "24px" }}>
+              <div
+                style={{
+                  width: "64px",
+                  height: "64px",
+                  borderRadius: "50%",
+                  background: "rgba(99,102,241,0.1)",
+                  border: "1px solid rgba(99,102,241,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  margin: "0 auto 12px",
+                }}
+              >
+                <User size={32} style={{ color: "#818cf8" }} />
+              </div>
+              <h3 style={{ color: "white", fontWeight: 700, fontSize: "18px", margin: "0 0 4px" }}>
+                {userState.real_name || "Nama Lengkap"}
+              </h3>
+              <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "13px", margin: 0 }}>
+                @{userState.username}
+              </p>
+            </div>
+
+            <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                  Nama Lengkap
+                </label>
+                <input
+                  type="text"
+                  value={userState.real_name || ""}
+                  disabled
+                  style={{
+                    width: "100%",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "10px",
+                    padding: "10px 14px",
+                    color: "rgba(255,255,255,0.4)",
+                    fontSize: "14px",
+                    cursor: "not-allowed",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                  Username
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    value={editUsername}
+                    onChange={(e) => setEditUsername(e.target.value)}
+                    required
+                    style={{
+                      width: "100%",
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "10px",
+                      padding: "10px 40px 10px 14px",
+                      color: "white",
+                      fontSize: "14px",
+                    }}
+                  />
+                  <Pencil size={14} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", pointerEvents: "none" }} />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                  Nomor WhatsApp
+                </label>
+                <div style={{ position: "relative" }}>
+                  <input
+                    type="text"
+                    placeholder="Contoh: 08123456789"
+                    value={editWhatsapp}
+                    onChange={(e) => setEditWhatsapp(e.target.value)}
+                    style={{
+                      width: "100%",
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "10px",
+                      padding: "10px 40px 10px 14px",
+                      color: "white",
+                      fontSize: "14px",
+                    }}
+                  />
+                  <Pencil size={14} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", pointerEvents: "none" }} />
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowProfile(false)}
+                  style={{
+                    flex: 1,
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "12px",
+                    padding: "10px",
+                    color: "rgba(255,255,255,0.78)",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                  }}
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={updatingProfile}
+                  style={{
+                    flex: 1,
+                    background: updatingProfile ? "rgba(99,102,241,0.5)" : "rgb(99, 102, 241)",
+                    border: "none",
+                    borderRadius: "12px",
+                    padding: "10px",
+                    color: "white",
+                    cursor: updatingProfile ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                  }}
+                >
+                  {updatingProfile ? "Menyimpan..." : "Simpan"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
