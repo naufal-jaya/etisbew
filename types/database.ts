@@ -63,10 +63,12 @@ export interface Notification {
   id: string;
   member_id: string;
   join_request_id?: string | null;
-  type: "join_request" | "request_accepted" | "request_rejected" | string;
+  team_member_id?: string | null;
+  type: "join_request" | "request_accepted" | "request_rejected" | "team_invite" | "team_deleted" | "member_left" | "new_member" | string;
   is_read: boolean;
   team_name?: string | null;
   actor_name?: string | null;
   created_at: string;
   join_request?: JoinRequest | null;
+  team_member?: TeamMember | null;
 }

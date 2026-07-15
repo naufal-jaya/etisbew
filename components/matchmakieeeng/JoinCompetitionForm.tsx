@@ -136,7 +136,26 @@ export default function JoinCompetitionForm({
           member_id: m.id,
           status: "pending" as const,
         }));
-        await supabase.from("team_members").insert(memberInserts);
+        const { data: insertedMembers, error: memberError } = await supabase
+          .from("team_members")
+          .insert(memberInserts)
+          .select();
+
+        if (memberError) throw memberError;
+
+        if (insertedMembers && insertedMembers.length > 0) {
+          const leaderName = currentUser.real_name || currentUser.username;
+          const notificationInserts = insertedMembers.map((tm) => ({
+            member_id: tm.member_id,
+            team_member_id: tm.id,
+            type: "team_invite",
+            team_name: teamName,
+            actor_name: leaderName,
+            is_read: false,
+          }));
+
+          await supabase.from("notifications").insert(notificationInserts);
+        }
       }
 
       setVisible(false);

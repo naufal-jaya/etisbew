@@ -42,7 +42,7 @@ export default function MatchmakingClient({
 
   // Refetch data client-side (for realtime updates)
   const fetchData = useCallback(async () => {
-    const [teamsRes, compsRes, notifsRes, invitesRes] = await Promise.all([
+    const [teamsRes, compsRes, notifsRes] = await Promise.all([
       supabase
         .from("teams")
         .select(
@@ -68,17 +68,11 @@ export default function MatchmakingClient({
         .select("id")
         .eq("member_id", currentUser.id)
         .eq("is_read", false),
-
-      supabase
-        .from("team_members")
-        .select("id")
-        .eq("member_id", currentUser.id)
-        .eq("status", "pending"),
     ]);
 
     setTeams(teamsRes.data ?? []);
     setCompetitions(compsRes.data ?? []);
-    setUnreadCount((notifsRes.data?.length ?? 0) + (invitesRes.data?.length ?? 0));
+    setUnreadCount(notifsRes.data?.length ?? 0);
   }, [currentUser.id, supabase]);
 
   // Realtime subscriptions
@@ -173,17 +167,6 @@ export default function MatchmakingClient({
   };
 
   const handleLeaveTeam = async (teamId: string) => {
-    const team = teams.find((t) => t.id === teamId);
-    if (team) {
-      const { error: notifError } = await supabase.from("notifications").insert({
-        member_id: team.leader_id,
-        type: "member_left",
-        team_name: team.name,
-        actor_name: currentUser.real_name || currentUser.username,
-      });
-      if (notifError) console.error("Error creating leave notification:", notifError);
-    }
-
     const { error } = await supabase
       .from("team_members")
       .delete()

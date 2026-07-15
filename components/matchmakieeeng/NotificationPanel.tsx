@@ -14,7 +14,6 @@ export default function NotificationPanel({
 }: NotificationPanelProps) {
   const supabase = createClient();
   const [notifs, setNotifs] = useState<Notification[]>([]);
-  const [teamInvites, setTeamInvites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,37 +21,30 @@ export default function NotificationPanel({
   }, []);
 
   const fetchNotifs = async () => {
-    const [notifsRes, invitesRes] = await Promise.all([
-      supabase
-        .from("notifications")
-        .select(
-          `
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("notifications")
+      .select(
+        `
+        *,
+        join_request:join_requests(
           *,
-          join_request:join_requests(
-            *,
-            requester:members(*),
-            team:teams(*, competition:competitions(*))
-          )
-        `,
-        )
-        .eq("member_id", currentUser.id)
-        .order("created_at", { ascending: false })
-        .limit(20),
-
-      supabase
-        .from("team_members")
-        .select(
-          `
+          requester:members(*),
+          team:teams(*, competition:competitions(*))
+        ),
+        team_member:team_members(
           *,
+          member:members(*),
           team:teams(*, leader:members(*), competition:competitions(*))
-          `
         )
-        .eq("member_id", currentUser.id)
-        .eq("status", "pending")
-    ]);
+      `
+      )
+      .eq("member_id", currentUser.id)
+      .order("created_at", { ascending: false })
+      .limit(30);
 
-    setNotifs(notifsRes.data ?? []);
-    setTeamInvites(invitesRes.data ?? []);
+    if (error) console.error("Error fetching notifications:", error);
+    setNotifs(data ?? []);
     setLoading(false);
 
     // Mark all as read
@@ -80,12 +72,18 @@ export default function NotificationPanel({
   };
 
   const handleAcceptInvite = async (teamMemberId: string) => {
-    await supabase.from("team_members").update({ status: "active" }).eq("id", teamMemberId);
+    await supabase
+      .from("team_members")
+      .update({ status: "active" })
+      .eq("id", teamMemberId);
     fetchNotifs();
   };
 
   const handleRejectInvite = async (teamMemberId: string) => {
-    await supabase.from("team_members").delete().eq("id", teamMemberId);
+    await supabase
+      .from("team_members")
+      .update({ status: "rejected" })
+      .eq("id", teamMemberId);
     fetchNotifs();
   };
 
@@ -95,20 +93,11 @@ export default function NotificationPanel({
     request_rejected: "Ditolak ❌",
     team_deleted: "Tim Dihapus ⚠️",
     member_left: "Anggota Keluar 🚪",
+    member_kicked: "Dikeluarkan 🚪",
+    member_kicked_team: "Anggota Keluar 🚪",
+    new_member: "Anggota Baru 🎉",
+    team_invite: "Undangan Tim 📩",
   };
-
-  // Find latest join request notification IDs to prevent old ones from acting active
-  const latestJoinRequestIds = new Set<string>();
-  const latestNotifIds = new Set<string>();
-
-  notifs.forEach((n) => {
-    if (n.type === "join_request" && n.join_request_id) {
-      if (!latestJoinRequestIds.has(n.join_request_id)) {
-        latestJoinRequestIds.add(n.join_request_id);
-        latestNotifIds.add(n.id);
-      }
-    }
-  });
 
   return (
     <div
@@ -180,7 +169,7 @@ export default function NotificationPanel({
           >
             Memuat...
           </div>
-        ) : notifs.length === 0 && teamInvites.length === 0 ? (
+        ) : notifs.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0" }}>
             <div style={{ fontSize: "40px", marginBottom: "12px" }}>📭</div>
             <p style={{ color: "rgba(255,255,255,0.68)" }}>
@@ -191,270 +180,292 @@ export default function NotificationPanel({
           <div
             style={{ display: "flex", flexDirection: "column", gap: "12px" }}
           >
-            {teamInvites.map((invite) => (
-              <div
-                key={invite.id}
-                style={{
-                  background: "rgba(99,102,241,0.08)",
-                  border: "1px solid rgba(99,102,241,0.24)",
-                  borderRadius: "14px",
-                  padding: "14px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    marginBottom: "6px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      color: "#fbbf24",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    Undangan Tim
-                  </span>
-                  <span
-                    style={{
-                      color: "rgba(255,255,255,0.55)",
-                      fontSize: "11px",
-                      fontFamily: "DM Mono, monospace",
-                    }}
-                  >
-                    {new Date(invite.joined_at || invite.created_at || new Date()).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </span>
-                </div>
-
-                <p
-                  style={{
-                    color: "rgba(255,255,255,0.8)",
-                    fontSize: "13px",
-                    margin: "0 0 10px",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  <strong style={{ color: "#a5b4fc" }}>
-                    {invite.team?.leader?.username || "Seseorang"}
-                  </strong>{" "}
-                  mengundangmu untuk bergabung ke tim{" "}
-                  <strong style={{ color: "white" }}>
-                    {invite.team?.name}
-                  </strong>
-                </p>
-
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <button
-                    onClick={() => handleAcceptInvite(invite.id)}
-                    style={{
-                      flex: 1,
-                      background: "rgba(34,197,94,0.15)",
-                      border: "1px solid rgba(34,197,94,0.3)",
-                      borderRadius: "8px",
-                      padding: "7px",
-                      color: "#4ade80",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    ✓ Terima
-                  </button>
-                  <button
-                    onClick={() => handleRejectInvite(invite.id)}
-                    style={{
-                      flex: 1,
-                      background: "rgba(239,68,68,0.1)",
-                      border: "1px solid rgba(239,68,68,0.25)",
-                      borderRadius: "8px",
-                      padding: "7px",
-                      color: "#fca5a5",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    ✕ Tolak
-                  </button>
-                </div>
-              </div>
-            ))}
             {notifs.map((n) => {
-                const req = n.join_request as any;
-                const isLatest = latestNotifIds.has(n.id);
-                const isPending = req?.status === "pending" && isLatest;
-                const isJoinRequest = n.type === "join_request";
+              const req = n.join_request as any;
+              const invite = n.team_member as any;
 
-                return (
+              return (
+                <div
+                  key={n.id}
+                  style={{
+                    background: n.is_read ? "#1A2234" : "rgba(99,102,241,0.08)",
+                    border: `1px solid ${n.is_read ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.24)"}`,
+                    borderRadius: "14px",
+                    padding: "14px",
+                  }}
+                >
                   <div
-                    key={n.id}
                     style={{
-                      background: n.is_read
-                        ? "#1A2234"
-                        : "rgba(99,102,241,0.08)",
-                      border: `1px solid ${n.is_read ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.24)"}`,
-                      borderRadius: "14px",
-                      padding: "14px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "6px",
                     }}
                   >
-                    <div
+                    <span
                       style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "6px",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: 700,
-                          color: isJoinRequest
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        color:
+                          n.type === "join_request" || n.type === "team_invite"
                             ? "#fbbf24"
-                            : n.type === "request_accepted"
+                            : n.type === "request_accepted" || n.type === "new_member"
                               ? "#4ade80"
                               : "#f87171",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        {typeLabel[n.type]}
-                      </span>
-                      <span
-                        style={{
-                          color: "rgba(255,255,255,0.55)",
-                          fontSize: "11px",
-                          fontFamily: "DM Mono, monospace",
-                        }}
-                      >
-                        {new Date(n.created_at).toLocaleDateString("id-ID", {
-                          day: "numeric",
-                          month: "short",
-                        })}
-                      </span>
-                    </div>
+                        textTransform: "uppercase",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      {typeLabel[n.type] || n.type}
+                    </span>
+                    <span
+                      style={{
+                        color: "rgba(255,255,255,0.55)",
+                        fontSize: "11px",
+                        fontFamily: "DM Mono, monospace",
+                      }}
+                    >
+                      {new Date(n.created_at).toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "short",
+                      })}
+                    </span>
+                  </div>
 
-                    {isJoinRequest && req && (
-                      <>
-                        <p
-                          style={{
-                            color: "rgba(255,255,255,0.8)",
-                            fontSize: "13px",
-                            margin: "0 0 10px",
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          <strong style={{ color: "#a5b4fc" }}>
-                            {req.requester?.username}
-                          </strong>{" "}
-                          ({req.requester?.real_name}) minta join tim{" "}
-                          <strong style={{ color: "white" }}>
-                            {n.team_name || req.team?.name || "[Tim Telah Dihapus]"}
-                          </strong>
-                        </p>
-                        {isPending && (
-                          <div style={{ display: "flex", gap: "8px" }}>
-                            <button
-                              onClick={() => handleAccept(req.id)}
-                              style={{
-                                flex: 1,
-                                background: "rgba(34,197,94,0.15)",
-                                border: "1px solid rgba(34,197,94,0.3)",
-                                borderRadius: "8px",
-                                padding: "7px",
-                                color: "#4ade80",
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                              }}
-                            >
-                              ✓ Terima
-                            </button>
-                            <button
-                              onClick={() => handleReject(req.id)}
-                              style={{
-                                flex: 1,
-                                background: "rgba(239,68,68,0.1)",
-                                border: "1px solid rgba(239,68,68,0.25)",
-                                borderRadius: "8px",
-                                padding: "7px",
-                                color: "#fca5a5",
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                              }}
-                            >
-                              ✕ Tolak
-                            </button>
-                          </div>
-                        )}
-                        {!isPending && (
-                          <span
+                  {/* 1. Join Request */}
+                  {n.type === "join_request" && req && (
+                    <>
+                      <p
+                        style={{
+                          color: "rgba(255,255,255,0.8)",
+                          fontSize: "13px",
+                          margin: "0 0 10px",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <strong style={{ color: "#a5b4fc" }}>
+                          @{req.requester?.username}
+                        </strong>{" "}
+                        ({req.requester?.real_name}) minta join tim{" "}
+                        <strong style={{ color: "white" }}>
+                          {n.team_name || req.team?.name || "[Tim Telah Dihapus]"}
+                        </strong>
+                      </p>
+                      {req.status === "pending" ? (
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            onClick={() => handleAccept(req.id)}
                             style={{
+                              flex: 1,
+                              background: "rgba(34,197,94,0.15)",
+                              border: "1px solid rgba(34,197,94,0.3)",
+                              borderRadius: "8px",
+                              padding: "7px",
+                              color: "#4ade80",
                               fontSize: "12px",
-                              color:
-                                req.status === "accepted" && isLatest ? "#4ade80" : "#f87171",
+                              fontWeight: 600,
+                              cursor: "pointer",
                             }}
                           >
-                            {req.status === "accepted" && isLatest
-                              ? "Sudah diterima"
-                              : "Sudah ditolak"}
-                          </span>
-                        )}
-                      </>
-                    )}
+                            ✓ Terima
+                          </button>
+                          <button
+                            onClick={() => handleReject(req.id)}
+                            style={{
+                              flex: 1,
+                              background: "rgba(239,68,68,0.1)",
+                              border: "1px solid rgba(239,68,68,0.25)",
+                              borderRadius: "8px",
+                              padding: "7px",
+                              color: "#fca5a5",
+                              fontSize: "12px",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                          >
+                            ✕ Tolak
+                          </button>
+                        </div>
+                      ) : (
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 500,
+                            color:
+                              req.status === "accepted"
+                                ? "#4ade80"
+                                : req.status === "rejected"
+                                  ? "#f87171"
+                                  : "rgba(255,255,255,0.4)",
+                          }}
+                        >
+                          {req.status === "accepted"
+                            ? "Permintaan disetujui"
+                            : req.status === "rejected"
+                              ? "Permintaan ditolak"
+                              : "Dibatalkan"}
+                        </span>
+                      )}
+                    </>
+                  )}
 
-                    {(n.type === "request_accepted" || n.type === "request_rejected") && (
+                  {/* 2. Team Invitation */}
+                  {n.type === "team_invite" && (
+                    <>
                       <p
                         style={{
-                          color: "rgba(255,255,255,0.7)",
+                          color: "rgba(255,255,255,0.8)",
                           fontSize: "13px",
-                          margin: 0,
+                          margin: "0 0 10px",
                           lineHeight: 1.5,
                         }}
                       >
-                        Permintaan join tim{" "}
-                        <strong style={{ color: "white" }}>
-                          {n.team_name || req?.team?.name || "[Tim Telah Dihapus]"}
+                        <strong style={{ color: "#a5b4fc" }}>
+                          @{n.actor_name || invite?.team?.leader?.username || "Seseorang"}
                         </strong>{" "}
-                        {n.type === "request_accepted" ? "diterima!" : "ditolak."}
+                        mengundangmu untuk bergabung ke tim{" "}
+                        <strong style={{ color: "white" }}>
+                          {n.team_name || invite?.team?.name || "[Tim Telah Dihapus]"}
+                        </strong>
                       </p>
-                    )}
+                      {!invite || invite.status === "rejected" ? (
+                        <span style={{ fontSize: "12px", fontWeight: 500, color: "#f87171" }}>
+                          Undangan ditolak
+                        </span>
+                      ) : invite.status === "active" ? (
+                        <span style={{ fontSize: "12px", fontWeight: 500, color: "#4ade80" }}>
+                          Undangan diterima
+                        </span>
+                      ) : invite.status === "cancelled" ? (
+                        <span style={{ fontSize: "12px", fontWeight: 500, color: "rgba(255,255,255,0.4)" }}>
+                          Undangan dibatalkan
+                        </span>
+                      ) : (
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            onClick={() => handleAcceptInvite(invite.id)}
+                            style={{
+                              flex: 1,
+                              background: "rgba(34,197,94,0.15)",
+                              border: "1px solid rgba(34,197,94,0.3)",
+                              borderRadius: "8px",
+                              padding: "7px",
+                              color: "#4ade80",
+                              fontSize: "12px",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                          >
+                            ✓ Terima
+                          </button>
+                          <button
+                            onClick={() => handleRejectInvite(invite.id)}
+                            style={{
+                              flex: 1,
+                              background: "rgba(239,68,68,0.1)",
+                              border: "1px solid rgba(239,68,68,0.25)",
+                              borderRadius: "8px",
+                              padding: "7px",
+                              color: "#fca5a5",
+                              fontSize: "12px",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                          >
+                            ✕ Tolak
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
 
-                    {n.type === "team_deleted" && (
-                      <p
-                        style={{
-                          color: "rgba(255,255,255,0.7)",
-                          fontSize: "13px",
-                          margin: 0,
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        Tim <strong style={{ color: "white" }}>{n.team_name}</strong> telah dihapus oleh ketua tim.
-                      </p>
-                    )}
+                  {/* 3. Request Accepted/Rejected */}
+                  {(n.type === "request_accepted" || n.type === "request_rejected") && (
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "13px",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      Permintaan join tim{" "}
+                      <strong style={{ color: "white" }}>
+                        {n.team_name || req?.team?.name || "[Tim Telah Dihapus]"}
+                      </strong>{" "}
+                      {n.type === "request_accepted" ? "diterima!" : "ditolak."}
+                    </p>
+                  )}
 
-                    {n.type === "member_left" && (
-                      <p
-                        style={{
-                          color: "rgba(255,255,255,0.7)",
-                          fontSize: "13px",
-                          margin: 0,
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        <strong style={{ color: "#a5b4fc" }}>{n.actor_name}</strong> telah keluar dari tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+                  {/* 4. Team Deleted */}
+                  {n.type === "team_deleted" && (
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "13px",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      Tim <strong style={{ color: "white" }}>{n.team_name}</strong> telah dihapus oleh ketua tim.
+                    </p>
+                  )}
+
+                  {/* 5. Member Left / Kicked */}
+                  {n.type === "member_left" && (
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "13px",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <strong style={{ color: "#a5b4fc" }}>@{n.actor_name}</strong> telah keluar dari tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
+                    </p>
+                  )}
+
+                  {n.type === "member_kicked" && (
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "13px",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      Anda telah dikeluarkan dari tim <strong style={{ color: "white" }}>{n.team_name}</strong> oleh ketua tim.
+                    </p>
+                  )}
+
+                  {n.type === "member_kicked_team" && (
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "13px",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <strong style={{ color: "#a5b4fc" }}>@{n.actor_name}</strong> telah dikeluarkan dari tim <strong style={{ color: "white" }}>{n.team_name}</strong> oleh ketua tim.
+                    </p>
+                  )}
+
+                  {/* 6. New Member Joined */}
+                  {n.type === "new_member" && (
+                    <p
+                      style={{
+                        color: "rgba(255,255,255,0.7)",
+                        fontSize: "13px",
+                        margin: 0,
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <strong style={{ color: "#a5b4fc" }}>@{n.actor_name}</strong> baru saja bergabung dengan tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
