@@ -9,6 +9,9 @@ interface TeamCardProps {
   isPending?: boolean;
   onAskToJoin?: (teamId: string) => void;
   onCancelRequest?: (teamId: string) => void;
+  onLeaveTeam?: (teamId: string) => void;
+  onDeleteTeam?: (teamId: string) => void;
+  onKickMember?: (teamId: string, memberId: string, username: string) => void;
 }
 
 export default function TeamCard({
@@ -18,8 +21,11 @@ export default function TeamCard({
   isPending,
   onAskToJoin,
   onCancelRequest,
+  onLeaveTeam,
+  onDeleteTeam,
+  onKickMember,
 }: TeamCardProps) {
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const maxMembers = team.competition?.max_members ?? 3;
   const currentCount =
     team.members?.filter((m) => m.status === "active").length ?? 0;
@@ -31,12 +37,6 @@ export default function TeamCard({
   const waLink = team.leader?.wa_number
     ? `https://wa.me/${team.leader.wa_number.replace(/\D/g, "")}?text=${encodeURIComponent(`Halo ${team.leader.real_name}, aku mau join tim kamu "${team.name}" untuk lomba ${team.competition?.name}!`)}`
     : null;
-
-  const handleConfirmJoin = () => {
-    if (waLink) window.open(waLink, "_blank");
-    onAskToJoin?.(team.id);
-    setShowConfirm(false);
-  };
 
   return (
     <div
@@ -144,24 +144,128 @@ export default function TeamCard({
           </p>
         </div>
 
-        {/* Member count */}
-        <div
-          style={{
-            background:
-              currentCount >= maxMembers
-                ? "rgba(239,68,68,0.15)"
-                : "rgba(34,197,94,0.12)",
-            border: `1px solid ${currentCount >= maxMembers ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.25)"}`,
-            borderRadius: "100px",
-            padding: "3px 10px",
-            fontSize: "12px",
-            fontWeight: 700,
-            color: currentCount >= maxMembers ? "#f87171" : "#4ade80",
-            fontFamily: "DM Mono, monospace",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {currentCount}/{maxMembers}
+        {/* Member count & Actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div
+            style={{
+              background:
+                currentCount >= maxMembers
+                  ? "rgba(239,68,68,0.15)"
+                  : "rgba(34,197,94,0.12)",
+              border: `1px solid ${currentCount >= maxMembers ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.25)"}`,
+              borderRadius: "100px",
+              padding: "3px 10px",
+              fontSize: "12px",
+              fontWeight: 700,
+              color: currentCount >= maxMembers ? "#f87171" : "#4ade80",
+              fontFamily: "DM Mono, monospace",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {currentCount}/{maxMembers}
+          </div>
+
+          {(isLeader || (isMember && !isLeader)) && (
+            <div style={{ position: "relative" }}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMenu(!showMenu);
+                }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  padding: "4px 8px",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                ⋮
+              </button>
+
+              {showMenu && (
+                <>
+                  {/* Backdrop to close menu */}
+                  <div 
+                    style={{ position: "fixed", inset: 0, zIndex: 9 }} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMenu(false);
+                    }} 
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      right: 0,
+                      background: "#1A2234",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "8px",
+                      padding: "4px",
+                      marginTop: "4px",
+                      minWidth: "120px",
+                      zIndex: 10,
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+                    }}
+                  >
+                    {isLeader && (
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          onDeleteTeam?.(team.id);
+                        }}
+                        style={{
+                          width: "100%",
+                          textAlign: "left",
+                          background: "transparent",
+                          border: "none",
+                          color: "#fca5a5",
+                          padding: "8px 12px",
+                          fontSize: "13px",
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.1)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        Hapus Tim
+                      </button>
+                    )}
+                    {isMember && !isLeader && (
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          onLeaveTeam?.(team.id);
+                        }}
+                        style={{
+                          width: "100%",
+                          textAlign: "left",
+                          background: "transparent",
+                          border: "none",
+                          color: "#fca5a5",
+                          padding: "8px 12px",
+                          fontSize: "13px",
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          borderRadius: "4px",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.1)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        Keluar Tim
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -183,11 +287,14 @@ export default function TeamCard({
           {team.members
             ?.filter((m) => m.status === "active")
             .map((m) => (
-              <span
+              <div
                 key={m.id}
                 className="username-tooltip"
                 tabIndex={0}
                 style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
                   background:
                     m.member_id === team.leader_id
                       ? "rgba(99,102,241,0.2)"
@@ -206,8 +313,32 @@ export default function TeamCard({
               >
                 {m.member?.username ?? "unknown"}
                 {m.member_id === team.leader_id && " 👑"}
+                {isLeader && m.member_id !== team.leader_id && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onKickMember?.(team.id, m.member_id, m.member?.username ?? "unknown");
+                    }}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "rgba(255,255,255,0.5)",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      padding: "0 2px",
+                      marginLeft: "2px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#fca5a5")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
+                  >
+                    ×
+                  </button>
+                )}
                 <span className="tooltip">{m.member?.real_name ?? "-"}</span>
-              </span>
+              </div>
             ))}
         </div>
       </div>
@@ -250,7 +381,7 @@ export default function TeamCard({
       {/* Actions */}
       {!isMyTeam && !isMember && !isPending && currentCount < maxMembers && (
         <button
-          onClick={() => setShowConfirm(true)}
+          onClick={() => onAskToJoin?.(team.id)}
           style={{
             width: "100%",
             background:
@@ -278,108 +409,41 @@ export default function TeamCard({
       )}
 
       {isPending && (
-        <button
-          onClick={() => onCancelRequest?.(team.id)}
-          style={{
-            width: "100%",
-            background: "rgba(239,68,68,0.08)",
-            border: "1px solid rgba(239,68,68,0.2)",
-            borderRadius: "10px",
-            padding: "8px",
-            color: "#fca5a5",
-            fontSize: "13px",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
-          Batalkan Pengajuan
-        </button>
-      )}
-
-      {/* Confirm popup */}
-      {showConfirm && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(8px)",
-          }}
-          onClick={() => setShowConfirm(false)}
-        >
-          <div
+        <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+          <button
+            onClick={() => onCancelRequest?.(team.id)}
             style={{
-              background: "#1A2234",
-              border: "1px solid rgba(99,102,241,0.3)",
-              borderRadius: "20px",
-              padding: "32px",
-              maxWidth: "360px",
-              width: "90%",
-              textAlign: "center",
+              flex: 1,
+              background: "rgba(239,68,68,0.08)",
+              border: "1px solid rgba(239,68,68,0.2)",
+              borderRadius: "10px",
+              padding: "8px",
+              color: "#fca5a5",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
             }}
-            onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🤝</div>
-            <h3
-              style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}
-            >
-              Yakin mau join?
-            </h3>
-            <p
+            Cancel Request
+          </button>
+          {waLink && (
+            <button
+              onClick={() => window.open(waLink, "_blank")}
               style={{
-                color: "rgba(255,255,255,0.72)",
-                fontSize: "14px",
-                marginBottom: "24px",
-                lineHeight: 1.5,
+                flex: 1,
+                background: "rgba(34,197,94,0.12)",
+                border: "1px solid rgba(34,197,94,0.25)",
+                borderRadius: "10px",
+                padding: "8px",
+                color: "#4ade80",
+                fontSize: "13px",
+                fontWeight: 600,
+                cursor: "pointer",
               }}
             >
-              Kamu akan kirim permintaan ke{" "}
-              <strong style={{ color: "#a5b4fc" }}>
-                {team.leader?.username}
-              </strong>{" "}
-              untuk join tim{" "}
-              <strong style={{ color: "white" }}>{team.name}</strong>. Link WA
-              akan dibuka otomatis.
-            </p>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button
-                onClick={() => setShowConfirm(false)}
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "rgba(255,255,255,0.78)",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleConfirmJoin}
-                style={{
-                  flex: 1,
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  border: "none",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "white",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                }}
-              >
-                Kirim & Buka WA
-              </button>
-            </div>
-          </div>
+              WhatsApp
+            </button>
+          )}
         </div>
       )}
     </div>

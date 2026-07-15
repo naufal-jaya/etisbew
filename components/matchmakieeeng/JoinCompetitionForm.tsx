@@ -142,7 +142,7 @@ export default function JoinCompetitionForm({
           team_id: team.id,
           member_id: sm.member.id,
           role_id: sm.role || null,
-          status: "active" as const,
+          status: "pending" as const,
         }));
         await supabase.from("team_members").insert(memberInserts);
       }
@@ -723,7 +723,9 @@ export default function JoinCompetitionForm({
                         color: "#c4b5fd",
                       }}
                     >
-                      {roles.find((r) => r.id === nr.roleId)?.name}
+                      <span style={{ fontWeight: 600 }}>
+                        {roles.find((r) => r.id.toString() === nr.roleId.toString())?.name || "Role"}
+                      </span>
                       <input
                         type="number"
                         min="1"

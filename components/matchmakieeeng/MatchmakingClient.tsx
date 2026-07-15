@@ -34,10 +34,15 @@ export default function MatchmakingClient({
   const [showForm, setShowForm] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const [confirmJoinTeam, setConfirmJoinTeam] = useState<Team | null>(null);
+  const [confirmLeaveTeam, setConfirmLeaveTeam] = useState<Team | null>(null);
+  const [confirmDeleteTeam, setConfirmDeleteTeam] = useState<Team | null>(null);
+  const [confirmKickMember, setConfirmKickMember] = useState<{team: Team, memberId: string, username: string} | null>(null);
 
   // Refetch data client-side (for realtime updates)
   const fetchData = useCallback(async () => {
-    const [teamsRes, compsRes, notifsRes] = await Promise.all([
+    const [teamsRes, compsRes, notifsRes, invitesRes] = await Promise.all([
       supabase
         .from("teams")
         .select(
@@ -46,7 +51,8 @@ export default function MatchmakingClient({
           competition:competitions(*, competition_type:competition_types(*)),
           leader:members!teams_leader_id_fkey(*),
           members:team_members(*, member:members(*), role:member_roles(*)),
-          needed_roles:team_needed_roles(*, role:member_roles(*))
+          needed_roles:team_needed_roles(*, role:member_roles(*)),
+          join_requests(*)
         `,
         )
         .order("created_at", { ascending: false }),
@@ -54,6 +60,7 @@ export default function MatchmakingClient({
       supabase
         .from("competitions")
         .select("*, competition_type:competition_types(*)")
+        .eq("is_custom", false)
         .gte("registration_deadline", new Date().toISOString().split("T")[0])
         .order("registration_deadline"),
 
@@ -62,11 +69,17 @@ export default function MatchmakingClient({
         .select("id")
         .eq("member_id", currentUser.id)
         .eq("is_read", false),
+
+      supabase
+        .from("team_members")
+        .select("id")
+        .eq("member_id", currentUser.id)
+        .eq("status", "pending"),
     ]);
 
     setTeams(teamsRes.data ?? []);
     setCompetitions(compsRes.data ?? []);
-    setUnreadCount(notifsRes.data?.length ?? 0);
+    setUnreadCount((notifsRes.data?.length ?? 0) + (invitesRes.data?.length ?? 0));
   }, [currentUser.id, supabase]);
 
   // Realtime subscriptions
@@ -101,12 +114,54 @@ export default function MatchmakingClient({
   }, [currentUser.id, fetchData, supabase]);
 
   const handleAskToJoin = async (teamId: string) => {
-    await supabase.from("join_requests").insert({
-      team_id: teamId,
-      requester_id: currentUser.id,
-      status: "pending",
-    });
-    fetchData();
+    try {
+      // Find existing request
+      const { data: existingRequests, error: findError } = await supabase
+        .from("join_requests")
+        .select("id")
+        .eq("team_id", teamId)
+        .eq("requester_id", currentUser.id);
+
+      if (findError) throw findError;
+
+      if (existingRequests && existingRequests.length > 0) {
+        // If it exists (e.g. rejected), update it back to pending
+        const { error: updateError } = await supabase
+          .from("join_requests")
+          .update({ status: "pending" })
+          .eq("id", existingRequests[0].id);
+
+        if (updateError) throw updateError;
+
+        // Insert a new notification for the team leader
+        const { data: teamData } = await supabase
+          .from("teams")
+          .select("leader_id")
+          .eq("id", teamId)
+          .single();
+
+        if (teamData?.leader_id) {
+          await supabase.from("notifications").insert({
+            member_id: teamData.leader_id,
+            type: "join_request",
+            join_request_id: existingRequests[0].id
+          });
+        }
+      } else {
+        // Otherwise create a new request
+        const { error: insertError } = await supabase.from("join_requests").insert({
+          team_id: teamId,
+          requester_id: currentUser.id,
+          status: "pending",
+        });
+
+        if (insertError) throw insertError;
+      }
+
+      fetchData();
+    } catch (err: any) {
+      alert("Gagal mengirim permintaan: " + (err.message || "Terjadi kesalahan"));
+    }
   };
 
   const handleCancelRequest = async (teamId: string) => {
@@ -116,6 +171,50 @@ export default function MatchmakingClient({
       .eq("team_id", teamId)
       .eq("requester_id", currentUser.id);
     fetchData();
+  };
+
+  const handleLeaveTeam = async (teamId: string) => {
+    const team = teams.find((t) => t.id === teamId);
+    if (team) {
+      const { error: notifError } = await supabase.from("notifications").insert({
+        member_id: team.leader_id,
+        type: "member_left",
+        team_name: team.name,
+        actor_name: currentUser.real_name || currentUser.username,
+      });
+      if (notifError) console.error("Error creating leave notification:", notifError);
+    }
+
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("member_id", currentUser.id);
+
+    if (error) console.error("Error leaving team:", error);
+    fetchData();
+  };
+
+  const handleKickMember = async (teamId: string, memberId: string) => {
+    const { error } = await supabase
+      .from("team_members")
+      .delete()
+      .eq("team_id", teamId)
+      .eq("member_id", memberId);
+
+    if (error) console.error("Error kicking member:", error);
+    fetchData();
+  };
+
+  const handleDeleteTeam = async (teamId: string) => {
+    try {
+      const { error } = await supabase.rpc('delete_team', { target_team_id: teamId });
+      if (error) throw error;
+      
+      fetchData();
+    } catch (err: any) {
+      alert("Gagal menghapus tim: " + (err.message || "Terjadi kesalahan"));
+    }
   };
 
   const handleLogout = async () => {
@@ -343,8 +442,11 @@ export default function MatchmakingClient({
                     team={team}
                     currentUser={currentUser}
                     isMyTeam={true}
-                    onAskToJoin={handleAskToJoin}
+                    onAskToJoin={(t) => setConfirmJoinTeam(teams.find((x) => x.id === t) || null)}
                     onCancelRequest={handleCancelRequest}
+                    onLeaveTeam={(t) => setConfirmLeaveTeam(teams.find((x) => x.id === t) || null)}
+                    onDeleteTeam={(t) => setConfirmDeleteTeam(teams.find((x) => x.id === t) || null)}
+                    onKickMember={(t, mId, uName) => setConfirmKickMember({team: teams.find((x) => x.id === t)!, memberId: mId, username: uName})}
                   />
                 ))}
               </div>
@@ -396,15 +498,23 @@ export default function MatchmakingClient({
                   gap: "14px",
                 }}
               >
-                {availableTeams.map((team) => (
-                  <TeamCard
-                    key={team.id}
-                    team={team}
-                    currentUser={currentUser}
-                    onAskToJoin={handleAskToJoin}
-                    onCancelRequest={handleCancelRequest}
-                  />
-                ))}
+                {availableTeams.map((team) => {
+                  const isPending = (team as any).join_requests?.some((jr: any) => jr.requester_id === currentUser.id && jr.status === 'pending');
+
+                  return (
+                    <TeamCard
+                      key={team.id}
+                      team={team}
+                      currentUser={currentUser}
+                      isPending={isPending}
+                      onAskToJoin={(t) => setConfirmJoinTeam(teams.find((x) => x.id === t) || null)}
+                      onCancelRequest={handleCancelRequest}
+                      onLeaveTeam={(t) => setConfirmLeaveTeam(teams.find((x) => x.id === t) || null)}
+                      onDeleteTeam={(t) => setConfirmDeleteTeam(teams.find((x) => x.id === t) || null)}
+                      onKickMember={(t, mId, uName) => setConfirmKickMember({team: teams.find((x) => x.id === t)!, memberId: mId, username: uName})}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
@@ -471,6 +581,320 @@ export default function MatchmakingClient({
             fetchData();
           }}
         />
+      )}
+
+      {/* Confirm Join Modal */}
+      {confirmJoinTeam && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setConfirmJoinTeam(null)}
+        >
+          <div
+            style={{
+              background: "#1A2234",
+              border: "1px solid rgba(99,102,241,0.3)",
+              borderRadius: "20px",
+              padding: "32px",
+              maxWidth: "360px",
+              width: "90%",
+              textAlign: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🤝</div>
+            <h3
+              style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}
+            >
+              Yakin mau join?
+            </h3>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.72)",
+                fontSize: "14px",
+                marginBottom: "24px",
+                lineHeight: 1.5,
+              }}
+            >
+              Kamu akan kirim permintaan ke{" "}
+              <strong style={{ color: "#a5b4fc" }}>
+                {confirmJoinTeam.leader?.username}
+              </strong>{" "}
+              untuk join tim{" "}
+              <strong style={{ color: "white" }}>{confirmJoinTeam.name}</strong>.
+            </p>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={() => setConfirmJoinTeam(null)}
+                style={{
+                  flex: 1,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "rgba(255,255,255,0.78)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  handleAskToJoin(confirmJoinTeam.id);
+                  setConfirmJoinTeam(null);
+                }}
+                style={{
+                  flex: 1,
+                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  border: "none",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "white",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                Kirim Permintaan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Leave Team Modal */}
+      {confirmLeaveTeam && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setConfirmLeaveTeam(null)}
+        >
+          <div
+            style={{
+              background: "#1A2234",
+              border: "1px solid rgba(239,68,68,0.3)",
+              borderRadius: "20px",
+              padding: "32px",
+              maxWidth: "360px",
+              width: "90%",
+              textAlign: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🚪</div>
+            <h3 style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}>
+              Keluar dari Tim?
+            </h3>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
+              Yakin mau keluar dari tim <strong style={{ color: "white" }}>{confirmLeaveTeam.name}</strong>?
+            </p>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={() => setConfirmLeaveTeam(null)}
+                style={{
+                  flex: 1,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "rgba(255,255,255,0.78)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  handleLeaveTeam(confirmLeaveTeam.id);
+                  setConfirmLeaveTeam(null);
+                }}
+                style={{
+                  flex: 1,
+                  background: "rgba(239,68,68,0.15)",
+                  border: "1px solid rgba(239,68,68,0.3)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "#fca5a5",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Team Modal */}
+      {confirmDeleteTeam && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setConfirmDeleteTeam(null)}
+        >
+          <div
+            style={{
+              background: "#1A2234",
+              border: "1px solid rgba(239,68,68,0.3)",
+              borderRadius: "20px",
+              padding: "32px",
+              maxWidth: "360px",
+              width: "90%",
+              textAlign: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🗑️</div>
+            <h3 style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}>
+              Hapus Tim?
+            </h3>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
+              Yakin mau menghapus tim <strong style={{ color: "white" }}>{confirmDeleteTeam.name}</strong> secara permanen? Aksi ini tidak bisa dibatalkan!
+            </p>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={() => setConfirmDeleteTeam(null)}
+                style={{
+                  flex: 1,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "rgba(255,255,255,0.78)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  handleDeleteTeam(confirmDeleteTeam.id);
+                  setConfirmDeleteTeam(null);
+                }}
+                style={{
+                  flex: 1,
+                  background: "rgba(239,68,68,0.15)",
+                  border: "1px solid rgba(239,68,68,0.3)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "#fca5a5",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Kick Member Modal */}
+      {confirmKickMember && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setConfirmKickMember(null)}
+        >
+          <div
+            style={{
+              background: "#1A2234",
+              border: "1px solid rgba(239,68,68,0.3)",
+              borderRadius: "20px",
+              padding: "32px",
+              maxWidth: "360px",
+              width: "90%",
+              textAlign: "center",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>👟</div>
+            <h3 style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}>
+              Keluarkan Anggota?
+            </h3>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
+              Yakin mau mengeluarkan <strong style={{ color: "#fca5a5" }}>{confirmKickMember.username}</strong> dari tim <strong style={{ color: "white" }}>{confirmKickMember.team.name}</strong>?
+            </p>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button
+                onClick={() => setConfirmKickMember(null)}
+                style={{
+                  flex: 1,
+                  background: "rgba(255,255,255,0.05)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "rgba(255,255,255,0.78)",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 500,
+                }}
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => {
+                  handleKickMember(confirmKickMember.team.id, confirmKickMember.memberId);
+                  setConfirmKickMember(null);
+                }}
+                style={{
+                  flex: 1,
+                  background: "rgba(239,68,68,0.15)",
+                  border: "1px solid rgba(239,68,68,0.3)",
+                  borderRadius: "12px",
+                  padding: "10px",
+                  color: "#fca5a5",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                }}
+              >
+                Ya, Keluarkan
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
