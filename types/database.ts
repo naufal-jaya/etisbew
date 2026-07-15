@@ -19,6 +19,7 @@ export interface Competition {
   organizer: string;
   registration_deadline: string;
   max_members: number | null;
+  min_members: number | null;
   competition_type_id?: string | null;
   poster_url?: string | null;
   detail_link?: string | null;

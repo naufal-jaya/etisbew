@@ -4,18 +4,8 @@ import Link from 'next/link'
 import { useRouter } from "next/navigation"
 import { createClient } from '@/utils/supabase/client'
 
-const particles = Array.from({ length: 20 }, (_, i) => {
-  const seed = i + 1
-  return {
-    left: `${(seed * 37) % 100}%`,
-    '--dur': `${4 + ((seed * 17) % 80) / 10}s`,
-    '--delay': `-${((seed * 29) % 100) / 10}s`,
-    '--drift': `${((seed * 53) % 100) - 50}px`,
-  } as React.CSSProperties
-})
-
 export default function MemberLoginPage() {
-    const router = useRouter()
+  const router = useRouter()
   const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -46,46 +36,18 @@ export default function MemberLoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0f0f1a]">
+    <main className="min-h-screen flex items-center justify-center bg-[#121820]">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
         * { font-family: 'Space Grotesk', sans-serif; box-sizing: border-box; }
         
         .login-card {
-          background: rgba(255,255,255,0.04);
+          background: #1E2638;
           border: 1px solid rgba(255,255,255,0.08);
           border-radius: 20px;
           padding: 48px;
           width: 100%;
           max-width: 420px;
-          backdrop-filter: blur(20px);
-        }
-        
-        .glow-ring {
-          position: absolute;
-          width: 300px; height: 300px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(99,102,241,0.3) 0%, transparent 70%);
-          top: -100px; left: 50%;
-          transform: translateX(-50%);
-          pointer-events: none;
-          filter: blur(40px);
-        }
-
-        .logo-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(99,102,241,0.15);
-          border: 1px solid rgba(99,102,241,0.3);
-          border-radius: 100px;
-          padding: 6px 14px;
-          color: #a5b4fc;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          margin-bottom: 24px;
         }
 
         .title {
@@ -113,8 +75,8 @@ export default function MemberLoginPage() {
 
         .field input {
           width: 100%;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
+          background: #121820;
+          border: 1px solid rgba(255,255,255,0.08);
           border-radius: 12px;
           padding: 12px 16px;
           color: white;
@@ -125,9 +87,8 @@ export default function MemberLoginPage() {
         }
 
         .field input:focus {
-          border-color: rgba(99,102,241,0.6);
-          background: rgba(99,102,241,0.08);
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+          border-color: #16357B;
+          background: rgba(22,53,123,0.1);
         }
 
         .field input::placeholder { color: rgba(255,255,255,0.2); }
@@ -144,7 +105,7 @@ export default function MemberLoginPage() {
 
         .btn-login {
           width: 100%;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: #16357B;
           color: white;
           font-weight: 600;
           font-size: 15px;
@@ -152,15 +113,14 @@ export default function MemberLoginPage() {
           border-radius: 12px;
           padding: 14px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: background-color 0.2s;
           margin-top: 8px;
           position: relative;
           overflow: hidden;
         }
 
         .btn-login:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 24px rgba(99,102,241,0.4);
+          background: #1a4299;
         }
 
         .btn-login:disabled {
@@ -177,55 +137,22 @@ export default function MemberLoginPage() {
 
         .forgot-link {
           display: inline-block;
-          color: #a5b4fc;
+          color: #93c5fd;
           font-size: 13px;
           text-decoration: none;
           margin-top: 2px;
         }
 
         .forgot-link:hover { text-decoration: underline; }
-
-        .particles {
-          position: fixed; inset: 0;
-          pointer-events: none;
-          overflow: hidden;
-        }
-
-        .particle {
-          position: absolute;
-          width: 2px; height: 2px;
-          background: rgba(99,102,241,0.6);
-          border-radius: 50%;
-          animation: float var(--dur) var(--delay) infinite linear;
-        }
-
-        @keyframes float {
-          0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(-100px) translateX(var(--drift)); opacity: 0; }
-        }
       `}</style>
 
-      {/* Background particles */}
-      <div className="particles">
-        {particles.map((style, i) => (
-          <div key={i} className="particle" style={style} />
-        ))}
-      </div>
-
       <div style={{ position: 'relative', width: '100%', maxWidth: 420, padding: '0 20px' }}>
-        <div className="glow-ring" />
         <div className="login-card">
-          <div className="logo-badge">
-            <span>⚡</span>
-            <span>IPB Member Portal</span>
-          </div>
-          <h1 className="title">Selamat datang<br/>kembali 👋</h1>
+          <h1 className="title">Selamat datang<br/>kembali</h1>
           <p className="subtitle">Login dengan akun @apps.ipb.ac.id</p>
 
           <form onSubmit={handleLogin}>
-            {error && <div className="error-msg">⚠️ {error}</div>}
+            {error && <div className="error-msg">{error}</div>}
 
             <div className="field">
               <label>Email IPB</label>

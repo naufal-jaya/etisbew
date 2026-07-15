@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { Team, Member } from "@/types/database";
+import { Crown } from "lucide-react";
 
 interface TeamCardProps {
   team: Team;
@@ -44,6 +45,7 @@ export default function TeamCard({
       setIsSaving(false);
     }
   };
+  const minMembers = team.competition?.min_members ?? 1;
   const maxMembers = team.competition?.max_members ?? 3;
   const currentCount =
     team.members?.filter((m) => m.status === "active").length ?? 0;
@@ -58,304 +60,138 @@ export default function TeamCard({
 
   return (
     <div
-      style={{
-        background: isMyTeam
-          ? "linear-gradient(135deg, rgba(99,102,241,0.18), #1A2234)"
-          : "#1A2234",
-        border: `1px solid ${isMyTeam ? "rgba(99,102,241,0.32)" : "rgba(255,255,255,0.1)"}`,
-        borderRadius: "16px",
-        padding: "16px",
-        position: "relative",
-        transition: "all 0.2s",
-      }}
-      className="team-card"
+      className={`bg-[#1E2638] rounded-2xl p-4 relative h-fit transition-all duration-200 border hover:border-[#16357B] `}
     >
-      <style>{`
-        .team-card:hover { border-color: rgba(99,102,241,0.3) !important; transform: translateY(-1px); }
-        .username-tooltip { position: relative; display: inline-block; }
-        .username-tooltip .tooltip {
-          visibility: hidden;
-          opacity: 0;
-          background: rgba(18,24,32,0.98);
-          border: 1px solid rgba(99,102,241,0.3);
-          color: white  ;
-          border-radius: 8px;
-          padding: 4px 10px;
-          font-size: 12px;
-          position: absolute;
-          bottom: 120%;
-          left: 50%;
-          transform: translateX(-50%);
-          white-space: nowrap;
-          transition: all 0.15s;
-          z-index: 10;
-        }
-        .username-tooltip:hover .tooltip,
-        .username-tooltip:focus .tooltip { visibility: visible; opacity: 1; }
-        @media (max-width: 768px) {
-          .username-tooltip .tooltip { bottom: auto; top: 120%; }
-          .username-tooltip:active .tooltip { visibility: visible; opacity: 1; }
-        }
-      `}</style>
-
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          marginBottom: "12px",
-        }}
-      >
-        <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <h3
-              style={{
-                color: "white",
-                fontWeight: 600,
-                fontSize: "15px",
-                margin: 0,
-              }}
-            >
+      <div className="flex flex-col mb-2">
+        {team.competition?.competition_type?.name && (
+          <div className="text-[10px] font-bold tracking-wider uppercase text-[#93c5fd] leading-none mb-1.5">
+            {team.competition.competition_type.name}
+          </div>
+        )}
+        <div className="flex justify-between items-start gap-3">
+          <div className="my-auto">
+            <h3 className="text-white font-semibold flex items-center gap-2 flex-wrap text-[15px] m-0">
               {team.name}
-            </h3>
-            {isLeader && (
-              <span
-                style={{
-                  background: "rgba(251,191,36,0.15)",
-                  border: "1px solid rgba(251,191,36,0.3)",
-                  color: "#fbbf24",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  padding: "2px 8px",
-                  borderRadius: "100px",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                KETUA
-              </span>
-            )}
-            {isPending && (
-              <span
-                style={{
-                  background: "rgba(234,179,8,0.15)",
-                  border: "1px solid rgba(234,179,8,0.3)",
-                  color: "#eab308",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  padding: "2px 8px",
-                  borderRadius: "100px",
-                }}
-              >
-                PENDING
-              </span>
-            )}
-          </div>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.68)",
-              fontSize: "12px",
-              margin: "2px 0 0",
-            }}
-          >
-            {team.competition?.name}
-          </p>
-        </div>
-
-        {/* Member count & Actions */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div
-            style={{
-              background:
-                currentCount >= maxMembers
-                  ? "rgba(239,68,68,0.15)"
-                  : "rgba(34,197,94,0.12)",
-              border: `1px solid ${currentCount >= maxMembers ? "rgba(239,68,68,0.3)" : "rgba(34,197,94,0.25)"}`,
-              borderRadius: "100px",
-              padding: "3px 10px",
-              fontSize: "12px",
-              fontWeight: 700,
-              color: currentCount >= maxMembers ? "#f87171" : "#4ade80",
-              fontFamily: "DM Mono, monospace",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {currentCount}/{maxMembers}
-          </div>
-
-          {(isLeader || (isMember && !isLeader)) && (
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowMenu(!showMenu);
-                }}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: "16px",
-                  cursor: "pointer",
-                  padding: "4px 8px",
-                  borderRadius: "6px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                ⋮
-              </button>
-
-              {showMenu && (
-                <>
-                  {/* Backdrop to close menu */}
-                  <div 
-                    style={{ position: "fixed", inset: 0, zIndex: 9 }} 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowMenu(false);
-                    }} 
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      right: 0,
-                      background: "#1A2234",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "8px",
-                      padding: "4px",
-                      marginTop: "4px",
-                      minWidth: "120px",
-                      zIndex: 10,
-                      boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-                    }}
-                  >
-                    {isLeader && (
-                      <button
-                        onClick={() => {
-                          setShowMenu(false);
-                          onDeleteTeam?.(team.id);
-                        }}
-                        style={{
-                          width: "100%",
-                          textAlign: "left",
-                          background: "transparent",
-                          border: "none",
-                          color: "#fca5a5",
-                          padding: "8px 12px",
-                          fontSize: "13px",
-                          fontWeight: 500,
-                          cursor: "pointer",
-                          borderRadius: "4px",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.1)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        Hapus Tim
-                      </button>
-                    )}
-                    {isMember && !isLeader && (
-                      <button
-                        onClick={() => {
-                          setShowMenu(false);
-                          onLeaveTeam?.(team.id);
-                        }}
-                        style={{
-                          width: "100%",
-                          textAlign: "left",
-                          background: "transparent",
-                          border: "none",
-                          color: "#fca5a5",
-                          padding: "8px 12px",
-                          fontSize: "13px",
-                          fontWeight: 500,
-                          cursor: "pointer",
-                          borderRadius: "4px",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239,68,68,0.1)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                      >
-                        Keluar Tim
-                      </button>
-                    )}
-                  </div>
-                </>
+              {isLeader && (
+                <span className="inline-flex items-center justify-center bg-amber-500/15 border border-amber-500/30 text-[#fbbf24] text-[10px] font-bold px-2 py-1 rounded-full tracking-wider leading-none">
+                  KETUA
+                </span>
               )}
-            </div>
-          )}
+              {isPending && (
+                <span className="inline-flex items-center justify-center bg-yellow-500/15 border border-yellow-500/30 text-yellow-500 text-[10px] font-bold px-2 py-1 rounded-full leading-none">
+                  PENDING
+                </span>
+              )}
+            </h3>
+          </div>
+
+          {/* Member count & Actions */}
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-sm font-bold font-mono whitespace-nowrap translate-y-[1px] ${currentCount < minMembers
+                ? "text-amber-400"
+                : currentCount >= maxMembers
+                  ? "text-[#f87171]"
+                  : "text-[#4ade80]"
+                }`}
+            >
+              {currentCount}/{maxMembers}
+            </span>
+
+            {(isLeader || (isMember && !isLeader)) && (
+              <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMenu(!showMenu);
+                  }}
+                  className="bg-transparent border-none text-white/70 text-base cursor-pointer px-2 py-1 rounded hover:bg-white/5 flex items-center whitespace-nowrap leading-none  justify-center"
+                >
+                  ⋮
+                </button>
+
+                {showMenu && (
+                  <>
+                    {/* Backdrop to close menu */}
+                    <div
+                      className="fixed inset-0 z-9"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu(false);
+                      }}
+                    />
+                    <div className="absolute top-full right-0 bg-[#1E2638] border border-white/8 rounded-lg p-1 mt-1 min-w-[120px] z-10 shadow-lg shadow-black/50">
+                      {isLeader && (
+                        <button
+                          onClick={() => {
+                            setShowMenu(false);
+                            onDeleteTeam?.(team.id);
+                          }}
+                          className="w-full text-left bg-transparent border-none text-red-300 px-3 py-2 text-xs font-medium cursor-pointer rounded hover:bg-red-500/10"
+                        >
+                          Hapus Tim
+                        </button>
+                      )}
+                      {isMember && !isLeader && (
+                        <button
+                          onClick={() => {
+                            setShowMenu(false);
+                            onLeaveTeam?.(team.id);
+                          }}
+                          className="w-full text-left bg-transparent border-none text-red-300 px-3 py-2 text-xs font-medium cursor-pointer rounded hover:bg-red-500/10"
+                        >
+                          Keluar Tim
+                        </button>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
+      <p className="text-white/68 text-xs mb-2">
+        {team.competition?.name}
+      </p>
+
       {/* Members */}
-      <div style={{ marginBottom: "12px" }}>
-        <p
-          style={{
-            color: "rgba(255,255,255,0.62)",
-            fontSize: "11px",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.5px",
-            marginBottom: "6px",
-          }}
-        >
+      <div className="mb-3">
+        <p className="text-white/62 text-[11px] font-semibold uppercase tracking-wider mb-1.5">
           Anggota
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+        <div className="flex flex-wrap gap-1.5">
           {team.members
             ?.filter((m) => m.status === "active")
             .map((m) => (
               <div
                 key={m.id}
-                className="username-tooltip"
+                className={`group relative inline-flex items-center gap-1 border rounded-lg px-2.5 py-0.5 text-xs select-none cursor-default ${m.member_id === team.leader_id
+                  ? "bg-[#16357B]/40 border-[#16357B] text-[#93c5fd]"
+                  : "bg-white/8 border-white/8 text-white/78"
+                  }`}
                 tabIndex={0}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  background:
-                    m.member_id === team.leader_id
-                      ? "rgba(99,102,241,0.2)"
-                      : "rgba(255,255,255,0.08)",
-                  border: `1px solid ${m.member_id === team.leader_id ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`,
-                  borderRadius: "8px",
-                  padding: "3px 10px",
-                  fontSize: "12px",
-                  color:
-                    m.member_id === team.leader_id
-                      ? "#a5b4fc"
-                      : "rgba(255,255,255,0.78)",
-                  cursor: "default",
-                  userSelect: "none",
-                }}
               >
                 {m.member?.username ?? "unknown"}
-                {m.member_id === team.leader_id && " 👑"}
+                {m.member_id === team.leader_id && (
+                  <Crown size={12} className="text-amber-400 ml-1" />
+                )}
                 {isLeader && m.member_id !== team.leader_id && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onKickMember?.(team.id, m.member_id, m.member?.username ?? "unknown");
                     }}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "rgba(255,255,255,0.5)",
-                      fontSize: "14px",
-                      cursor: "pointer",
-                      padding: "0 2px",
-                      marginLeft: "2px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#fca5a5")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
+                    className="bg-transparent border-none text-white/50 text-sm cursor-pointer px-0.5 ml-0.5 flex items-center justify-center hover:text-red-300"
                   >
                     ×
                   </button>
                 )}
-                <span className="tooltip">{m.member?.real_name ?? "-"}</span>
+                <span className="invisible opacity-0 group-hover:visible group-focus:visible group-hover:opacity-100 group-focus:opacity-100 bg-[#121820] border border-[#16357B] text-white rounded-lg py-1 px-2.5 text-xs absolute bottom-[120%] left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-150 z-10 md:bottom-[120%] md:top-auto bottom-auto top-[120%] group-active:visible group-active:opacity-100">
+                  {m.member?.real_name ?? "-"}
+                </span>
               </div>
             ))}
         </div>
@@ -363,20 +199,8 @@ export default function TeamCard({
 
       {/* Team Note */}
       {(team.note || isLeader) && (
-        <div style={{ marginBottom: "12px" }}>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.62)",
-              fontSize: "11px",
-              fontWeight: 600,
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              marginBottom: "6px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+        <div className="mb-3">
+          <p className="text-white/62 text-[11px] font-semibold uppercase tracking-wider mb-1.5 flex justify-between items-center">
             <span>Catatan Tim</span>
             {isLeader && (
               <button
@@ -384,74 +208,40 @@ export default function TeamCard({
                   setTempNote(team.note || "");
                   setIsEditingNote(!isEditingNote);
                 }}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "#a5b4fc",
-                  fontSize: "11px",
-                  cursor: "pointer",
-                  padding: "0 4px",
-                }}
+                className="bg-transparent border-none text-[#93c5fd] text-[11px] cursor-pointer px-1"
               >
                 {team.note ? "Edit" : "+ Tambah"}
               </button>
             )}
           </p>
           {isEditingNote ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div className="flex flex-col gap-1.5">
               <textarea
                 value={tempNote}
                 onChange={(e) => setTempNote(e.target.value)}
                 placeholder="Tulis catatan tim (misal: butuh UI/UX designer, target juara)..."
                 maxLength={200}
                 rows={2}
-                style={{
-                  width: "100%",
-                  background: "#121820",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  borderRadius: "8px",
-                  padding: "8px",
-                  color: "white",
-                  fontSize: "12px",
-                  resize: "none",
-                  outline: "none",
-                }}
+                className="w-full bg-[#121820] border border-white/14 rounded-lg p-2 text-white text-xs resize-none outline-none focus:border-[#16357B]"
               />
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)" }}>
+              <div className="flex justify-between items-center">
+                <span className="text-[11px] text-white/40">
                   {tempNote.length}/200
                 </span>
-                <div style={{ display: "flex", gap: "6px" }}>
+                <div className="flex gap-1.5">
                   <button
                     onClick={() => {
                       setIsEditingNote(false);
                       setTempNote(team.note || "");
                     }}
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: "6px",
-                      padding: "3px 8px",
-                      color: "rgba(255,255,255,0.7)",
-                      fontSize: "11px",
-                      cursor: "pointer",
-                    }}
+                    className="bg-white/5 border border-white/10 rounded-md px-2 py-0.5 text-white/70 text-[11px] cursor-pointer hover:bg-white/10"
                   >
                     Batal
                   </button>
                   <button
                     onClick={handleSaveNote}
                     disabled={isSaving}
-                    style={{
-                      background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                      border: "none",
-                      borderRadius: "6px",
-                      padding: "3px 10px",
-                      color: "white",
-                      fontSize: "11px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
+                    className="bg-[#16357B] border-none rounded-md px-2.5 py-0.5 text-white text-[11px] font-semibold cursor-pointer hover:bg-[#16357B]/80"
                   >
                     {isSaving ? "Simpan..." : "Simpan"}
                   </button>
@@ -460,17 +250,8 @@ export default function TeamCard({
             </div>
           ) : (
             <div
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: "8px",
-                padding: "8px 12px",
-                fontSize: "12px",
-                color: team.note ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.44)",
-                fontStyle: team.note ? "normal" : "italic",
-                lineHeight: "1.4",
-                whiteSpace: "pre-wrap",
-              }}
+              className={`bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-xs leading-relaxed whitespace-pre-wrap ${team.note ? "text-white/88 not-italic" : "text-white/44 italic"
+                }`}
             >
               {team.note || "Belum ada catatan tim."}
             </div>
@@ -482,64 +263,24 @@ export default function TeamCard({
       {!isMyTeam && !isMember && !isPending && currentCount < maxMembers && (
         <button
           onClick={() => onAskToJoin?.(team.id)}
-          style={{
-            width: "100%",
-            background:
-              "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))",
-            border: "1px solid rgba(99,102,241,0.35)",
-            borderRadius: "10px",
-            padding: "8px",
-            color: "#a5b4fc",
-            fontSize: "13px",
-            fontWeight: 600,
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background =
-              "linear-gradient(135deg, rgba(99,102,241,0.35), rgba(139,92,246,0.35))")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background =
-              "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))")
-          }
+          className="w-full bg-[#16357B]/25 border border-[#16357B]/60 rounded-xl p-2 text-[#93c5fd] text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-[#16357B]/45"
         >
-          Ask to Join →
+          Gabung
         </button>
       )}
 
       {isPending && (
-        <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+        <div className="flex gap-2 w-full">
           <button
             onClick={() => onCancelRequest?.(team.id)}
-            style={{
-              flex: 1,
-              background: "rgba(239,68,68,0.08)",
-              border: "1px solid rgba(239,68,68,0.2)",
-              borderRadius: "10px",
-              padding: "8px",
-              color: "#fca5a5",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            className="flex-1 bg-red-500/8 border border-red-500/20 rounded-xl p-2 text-red-300 text-xs font-semibold cursor-pointer hover:bg-red-500/15"
           >
-            Cancel Request
+            Batalkan Permintaan
           </button>
           {waLink && (
             <button
               onClick={() => window.open(waLink, "_blank")}
-              style={{
-                flex: 1,
-                background: "rgba(34,197,94,0.12)",
-                border: "1px solid rgba(34,197,94,0.25)",
-                borderRadius: "10px",
-                padding: "8px",
-                color: "#4ade80",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
+              className="flex-1 bg-green-500/12 border border-green-500/25 rounded-xl p-2 text-[#4ade80] text-xs font-semibold cursor-pointer hover:bg-green-500/20"
             >
               WhatsApp
             </button>

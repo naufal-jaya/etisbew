@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { Member, Team, Competition } from "@/types/database";
-import { Menu, X, User, Pencil } from "lucide-react";
+import { X, User, Pencil, Bell, Flag, Trophy } from "lucide-react";
 import TeamCard from "@/components/matchmakieeeng/TeamCard";
 import CompetitionCard from "@/components/matchmakieeeng/CompetitionCard";
 import JoinCompetitionForm from "@/components/matchmakieeeng/JoinCompetitionForm";
@@ -39,12 +39,12 @@ export default function MatchmakingClient({
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const [showForm, setShowForm] = useState(false);
   const [showNotifs, setShowNotifs] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+  const [showMobileCompList, setShowMobileCompList] = useState(false);
+
   const [confirmJoinTeam, setConfirmJoinTeam] = useState<Team | null>(null);
   const [confirmLeaveTeam, setConfirmLeaveTeam] = useState<Team | null>(null);
   const [confirmDeleteTeam, setConfirmDeleteTeam] = useState<Team | null>(null);
-  const [confirmKickMember, setConfirmKickMember] = useState<{team: Team, memberId: string, username: string} | null>(null);
+  const [confirmKickMember, setConfirmKickMember] = useState<{ team: Team, memberId: string, username: string } | null>(null);
 
   // Refetch data client-side (for realtime updates)
   const fetchData = useCallback(async () => {
@@ -198,7 +198,7 @@ export default function MatchmakingClient({
     try {
       const { error } = await supabase.rpc('delete_team', { target_team_id: teamId });
       if (error) throw error;
-      
+
       fetchData();
     } catch (err: any) {
       alert("Gagal menghapus tim: " + (err.message || "Terjadi kesalahan"));
@@ -268,15 +268,8 @@ export default function MatchmakingClient({
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#121820", color: "white" }}>
-      <nav
-        className="sticky top-0 left-0 right-0 z-50 transition-all duration-500 py-3"
-        style={{
-          background: "rgba(18,24,32,0.92)",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          backdropFilter: "blur(18px)",
-        }}
-      >
+    <div className="min-h-screen bg-[#121820] text-white">
+      <nav className="sticky top-0 left-0 right-0 z-50 transition-all duration-500 py-3 bg-[#121820]/90 border-b border-white/10 backdrop-blur-[18px]">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2 group">
@@ -288,230 +281,62 @@ export default function MatchmakingClient({
               </div>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8">
+            <div className="flex items-center gap-3 md:gap-8">
               <button
                 onClick={() => {
                   setEditUsername(userState.username);
                   setEditWhatsapp(userState.wa_number || "");
                   setShowProfile(true);
                 }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  color: "rgba(255,255,255,0.72)",
-                  fontSize: "13px",
-                  cursor: "pointer",
-                  padding: "4px 8px",
-                  borderRadius: "8px",
-                  transition: "background 0.2s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.05)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                className="bg-transparent border-none flex items-center gap-1.5 text-white/70 text-xs cursor-pointer px-2 py-1 rounded-lg transition-colors duration-200 hover:bg-white/10"
               >
-                <User size={16} strokeWidth={2} style={{ color: "rgba(255,255,255,0.6)" }} />
+                <User size={16} strokeWidth={2} className="text-white/60" />
                 <span>@{userState.username}</span>
               </button>
               <button
                 onClick={handleLogout}
-                style={{
-                  background: "#1A2234",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: "8px",
-                  padding: "6px 12px",
-                  color: "rgba(255,255,255,0.78)",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                }}
+                className="bg-[#1E2638] border border-white/10 rounded-lg px-3 py-1.5 text-white/80 text-xs cursor-pointer hover:bg-white/10 transition-colors duration-200"
               >
                 Logout
               </button>
             </div>
-
-            <button
-              className="md:hidden p-2 rounded-full transition-colors text-white hover:bg-white/10"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
-
-          {isMobileMenuOpen && (
-            <div
-              className="md:hidden absolute top-full left-0 right-0 backdrop-blur-xl shadow-xl animate-in slide-in-from-top-5"
-              style={{
-                background: "rgba(26,34,52,0.98)",
-                borderBottom: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              <div className="flex flex-col p-4 space-y-2">
-                <Link
-                  href="/"
-                  className="block py-3 px-4 text-slate-200 hover:bg-white/10 hover:text-white rounded-lg transition-colors font-medium"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Home
-                </Link>
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    setEditUsername(userState.username);
-                    setEditWhatsapp(userState.wa_number || "");
-                    setShowProfile(true);
-                  }}
-                  className="w-full text-left flex items-center gap-2 py-3 px-4 text-slate-200 hover:bg-white/10 hover:text-white rounded-lg transition-colors font-medium"
-                  style={{ background: "transparent", border: "none" }}
-                >
-                  <User size={16} style={{ color: "rgba(255,255,255,0.6)" }} />
-                  <span>@{userState.username} (Profil)</span>
-                </button>
-                <button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    handleLogout();
-                  }}
-                  className="w-full text-left py-3 px-4 text-red-400 hover:bg-white/10 rounded-lg transition-colors font-medium"
-                  style={{ background: "transparent", border: "none" }}
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </nav>
 
-      <div
-        style={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "32px 24px",
-          display: "grid",
-          gridTemplateColumns: "1fr 320px",
-          gap: "32px",
-        }}
-      >
+      <div className="max-w-[1400px] mx-auto px-3 py-4 md:px-6 md:py-8 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 md:gap-8">
         {/* LEFT: Teams */}
-        <div>
+        <div className="flex flex-col gap-8 md:block md:space-y-10">
           {/* My Teams */}
-          <div style={{ marginBottom: "40px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
-              <h2 style={{ color: "white", fontWeight: 700, fontSize: "20px" }}>
+          <div className="md:mb-10">
+            <div className="flex items-center gap-3 mb-5">
+              <h2 className="text-white font-bold text-xl">
                 My Teams
               </h2>
               <button
                 onClick={() => setShowNotifs(true)}
-                style={{
-                  position: "relative",
-                  background: "#1A2234",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: "10px",
-                  width: "36px",
-                  height: "36px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  fontSize: "16px",
-                }}
+                className="relative bg-[#1E2638] border border-white/10 rounded-xl w-9 h-9 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors duration-200"
               >
-                🔔
+                <Bell size={18} className="text-white" />
                 {unreadCount > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-4px",
-                      right: "-4px",
-                      background: "#ef4444",
-                      color: "white",
-                      fontSize: "10px",
-                      fontWeight: 700,
-                      width: "16px",
-                      height: "16px",
-                      borderRadius: "50%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </span>
                 )}
               </button>
-              <button
-                onClick={() => setShowForm(true)}
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(99,102,241,0.24), rgba(139,92,246,0.24))",
-                  border: "1px solid rgba(99,102,241,0.36)",
-                  borderRadius: "10px",
-                  padding: "8px 16px",
-                  color: "#c7d2fe",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                + Join Competition
-              </button>
             </div>
 
             {myActiveTeams.length === 0 ? (
-              <div
-                style={{
-                  background: "#1A2234",
-                  border: "1px dashed rgba(255,255,255,0.14)",
-                  borderRadius: "16px",
-                  padding: "40px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "32px", marginBottom: "12px" }}>🏁</div>
-                <p
-                  style={{
-                    color: "rgba(255,255,255,0.72)",
-                    fontSize: "14px",
-                    marginBottom: "16px",
-                  }}
-                >
+              <div className="bg-[#1E2638] border border-dashed border-white/10 rounded-2xl p-10 text-center">
+                <div className="flex justify-center mb-3">
+                  <Flag size={32} className="text-white/30" />
+                </div>
+                <p className="text-white/70 text-sm">
                   Kamu belum di tim manapun
                 </p>
-                <button
-                  onClick={() => setShowForm(true)}
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2))",
-                    border: "1px solid rgba(99,102,241,0.3)",
-                    borderRadius: "10px",
-                    padding: "8px 20px",
-                    color: "#a5b4fc",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  + Join a Competition
-                </button>
               </div>
             ) : (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                  gap: "14px",
-                }}
-              >
+              <div className="team-grid grid grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 md:gap-3.5">
                 {myActiveTeams.map((team) => (
                   <TeamCard
                     key={team.id}
@@ -522,7 +347,7 @@ export default function MatchmakingClient({
                     onCancelRequest={handleCancelRequest}
                     onLeaveTeam={(t) => setConfirmLeaveTeam(teams.find((x) => x.id === t) || null)}
                     onDeleteTeam={(t) => setConfirmDeleteTeam(teams.find((x) => x.id === t) || null)}
-                    onKickMember={(t, mId, uName) => setConfirmKickMember({team: teams.find((x) => x.id === t)!, memberId: mId, username: uName})}
+                    onKickMember={(t, mId, uName) => setConfirmKickMember({ team: teams.find((x) => x.id === t)!, memberId: mId, username: uName })}
                     onUpdateNote={handleUpdateNote}
                   />
                 ))}
@@ -532,49 +357,23 @@ export default function MatchmakingClient({
 
           {/* Available Teams */}
           <div>
-            <h2
-              style={{
-                color: "white",
-                fontWeight: 700,
-                fontSize: "20px",
-                marginBottom: "20px",
-              }}
-            >
-              Available Teams
-              <span
-                style={{
-                  color: "rgba(255,255,255,0.55)",
-                  fontWeight: 400,
-                  fontSize: "14px",
-                  marginLeft: "10px",
-                }}
-              >
+            <div className="flex items-baseline gap-2.5 mb-5">
+              <h2 className="text-white font-bold text-xl">
+                Available Teams
+              </h2>
+              <span className="text-white/60 font-normal text-sm">
                 {availableTeams.length} tim
               </span>
-            </h2>
+            </div>
 
             {availableTeams.length === 0 ? (
-              <div
-                style={{
-                  background: "#1A2234",
-                  border: "1px dashed rgba(255,255,255,0.14)",
-                  borderRadius: "16px",
-                  padding: "40px",
-                  textAlign: "center",
-                }}
-              >
-                <p style={{ color: "rgba(255,255,255,0.68)", fontSize: "14px" }}>
+              <div className="bg-[#1E2638] border border-dashed border-white/10 rounded-2xl p-10 text-center">
+                <p className="text-white/70 text-sm">
                   Belum ada tim yang tersedia
                 </p>
               </div>
             ) : (
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-                  gap: "14px",
-                }}
-              >
+              <div className="team-grid grid grid-cols-2 md:grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3 md:gap-3.5">
                 {availableTeams.map((team) => {
                   const isPending = (team as any).join_requests?.some((jr: any) => jr.requester_id === userState.id && jr.status === 'pending');
 
@@ -588,7 +387,7 @@ export default function MatchmakingClient({
                       onCancelRequest={handleCancelRequest}
                       onLeaveTeam={(t) => setConfirmLeaveTeam(teams.find((x) => x.id === t) || null)}
                       onDeleteTeam={(t) => setConfirmDeleteTeam(teams.find((x) => x.id === t) || null)}
-                      onKickMember={(t, mId, uName) => setConfirmKickMember({team: teams.find((x) => x.id === t)!, memberId: mId, username: uName})}
+                      onKickMember={(t, mId, uName) => setConfirmKickMember({ team: teams.find((x) => x.id === t)!, memberId: mId, username: uName })}
                       onUpdateNote={handleUpdateNote}
                     />
                   );
@@ -599,41 +398,26 @@ export default function MatchmakingClient({
         </div>
 
         {/* RIGHT: Competitions */}
-        <div>
-          <div style={{ position: "sticky", top: "80px" }}>
-            <h2
-              style={{
-                color: "white",
-                fontWeight: 700,
-                fontSize: "20px",
-                marginBottom: "20px",
-              }}
+        <div className="hidden md:block">
+          <div className="sticky top-20">
+            <button
+              onClick={() => setShowForm(true)}
+              className="w-full bg-[#16357B] border-none rounded-xl px-4 py-4 text-white text-sm font-bold cursor-pointer mb-4 text-center hover:bg-[#16357B]/80 transition-colors duration-200"
             >
-              Lomba Aktif 🏆
+              Ikut Lomba
+            </button>
+            <h2 className="text-white font-bold text-xl mb-3">
+              Lomba Aktif
             </h2>
 
             {competitions.length === 0 ? (
-              <div
-                style={{
-                  background: "#1A2234",
-                  border: "1px dashed rgba(255,255,255,0.14)",
-                  borderRadius: "16px",
-                  padding: "32px",
-                  textAlign: "center",
-                }}
-              >
-                <p style={{ color: "rgba(255,255,255,0.68)", fontSize: "13px" }}>
+              <div className="bg-[#1E2638] border border-dashed border-white/10 rounded-2xl p-8 text-center">
+                <p className="text-white/70 text-xs">
                   Belum ada lomba aktif
                 </p>
               </div>
             ) : (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
-                }}
-              >
+              <div className="flex flex-col gap-3">
                 {competitions.slice(0, 8).map((comp) => (
                   <CompetitionCard key={comp.id} competition={comp} />
                 ))}
@@ -664,65 +448,28 @@ export default function MatchmakingClient({
       {/* Confirm Join Modal */}
       {confirmJoinTeam && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(8px)",
-          }}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md"
           onClick={() => setConfirmJoinTeam(null)}
         >
           <div
-            style={{
-              background: "#1A2234",
-              border: "1px solid rgba(99,102,241,0.3)",
-              borderRadius: "20px",
-              padding: "32px",
-              maxWidth: "360px",
-              width: "90%",
-              textAlign: "center",
-            }}
+            className="bg-[#1E2638] border border-[#16357B]/60 rounded-[20px] p-8 max-w-[360px] w-[90%] text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🤝</div>
-            <h3
-              style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}
-            >
+            <h3 className="text-white font-bold text-lg mb-2">
               Yakin mau join?
             </h3>
-            <p
-              style={{
-                color: "rgba(255,255,255,0.72)",
-                fontSize: "14px",
-                marginBottom: "24px",
-                lineHeight: 1.5,
-              }}
-            >
+            <p className="text-white/70 text-sm mb-6 leading-relaxed">
               Kamu akan kirim permintaan ke{" "}
-              <strong style={{ color: "#a5b4fc" }}>
+              <strong className="text-[#93c5fd] font-bold">
                 {confirmJoinTeam.leader?.username}
               </strong>{" "}
               untuk join tim{" "}
-              <strong style={{ color: "white" }}>{confirmJoinTeam.name}</strong>.
+              <strong className="text-white font-bold">{confirmJoinTeam.name}</strong>.
             </p>
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setConfirmJoinTeam(null)}
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "rgba(255,255,255,0.78)",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
               >
                 Batal
               </button>
@@ -731,17 +478,7 @@ export default function MatchmakingClient({
                   handleAskToJoin(confirmJoinTeam.id);
                   setConfirmJoinTeam(null);
                 }}
-                style={{
-                  flex: 1,
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  border: "none",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "white",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                }}
+                className="flex-1 bg-[#16357B] border-none rounded-xl py-2.5 text-white cursor-pointer text-sm font-semibold hover:bg-[#16357B]/80 transition-colors duration-200"
               >
                 Kirim Permintaan
               </button>
@@ -753,51 +490,23 @@ export default function MatchmakingClient({
       {/* Confirm Leave Team Modal */}
       {confirmLeaveTeam && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(8px)",
-          }}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md"
           onClick={() => setConfirmLeaveTeam(null)}
         >
           <div
-            style={{
-              background: "#1A2234",
-              border: "1px solid rgba(239,68,68,0.3)",
-              borderRadius: "20px",
-              padding: "32px",
-              maxWidth: "360px",
-              width: "90%",
-              textAlign: "center",
-            }}
+            className="bg-[#1E2638] border border-red-500/30 rounded-[20px] p-8 max-w-[360px] w-[90%] text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🚪</div>
-            <h3 style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}>
+            <h3 className="text-white font-bold text-lg mb-2">
               Keluar dari Tim?
             </h3>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
-              Yakin mau keluar dari tim <strong style={{ color: "white" }}>{confirmLeaveTeam.name}</strong>?
+            <p className="text-white/70 text-sm mb-6 leading-relaxed">
+              Yakin mau keluar dari tim <strong className="text-white font-bold">{confirmLeaveTeam.name}</strong>?
             </p>
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setConfirmLeaveTeam(null)}
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "rgba(255,255,255,0.78)",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
               >
                 Batal
               </button>
@@ -806,17 +515,7 @@ export default function MatchmakingClient({
                   handleLeaveTeam(confirmLeaveTeam.id);
                   setConfirmLeaveTeam(null);
                 }}
-                style={{
-                  flex: 1,
-                  background: "rgba(239,68,68,0.15)",
-                  border: "1px solid rgba(239,68,68,0.3)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "#fca5a5",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                }}
+                className="flex-1 bg-red-500/15 border border-red-500/30 rounded-xl py-2.5 text-[#fca5a5] cursor-pointer text-sm font-semibold hover:bg-red-500/25 transition-colors duration-200"
               >
                 Ya, Keluar
               </button>
@@ -828,51 +527,23 @@ export default function MatchmakingClient({
       {/* Confirm Delete Team Modal */}
       {confirmDeleteTeam && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(8px)",
-          }}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md"
           onClick={() => setConfirmDeleteTeam(null)}
         >
           <div
-            style={{
-              background: "#1A2234",
-              border: "1px solid rgba(239,68,68,0.3)",
-              borderRadius: "20px",
-              padding: "32px",
-              maxWidth: "360px",
-              width: "90%",
-              textAlign: "center",
-            }}
+            className="bg-[#1E2638] border border-red-500/30 rounded-[20px] p-8 max-w-[360px] w-[90%] text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🗑️</div>
-            <h3 style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}>
+            <h3 className="text-white font-bold text-lg mb-2">
               Hapus Tim?
             </h3>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
-              Yakin mau menghapus tim <strong style={{ color: "white" }}>{confirmDeleteTeam.name}</strong> secara permanen? Aksi ini tidak bisa dibatalkan!
+            <p className="text-white/70 text-sm mb-6 leading-relaxed">
+              Yakin mau menghapus tim <strong className="text-white font-bold">{confirmDeleteTeam.name}</strong> secara permanen? Aksi ini tidak bisa dibatalkan!
             </p>
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setConfirmDeleteTeam(null)}
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "rgba(255,255,255,0.78)",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
               >
                 Batal
               </button>
@@ -881,17 +552,7 @@ export default function MatchmakingClient({
                   handleDeleteTeam(confirmDeleteTeam.id);
                   setConfirmDeleteTeam(null);
                 }}
-                style={{
-                  flex: 1,
-                  background: "rgba(239,68,68,0.15)",
-                  border: "1px solid rgba(239,68,68,0.3)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "#fca5a5",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                }}
+                className="flex-1 bg-red-500/15 border border-red-500/30 rounded-xl py-2.5 text-[#fca5a5] cursor-pointer text-sm font-semibold hover:bg-red-500/25 transition-colors duration-200"
               >
                 Ya, Hapus
               </button>
@@ -903,51 +564,23 @@ export default function MatchmakingClient({
       {/* Confirm Kick Member Modal */}
       {confirmKickMember && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(8px)",
-          }}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-md"
           onClick={() => setConfirmKickMember(null)}
         >
           <div
-            style={{
-              background: "#1A2234",
-              border: "1px solid rgba(239,68,68,0.3)",
-              borderRadius: "20px",
-              padding: "32px",
-              maxWidth: "360px",
-              width: "90%",
-              textAlign: "center",
-            }}
+            className="bg-[#1E2638] border border-red-500/30 rounded-[20px] p-8 max-w-[360px] w-[90%] text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>👟</div>
-            <h3 style={{ color: "white", fontWeight: 700, marginBottom: "8px" }}>
+            <h3 className="text-white font-bold text-lg mb-2">
               Keluarkan Anggota?
             </h3>
-            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: "14px", marginBottom: "24px", lineHeight: 1.5 }}>
-              Yakin mau mengeluarkan <strong style={{ color: "#fca5a5" }}>{confirmKickMember.username}</strong> dari tim <strong style={{ color: "white" }}>{confirmKickMember.team.name}</strong>?
+            <p className="text-white/70 text-sm mb-6 leading-relaxed">
+              Yakin mau mengeluarkan <strong className="text-[#fca5a5] font-bold">{confirmKickMember.username}</strong> dari tim <strong className="text-white font-bold">{confirmKickMember.team.name}</strong>?
             </p>
-            <div style={{ display: "flex", gap: "10px" }}>
+            <div className="flex gap-2.5">
               <button
                 onClick={() => setConfirmKickMember(null)}
-                style={{
-                  flex: 1,
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "rgba(255,255,255,0.78)",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                }}
+                className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
               >
                 Batal
               </button>
@@ -956,17 +589,7 @@ export default function MatchmakingClient({
                   handleKickMember(confirmKickMember.team.id, confirmKickMember.memberId);
                   setConfirmKickMember(null);
                 }}
-                style={{
-                  flex: 1,
-                  background: "rgba(239,68,68,0.15)",
-                  border: "1px solid rgba(239,68,68,0.3)",
-                  borderRadius: "12px",
-                  padding: "10px",
-                  color: "#fca5a5",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                }}
+                className="flex-1 bg-red-500/15 border border-red-500/30 rounded-xl py-2.5 text-[#fca5a5] cursor-pointer text-sm font-semibold hover:bg-red-500/25 transition-colors duration-200"
               >
                 Ya, Keluarkan
               </button>
@@ -977,160 +600,146 @@ export default function MatchmakingClient({
 
       {showProfile && (
         <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.6)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-            backdropFilter: "blur(8px)",
-          }}
+          className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-md"
           onClick={() => setShowProfile(false)}
         >
           <div
-            style={{
-              background: "#1A2234",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "20px",
-              padding: "32px",
-              maxWidth: "400px",
-              width: "90%",
-            }}
+            className="bg-[#1E2638] border border-white/10 rounded-[20px] p-8 max-w-[400px] w-[90%]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ textAlign: "center", marginBottom: "24px" }}>
-              <div
-                style={{
-                  width: "64px",
-                  height: "64px",
-                  borderRadius: "50%",
-                  background: "rgba(99,102,241,0.1)",
-                  border: "1px solid rgba(99,102,241,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 12px",
-                }}
-              >
-                <User size={32} style={{ color: "#818cf8" }} />
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 rounded-full bg-[#16357B]/20 border border-[#16357B]/40 flex items-center justify-center mx-auto mb-3">
+                <User size={32} className="text-[#93c5fd]" />
               </div>
-              <h3 style={{ color: "white", fontWeight: 700, fontSize: "18px", margin: "0 0 4px" }}>
+              <h3 className="text-white font-bold text-lg mb-1">
                 {userState.real_name || "Nama Lengkap"}
               </h3>
-              <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "13px", margin: 0 }}>
+              <p className="text-white/60 text-xs m-0">
                 @{userState.username}
               </p>
             </div>
 
-            <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <form onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
               <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                <label className="block text-xs font-semibold text-white/60 mb-1.5">
                   Nama Lengkap
                 </label>
                 <input
                   type="text"
                   value={userState.real_name || ""}
                   disabled
-                  style={{
-                    width: "100%",
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "10px",
-                    padding: "10px 14px",
-                    color: "rgba(255,255,255,0.4)",
-                    fontSize: "14px",
-                    cursor: "not-allowed",
-                  }}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-white/40 text-sm cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                <label className="block text-xs font-semibold text-white/60 mb-1.5">
                   Username
                 </label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <input
                     type="text"
                     value={editUsername}
                     onChange={(e) => setEditUsername(e.target.value)}
                     required
-                    style={{
-                      width: "100%",
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: "10px",
-                      padding: "10px 40px 10px 14px",
-                      color: "white",
-                      fontSize: "14px",
-                    }}
+                    className="w-full bg-[#121820] border border-white/10 rounded-xl pl-3.5 pr-10 py-2.5 text-white text-sm outline-none focus:border-[#16357B]"
                   />
-                  <Pencil size={14} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", pointerEvents: "none" }} />
+                  <Pencil size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
                 </div>
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: "6px" }}>
+                <label className="block text-xs font-semibold text-white/60 mb-1.5">
                   Nomor WhatsApp
                 </label>
-                <div style={{ position: "relative" }}>
+                <div className="relative">
                   <input
                     type="text"
                     placeholder="Contoh: 08123456789"
                     value={editWhatsapp}
                     onChange={(e) => setEditWhatsapp(e.target.value)}
-                    style={{
-                      width: "100%",
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: "10px",
-                      padding: "10px 40px 10px 14px",
-                      color: "white",
-                      fontSize: "14px",
-                    }}
+                    className="w-full bg-[#121820] border border-white/10 rounded-xl pl-3.5 pr-10 py-2.5 text-white text-sm outline-none focus:border-[#16357B]"
                   />
-                  <Pencil size={14} style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.4)", pointerEvents: "none" }} />
+                  <Pencil size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
                 </div>
               </div>
 
-              <div style={{ display: "flex", gap: "10px", marginTop: "8px" }}>
+              <div className="flex gap-2.5 mt-2">
                 <button
                   type="button"
                   onClick={() => setShowProfile(false)}
-                  style={{
-                    flex: 1,
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "12px",
-                    padding: "10px",
-                    color: "rgba(255,255,255,0.78)",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                  }}
+                  className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={updatingProfile}
-                  style={{
-                    flex: 1,
-                    background: updatingProfile ? "rgba(99,102,241,0.5)" : "rgb(99, 102, 241)",
-                    border: "none",
-                    borderRadius: "12px",
-                    padding: "10px",
-                    color: "white",
-                    cursor: updatingProfile ? "not-allowed" : "pointer",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                  }}
+                  className={`flex-1 border-none rounded-xl py-2.5 text-white text-sm font-semibold transition-colors duration-200 ${updatingProfile
+                    ? "bg-[#16357B]/50 cursor-not-allowed"
+                    : "bg-[#16357B] cursor-pointer hover:bg-[#16357B]/80"
+                    }`}
                 >
                   {updatingProfile ? "Menyimpan..." : "Simpan"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Floating Sticky Action Bar */}
+      <div className="mobile-floating-bar grid grid-cols-[8fr_2fr] gap-2.5 fixed bottom-4 left-4 right-4 z-50 md:hidden">
+        <button
+          onClick={() => setShowForm(true)}
+          className="bg-[#16357B] border-none rounded-xl p-3.5 text-white text-sm font-bold cursor-pointer text-center shadow-lg shadow-black/50 hover:bg-[#16357B]/80 transition-colors duration-200"
+        >
+          Ikut Lomba
+        </button>
+        <button
+          onClick={() => setShowMobileCompList(true)}
+          className="bg-[#1E2638] border border-white/10 rounded-xl p-3.5 text-white flex items-center justify-center cursor-pointer shadow-lg shadow-black/50 hover:bg-white/10 transition-colors duration-200"
+          title="Daftar Lomba"
+        >
+          <Trophy size={20} className="text-amber-400" />
+        </button>
+      </div>
+
+      {/* Mobile Competition List Overlay Modal */}
+      {showMobileCompList && (
+        <div
+          className="fixed inset-0 bg-black/75 backdrop-blur-md z-[600] flex items-center justify-center p-4"
+          onClick={() => setShowMobileCompList(false)}
+        >
+          <div
+            className="bg-[#1E2638] border border-white/10 rounded-[20px] p-6 w-full max-w-[400px] max-h-[85vh] overflow-y-auto flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-white font-bold text-lg m-0">
+                Lomba Aktif
+              </h3>
+              <button
+                onClick={() => setShowMobileCompList(false)}
+                className="bg-transparent border-none text-white cursor-pointer p-1 flex items-center justify-center hover:bg-white/10 rounded transition-colors duration-200"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {competitions.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-white/70 text-sm m-0">
+                  Belum ada lomba aktif
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {competitions.slice(0, 8).map((comp) => (
+                  <CompetitionCard key={comp.id} competition={comp} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

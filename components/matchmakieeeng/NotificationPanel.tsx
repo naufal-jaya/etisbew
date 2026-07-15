@@ -2,6 +2,39 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import type { Notification, Member } from "@/types/database";
+import {
+  UserPlus,
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  LogOut,
+  Mail,
+  Inbox
+} from "lucide-react";
+
+const getNotificationIcon = (type: string) => {
+  const size = 14;
+  switch (type) {
+    case "join_request":
+      return <UserPlus size={size} style={{ color: "#fbbf24" }} />;
+    case "team_invite":
+      return <Mail size={size} style={{ color: "#fbbf24" }} />;
+    case "request_accepted":
+      return <CheckCircle2 size={size} style={{ color: "#4ade80" }} />;
+    case "new_member":
+      return <UserPlus size={size} style={{ color: "#4ade80" }} />;
+    case "request_rejected":
+      return <XCircle size={size} style={{ color: "#f87171" }} />;
+    case "team_deleted":
+      return <AlertTriangle size={size} style={{ color: "#f87171" }} />;
+    case "member_left":
+    case "member_kicked":
+    case "member_kicked_team":
+      return <LogOut size={size} style={{ color: "#f87171" }} />;
+    default:
+      return <Mail size={size} style={{ color: "#93c5fd" }} />;
+  }
+};
 
 interface NotificationPanelProps {
   currentUser: Member;
@@ -89,14 +122,14 @@ export default function NotificationPanel({
 
   const typeLabel: Record<string, string> = {
     join_request: "Minta Join",
-    request_accepted: "Diterima ✅",
-    request_rejected: "Ditolak ❌",
-    team_deleted: "Tim Dihapus ⚠️",
-    member_left: "Anggota Keluar 🚪",
-    member_kicked: "Dikeluarkan 🚪",
-    member_kicked_team: "Anggota Keluar 🚪",
-    new_member: "Anggota Baru 🎉",
-    team_invite: "Undangan Tim 📩",
+    request_accepted: "Diterima",
+    request_rejected: "Ditolak",
+    team_deleted: "Tim Dihapus",
+    member_left: "Anggota Keluar",
+    member_kicked: "Dikeluarkan",
+    member_kicked_team: "Anggota Keluar",
+    new_member: "Anggota Baru",
+    team_invite: "Undangan Tim",
   };
 
   return (
@@ -143,7 +176,7 @@ export default function NotificationPanel({
               margin: 0,
             }}
           >
-            🔔 Notifikasi
+            Notifikasi
           </h2>
           <button
             onClick={onClose}
@@ -171,7 +204,9 @@ export default function NotificationPanel({
           </div>
         ) : notifs.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 0" }}>
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>📭</div>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+              <Inbox size={40} style={{ color: "rgba(255,255,255,0.25)" }} />
+            </div>
             <p style={{ color: "rgba(255,255,255,0.68)" }}>
               Belum ada notifikasi
             </p>
@@ -188,8 +223,8 @@ export default function NotificationPanel({
                 <div
                   key={n.id}
                   style={{
-                    background: n.is_read ? "#1A2234" : "rgba(99,102,241,0.08)",
-                    border: `1px solid ${n.is_read ? "rgba(255,255,255,0.1)" : "rgba(99,102,241,0.24)"}`,
+                    background: n.is_read ? "#1E2638" : "rgba(22, 53, 123, 0.15)",
+                    border: `1px solid ${n.is_read ? "rgba(255,255,255,0.08)" : "rgba(22, 53, 123, 0.4)"}`,
                     borderRadius: "14px",
                     padding: "14px",
                   }}
@@ -201,22 +236,25 @@ export default function NotificationPanel({
                       marginBottom: "6px",
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: "11px",
-                        fontWeight: 700,
-                        color:
-                          n.type === "join_request" || n.type === "team_invite"
-                            ? "#fbbf24"
-                            : n.type === "request_accepted" || n.type === "new_member"
-                              ? "#4ade80"
-                              : "#f87171",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      {typeLabel[n.type] || n.type}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      {getNotificationIcon(n.type)}
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          color:
+                            n.type === "join_request" || n.type === "team_invite"
+                              ? "#fbbf24"
+                              : n.type === "request_accepted" || n.type === "new_member"
+                                ? "#4ade80"
+                                : "#f87171",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        {typeLabel[n.type] || n.type}
+                      </span>
+                    </div>
                     <span
                       style={{
                         color: "rgba(255,255,255,0.55)",
@@ -242,7 +280,7 @@ export default function NotificationPanel({
                           lineHeight: 1.5,
                         }}
                       >
-                        <strong style={{ color: "#a5b4fc" }}>
+                        <strong style={{ color: "#93c5fd" }}>
                           @{req.requester?.username}
                         </strong>{" "}
                         ({req.requester?.real_name}) minta join tim{" "}
@@ -266,7 +304,7 @@ export default function NotificationPanel({
                               cursor: "pointer",
                             }}
                           >
-                            ✓ Terima
+                            Terima
                           </button>
                           <button
                             onClick={() => handleReject(req.id)}
@@ -282,7 +320,7 @@ export default function NotificationPanel({
                               cursor: "pointer",
                             }}
                           >
-                            ✕ Tolak
+                            Tolak
                           </button>
                         </div>
                       ) : (
@@ -319,7 +357,7 @@ export default function NotificationPanel({
                           lineHeight: 1.5,
                         }}
                       >
-                        <strong style={{ color: "#a5b4fc" }}>
+                        <strong style={{ color: "#93c5fd" }}>
                           @{n.actor_name || invite?.team?.leader?.username || "Seseorang"}
                         </strong>{" "}
                         mengundangmu untuk bergabung ke tim{" "}
@@ -355,7 +393,7 @@ export default function NotificationPanel({
                               cursor: "pointer",
                             }}
                           >
-                            ✓ Terima
+                            Terima
                           </button>
                           <button
                             onClick={() => handleRejectInvite(invite.id)}
@@ -371,7 +409,7 @@ export default function NotificationPanel({
                               cursor: "pointer",
                             }}
                           >
-                            ✕ Tolak
+                            Tolak
                           </button>
                         </div>
                       )}
@@ -420,7 +458,7 @@ export default function NotificationPanel({
                         lineHeight: 1.5,
                       }}
                     >
-                      <strong style={{ color: "#a5b4fc" }}>@{n.actor_name}</strong> telah keluar dari tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
+                      <strong style={{ color: "#93c5fd" }}>@{n.actor_name}</strong> telah keluar dari tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
                     </p>
                   )}
 
@@ -446,7 +484,7 @@ export default function NotificationPanel({
                         lineHeight: 1.5,
                       }}
                     >
-                      <strong style={{ color: "#a5b4fc" }}>@{n.actor_name}</strong> telah dikeluarkan dari tim <strong style={{ color: "white" }}>{n.team_name}</strong> oleh ketua tim.
+                      <strong style={{ color: "#93c5fd" }}>@{n.actor_name}</strong> telah dikeluarkan dari tim <strong style={{ color: "white" }}>{n.team_name}</strong> oleh ketua tim.
                     </p>
                   )}
 
@@ -460,7 +498,7 @@ export default function NotificationPanel({
                         lineHeight: 1.5,
                       }}
                     >
-                      <strong style={{ color: "#a5b4fc" }}>@{n.actor_name}</strong> baru saja bergabung dengan tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
+                      <strong style={{ color: "#93c5fd" }}>@{n.actor_name}</strong> baru saja bergabung dengan tim <strong style={{ color: "white" }}>{n.team_name}</strong>.
                     </p>
                   )}
                 </div>

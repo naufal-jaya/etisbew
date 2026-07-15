@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import type {
   Competition,
-  CompetitionType,
   Member,
 } from "@/types/database";
 
@@ -21,7 +20,6 @@ export default function JoinCompetitionForm({
   const supabase = createClient();
   const [step, setStep] = useState(1);
   const [competitions, setCompetitions] = useState<Competition[]>([]);
-  const [compTypes, setCompTypes] = useState<CompetitionType[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
 
   const [selectedComp, setSelectedComp] = useState<Competition | null>(null);
@@ -30,10 +28,9 @@ export default function JoinCompetitionForm({
     name: "",
     organizer: "",
     deadline: "",
+    minMembers: "1",
     maxMembers: "3",
   });
-  const [selectedCompType, setSelectedCompType] = useState("");
-  const [customCompType, setCustomCompType] = useState("");
   const [teamName, setTeamName] = useState("");
   const [maxMembers, setMaxMembers] = useState("3");
   const [hasTeam, setHasTeam] = useState(false);
@@ -50,16 +47,14 @@ export default function JoinCompetitionForm({
   }, []);
 
   const fetchData = async () => {
-    const [compsRes, typesRes, membersRes] = await Promise.all([
+    const [compsRes, membersRes] = await Promise.all([
       supabase
         .from("competitions")
         .select("*, competition_type:competition_types(*)")
         .order("name"),
-      supabase.from("competition_types").select("*").order("name"),
       supabase.from("members").select("*").order("username"),
     ]);
     setCompetitions(compsRes.data ?? []);
-    setCompTypes(typesRes.data ?? []);
     setMembers((membersRes.data ?? []).filter((m) => m.id !== currentUser.id));
   };
 
@@ -82,16 +77,6 @@ export default function JoinCompetitionForm({
 
       // Create custom competition if needed
       if (isCustomComp) {
-        let typeId = selectedCompType;
-        if (customCompType) {
-          const { data: newType } = await supabase
-            .from("competition_types")
-            .insert({ name: customCompType })
-            .select()
-            .single();
-          typeId = newType?.id;
-        }
-
         const { data: newComp } = await supabase
           .from("competitions")
           .insert({
@@ -99,7 +84,7 @@ export default function JoinCompetitionForm({
             organizer: customComp.organizer,
             registration_deadline: customComp.deadline,
             max_members: parseInt(customComp.maxMembers),
-            competition_type_id: typeId,
+            min_members: parseInt(customComp.minMembers),
             is_custom: true,
             created_by: currentUser.id,
           })
@@ -172,8 +157,8 @@ export default function JoinCompetitionForm({
 
   const inputStyle = {
     width: "100%",
-    background: "#1A2234",
-    border: "1px solid rgba(255,255,255,0.14)",
+    background: "#121820",
+    border: "1px solid rgba(255,255,255,0.08)",
     borderRadius: "10px",
     padding: "10px 14px",
     color: "white",
@@ -217,7 +202,7 @@ export default function JoinCompetitionForm({
           width: "100%",
           maxWidth: "640px",
           margin: "0 auto",
-          background: "#121820",
+          background: "#1E2638",
           borderRadius: "24px 24px 0 0",
           border: "1px solid rgba(255,255,255,0.08)",
           borderBottom: "none",
@@ -246,7 +231,7 @@ export default function JoinCompetitionForm({
                 margin: "0 0 4px",
               }}
             >
-              Join a Competition 🚀
+              Buat Tim
             </h2>
             <p
               style={{
@@ -261,8 +246,8 @@ export default function JoinCompetitionForm({
           <button
             onClick={handleClose}
             style={{
-              background: "#1A2234",
-              border: "1px solid rgba(255,255,255,0.14)",
+              background: "#121820",
+              border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: "10px",
               width: "36px",
               height: "36px",
@@ -286,7 +271,7 @@ export default function JoinCompetitionForm({
                 borderRadius: "100px",
                 background:
                   s <= step
-                    ? "linear-gradient(90deg, #6366f1, #8b5cf6)"
+                    ? "#16357B"
                     : "rgba(255,255,255,0.1)",
                 transition: "background 0.3s",
               }}
@@ -311,10 +296,10 @@ export default function JoinCompetitionForm({
                     fontWeight: 600,
                     cursor: "pointer",
                     background: !isCustomComp
-                      ? "rgba(99,102,241,0.2)"
+                      ? "rgba(22, 53, 123, 0.25)"
                       : "transparent",
-                    border: `1px solid ${!isCustomComp ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`,
-                    color: !isCustomComp ? "#a5b4fc" : "rgba(255,255,255,0.72)",
+                    border: `1px solid ${!isCustomComp ? "#16357B" : "rgba(255,255,255,0.08)"}`,
+                    color: !isCustomComp ? "#93c5fd" : "rgba(255,255,255,0.72)",
                   }}
                 >
                   Dari daftar
@@ -328,10 +313,10 @@ export default function JoinCompetitionForm({
                     fontWeight: 600,
                     cursor: "pointer",
                     background: isCustomComp
-                      ? "rgba(99,102,241,0.2)"
+                      ? "rgba(22, 53, 123, 0.25)"
                       : "transparent",
-                    border: `1px solid ${isCustomComp ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.1)"}`,
-                    color: isCustomComp ? "#a5b4fc" : "rgba(255,255,255,0.72)",
+                    border: `1px solid ${isCustomComp ? "#16357B" : "rgba(255,255,255,0.08)"}`,
+                    color: isCustomComp ? "#93c5fd" : "rgba(255,255,255,0.72)",
                   }}
                 >
                   + Tambah sendiri
@@ -360,102 +345,135 @@ export default function JoinCompetitionForm({
                   style={{
                     display: "flex",
                     flexDirection: "column",
-                    gap: "8px",
+                    gap: "12px",
                   }}
                 >
-                  <input
-                    style={inputStyle}
-                    placeholder="Nama lomba"
-                    value={customComp.name}
-                    onChange={(e) =>
-                      setCustomComp((p) => ({ ...p, name: e.target.value }))
-                    }
-                  />
-                  <input
-                    style={inputStyle}
-                    placeholder="Penyelenggara"
-                    value={customComp.organizer}
-                    onChange={(e) =>
-                      setCustomComp((p) => ({
-                        ...p,
-                        organizer: e.target.value,
-                      }))
-                    }
-                  />
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr 1fr",
-                      gap: "8px",
-                    }}
-                  >
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <label style={labelStyle}>Nama Lomba</label>
+                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>
+                        {customComp.name.length}/30
+                      </span>
+                    </div>
                     <input
-                      type="date"
                       style={inputStyle}
-                      value={customComp.deadline}
+                      maxLength={30}
+                      placeholder="Nama lomba..."
+                      value={customComp.name}
+                      onChange={(e) =>
+                        setCustomComp((p) => ({ ...p, name: e.target.value }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <label style={labelStyle}>Penyelenggara</label>
+                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>
+                        {customComp.organizer.length}/20
+                      </span>
+                    </div>
+                    <input
+                      style={inputStyle}
+                      maxLength={20}
+                      placeholder="Penyelenggara..."
+                      value={customComp.organizer}
                       onChange={(e) =>
                         setCustomComp((p) => ({
                           ...p,
-                          deadline: e.target.value,
+                          organizer: e.target.value,
                         }))
                       }
                     />
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      style={inputStyle}
-                      placeholder="Maks anggota"
-                      value={customComp.maxMembers}
-                      onChange={(e) =>
-                        setCustomComp((p) => ({
-                          ...p,
-                          maxMembers: e.target.value,
-                        }))
-                      }
-                    />
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "2fr 1fr 1fr",
+                        gap: "8px",
+                      }}
+                    >
+                      <div>
+                        <label style={labelStyle}>Deadline Pendaftaran</label>
+                        <input
+                          type="date"
+                          style={inputStyle}
+                          value={customComp.deadline}
+                          onChange={(e) =>
+                            setCustomComp((p) => ({
+                              ...p,
+                              deadline: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Min</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="10"
+                          style={inputStyle}
+                          placeholder="Min"
+                          value={customComp.minMembers}
+                          onChange={(e) =>
+                            setCustomComp((p) => ({
+                              ...p,
+                              minMembers: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Max</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="10"
+                          style={inputStyle}
+                          placeholder="Max"
+                          value={customComp.maxMembers}
+                          onChange={(e) =>
+                            setCustomComp((p) => ({
+                              ...p,
+                              maxMembers: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Competition type */}
-            <div>
-              <label style={labelStyle}>Jenis Lomba</label>
-              <select
-                style={selectStyle}
-                value={selectedCompType}
-                onChange={(e) => setSelectedCompType(e.target.value)}
-              >
-                <option value="">-- Pilih jenis --</option>
-                {compTypes.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-                <option value="custom">+ Tambah jenis baru...</option>
-              </select>
-              {selectedCompType === "custom" && (
-                <input
-                  style={{ ...inputStyle, marginTop: "8px" }}
-                  placeholder="Nama jenis lomba baru"
-                  value={customCompType}
-                  onChange={(e) => setCustomCompType(e.target.value)}
-                />
-              )}
-            </div>
-
             <button
-              onClick={() => setStep(2)}
+              onClick={() => {
+                const min = parseInt(customComp.minMembers) || 1;
+                const max = parseInt(customComp.maxMembers) || 3;
+                if (min < 1) {
+                  alert("Jumlah anggota minimal harus setidaknya 1 orang");
+                  return;
+                }
+                if (min > max) {
+                  alert("Jumlah anggota minimal tidak boleh melebihi jumlah maksimal");
+                  return;
+                }
+                setStep(2);
+              }}
               disabled={
                 !isCustomComp
                   ? !selectedComp
                   : !customComp.name ||
-                    !customComp.organizer ||
-                    !customComp.deadline
+                  !customComp.organizer ||
+                  !customComp.deadline ||
+                  !customComp.minMembers ||
+                  !customComp.maxMembers
               }
               style={{
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                background: "#16357B",
                 border: "none",
                 borderRadius: "12px",
                 padding: "12px",
@@ -463,12 +481,12 @@ export default function JoinCompetitionForm({
                 fontWeight: 600,
                 fontSize: "15px",
                 cursor: "pointer",
-                opacity: (!isCustomComp ? !selectedComp : !customComp.name)
+                opacity: (!isCustomComp ? !selectedComp : !customComp.name || !customComp.organizer || !customComp.deadline || !customComp.minMembers || !customComp.maxMembers)
                   ? 0.5
                   : 1,
               }}
             >
-              Selanjutnya →
+              Lanjut
             </button>
           </div>
         )}
@@ -479,12 +497,18 @@ export default function JoinCompetitionForm({
           >
             {/* Team name */}
             <div>
-              <label style={labelStyle}>Nama Tim</label>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                <label style={{ ...labelStyle, marginBottom: 0 }}>Nama Tim</label>
+                <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)", fontFamily: "monospace" }}>
+                  {teamName.length}/70
+                </span>
+              </div>
               <input
                 style={inputStyle}
                 placeholder="Masukkan nama tim..."
                 value={teamName}
                 onChange={(e) => setTeamName(e.target.value)}
+                maxLength={70}
               />
             </div>
 
@@ -518,7 +542,7 @@ export default function JoinCompetitionForm({
                   style={{
                     width: "16px",
                     height: "16px",
-                    accentColor: "#6366f1",
+                    accentColor: "#16357B",
                   }}
                 />
                 <span
@@ -541,7 +565,7 @@ export default function JoinCompetitionForm({
                 {filteredMembers.length > 0 && (
                   <div
                     style={{
-                      background: "#1A2234",
+                      background: "#121820",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "10px",
                       marginTop: "4px",
@@ -608,15 +632,15 @@ export default function JoinCompetitionForm({
                           display: "flex",
                           alignItems: "center",
                           gap: "8px",
-                          background: "rgba(99,102,241,0.08)",
-                          border: "1px solid rgba(99,102,241,0.2)",
+                          background: "rgba(22, 53, 123, 0.15)",
+                          border: "1px solid rgba(22, 53, 123, 0.4)",
                           borderRadius: "10px",
                           padding: "8px 12px",
                         }}
                       >
                         <span
                           style={{
-                            color: "#a5b4fc",
+                            color: "#93c5fd",
                             fontSize: "13px",
                             flex: 1,
                           }}
@@ -689,7 +713,7 @@ export default function JoinCompetitionForm({
                 disabled={!teamName || submitting}
                 style={{
                   flex: 2,
-                  background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                  background: "#16357B",
                   border: "none",
                   borderRadius: "12px",
                   padding: "12px",
@@ -700,7 +724,7 @@ export default function JoinCompetitionForm({
                   opacity: !teamName ? 0.5 : 1,
                 }}
               >
-                {submitting ? "Membuat tim..." : "🚀 Buat Tim"}
+                {submitting ? "Membuat tim..." : "Buat Tim"}
               </button>
             </div>
           </div>

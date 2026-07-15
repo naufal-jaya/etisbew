@@ -1,5 +1,6 @@
 "use client";
 import type { Competition } from "@/types/database";
+import { Award, Users, AlertTriangle } from "lucide-react";
 
 interface CompetitionCardProps {
   competition: Competition;
@@ -16,8 +17,8 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
   return (
     <div
       style={{
-        background: "#1A2234",
-        border: "1px solid rgba(255,255,255,0.1)",
+        background: "#1E2638",
+        border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: "14px",
         overflow: "hidden",
         transition: "all 0.2s",
@@ -25,7 +26,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
       }}
       className="comp-card"
     >
-      <style>{`.comp-card:hover { border-color: rgba(99,102,241,0.3) !important; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }`}</style>
+      <style>{`.comp-card:hover { border-color: #16357B !important; }`}</style>
 
       {/* Poster */}
       <div
@@ -33,22 +34,21 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           height: "120px",
           background: competition.poster_url
             ? `url(${competition.poster_url}) center/cover no-repeat`
-            : "linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.3))",
+            : "rgba(22, 53, 123, 0.2)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: "32px",
         }}
       >
-        {!competition.poster_url && "🏆"}
+        {!competition.poster_url && <Award size={36} style={{ color: "#93c5fd", opacity: 0.8 }} />}
       </div>
 
       <div style={{ padding: "12px" }}>
         <div style={{ marginBottom: "8px" }}>
           <span
             style={{
-              background: "rgba(99,102,241,0.15)",
-              color: "#a5b4fc",
+              background: "rgba(22,53,123,0.4)",
+              color: "#93c5fd",
               fontSize: "10px",
               fontWeight: 600,
               padding: "2px 8px",
@@ -85,6 +85,39 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
         <div
           style={{
             display: "flex",
+            flexDirection: "column",
+            gap: "6px",
+            marginBottom: "10px",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            paddingTop: "8px",
+          }}
+        >
+          {competition.max_members && (
+            <div
+              style={{
+                fontSize: "11px",
+                color: "rgba(255,255,255,0.55)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <Users size={12} style={{ color: "rgba(255,255,255,0.4)" }} />
+              <span>
+                {(() => {
+                  const min = competition.min_members ?? 1;
+                  const max = competition.max_members;
+                  if (min === max) return `${max} Anggota`;
+                  return `${min} - ${max} Anggota`;
+                })()}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
@@ -92,12 +125,15 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
           <span
             style={{
               fontSize: "11px",
-              color: isUrgent ? "#f87171" : "rgba(255,255,255,0.68)",
+              color: isUrgent ? "#f87171" : "rgba(255,255,255,0.55)",
               fontFamily: "DM Mono, monospace",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
             }}
           >
-            {isUrgent && "⚠️ "}
-            {daysLeft > 0 ? `${daysLeft}h lagi` : "Tutup"}
+            {isUrgent && <AlertTriangle size={12} style={{ color: "#f87171" }} />}
+            <span>{daysLeft > 0 ? `${daysLeft} hari lagi` : "Tutup"}</span>
           </span>
           {competition.detail_link && (
             <a
@@ -105,7 +141,7 @@ export default function CompetitionCard({ competition }: CompetitionCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                color: "#818cf8",
+                color: "#93c5fd",
                 fontSize: "11px",
                 textDecoration: "none",
                 fontWeight: 600,
