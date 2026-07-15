@@ -50,8 +50,7 @@ export default function MatchmakingClient({
           *,
           competition:competitions(*, competition_type:competition_types(*)),
           leader:members!teams_leader_id_fkey(*),
-          members:team_members(*, member:members(*), role:member_roles(*)),
-          needed_roles:team_needed_roles(*, role:member_roles(*)),
+          members:team_members(*, member:members(*)),
           join_requests(*)
         `,
         )
@@ -215,6 +214,19 @@ export default function MatchmakingClient({
     } catch (err: any) {
       alert("Gagal menghapus tim: " + (err.message || "Terjadi kesalahan"));
     }
+  };
+
+  const handleUpdateNote = async (teamId: string, note: string) => {
+    const { error } = await supabase
+      .from("teams")
+      .update({ note: note || null })
+      .eq("id", teamId);
+
+    if (error) {
+      console.error("Error updating team note:", error);
+      throw error;
+    }
+    fetchData();
   };
 
   const handleLogout = async () => {
@@ -447,6 +459,7 @@ export default function MatchmakingClient({
                     onLeaveTeam={(t) => setConfirmLeaveTeam(teams.find((x) => x.id === t) || null)}
                     onDeleteTeam={(t) => setConfirmDeleteTeam(teams.find((x) => x.id === t) || null)}
                     onKickMember={(t, mId, uName) => setConfirmKickMember({team: teams.find((x) => x.id === t)!, memberId: mId, username: uName})}
+                    onUpdateNote={handleUpdateNote}
                   />
                 ))}
               </div>
@@ -512,6 +525,7 @@ export default function MatchmakingClient({
                       onLeaveTeam={(t) => setConfirmLeaveTeam(teams.find((x) => x.id === t) || null)}
                       onDeleteTeam={(t) => setConfirmDeleteTeam(teams.find((x) => x.id === t) || null)}
                       onKickMember={(t, mId, uName) => setConfirmKickMember({team: teams.find((x) => x.id === t)!, memberId: mId, username: uName})}
+                      onUpdateNote={handleUpdateNote}
                     />
                   );
                 })}

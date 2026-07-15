@@ -50,8 +50,7 @@ export default async function MatchmakingPage() {
         *,
         competition:competitions(*, competition_type:competition_types(*)),
         leader:members!teams_leader_id_fkey(*),
-        members:team_members(*, member:members(*), role:member_roles(*)),
-        needed_roles:team_needed_roles(*, role:member_roles(*))
+        members:team_members(*, member:members(*))
       `,
       )
       .order("created_at", { ascending: false }),

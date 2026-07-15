@@ -28,30 +28,13 @@ export interface Competition {
   competition_type?: CompetitionType | null;
 }
 
-export interface MemberRole {
-  id: string;
-  name: string;
-  created_at?: string | null;
-}
-
 export interface TeamMember {
   id: string;
   team_id: string;
   member_id: string;
-  role_id?: string | null;
   status: "active" | "pending" | "cancelled" | "accepted" | "rejected" | string;
   created_at?: string | null;
   member?: Member | null;
-  role?: MemberRole | null;
-}
-
-export interface TeamNeededRole {
-  id: string;
-  team_id: string;
-  role_id: string;
-  count: number;
-  created_at?: string | null;
-  role?: MemberRole | null;
 }
 
 export interface Team {
@@ -59,11 +42,11 @@ export interface Team {
   name: string;
   competition_id?: string | null;
   leader_id: string;
+  note?: string | null;
   created_at?: string | null;
   competition?: Competition | null;
   leader?: Member | null;
   members?: TeamMember[] | null;
-  needed_roles?: TeamNeededRole[] | null;
 }
 
 export interface JoinRequest {
@@ -82,6 +65,8 @@ export interface Notification {
   join_request_id?: string | null;
   type: "join_request" | "request_accepted" | "request_rejected" | string;
   is_read: boolean;
+  team_name?: string | null;
+  actor_name?: string | null;
   created_at: string;
   join_request?: JoinRequest | null;
 }

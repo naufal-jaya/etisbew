@@ -12,6 +12,7 @@ interface TeamCardProps {
   onLeaveTeam?: (teamId: string) => void;
   onDeleteTeam?: (teamId: string) => void;
   onKickMember?: (teamId: string, memberId: string, username: string) => void;
+  onUpdateNote?: (teamId: string, note: string) => Promise<void>;
 }
 
 export default function TeamCard({
@@ -24,8 +25,25 @@ export default function TeamCard({
   onLeaveTeam,
   onDeleteTeam,
   onKickMember,
+  onUpdateNote,
 }: TeamCardProps) {
   const [showMenu, setShowMenu] = useState(false);
+  const [isEditingNote, setIsEditingNote] = useState(false);
+  const [tempNote, setTempNote] = useState(team.note || "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSaveNote = async () => {
+    if (!onUpdateNote) return;
+    setIsSaving(true);
+    try {
+      await onUpdateNote(team.id, tempNote);
+      setIsEditingNote(false);
+    } catch (err: any) {
+      alert("Gagal menyimpan catatan: " + (err.message || "Terjadi kesalahan"));
+    } finally {
+      setIsSaving(false);
+    }
+  };
   const maxMembers = team.competition?.max_members ?? 3;
   const currentCount =
     team.members?.filter((m) => m.status === "active").length ?? 0;
@@ -343,8 +361,8 @@ export default function TeamCard({
         </div>
       </div>
 
-      {/* Needed roles */}
-      {team.needed_roles && team.needed_roles.length > 0 && (
+      {/* Team Note */}
+      {(team.note || isLeader) && (
         <div style={{ marginBottom: "12px" }}>
           <p
             style={{
@@ -354,27 +372,109 @@ export default function TeamCard({
               textTransform: "uppercase",
               letterSpacing: "0.5px",
               marginBottom: "6px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            Butuh
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
-            {team.needed_roles.map((nr) => (
-              <span
-                key={nr.id}
+            <span>Catatan Tim</span>
+            {isLeader && (
+              <button
+                onClick={() => {
+                  setTempNote(team.note || "");
+                  setIsEditingNote(!isEditingNote);
+                }}
                 style={{
-                  background: "rgba(139,92,246,0.12)",
-                  border: "1px solid rgba(139,92,246,0.25)",
-                  borderRadius: "6px",
-                  padding: "2px 8px",
+                  background: "transparent",
+                  border: "none",
+                  color: "#a5b4fc",
                   fontSize: "11px",
-                  color: "#c4b5fd",
+                  cursor: "pointer",
+                  padding: "0 4px",
                 }}
               >
-                {nr.role?.name} ×{nr.count}
-              </span>
-            ))}
-          </div>
+                {team.note ? "Edit" : "+ Tambah"}
+              </button>
+            )}
+          </p>
+          {isEditingNote ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <textarea
+                value={tempNote}
+                onChange={(e) => setTempNote(e.target.value)}
+                placeholder="Tulis catatan tim (misal: butuh UI/UX designer, target juara)..."
+                maxLength={200}
+                rows={2}
+                style={{
+                  width: "100%",
+                  background: "#121820",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  borderRadius: "8px",
+                  padding: "8px",
+                  color: "white",
+                  fontSize: "12px",
+                  resize: "none",
+                  outline: "none",
+                }}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)" }}>
+                  {tempNote.length}/200
+                </span>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <button
+                    onClick={() => {
+                      setIsEditingNote(false);
+                      setTempNote(team.note || "");
+                    }}
+                    style={{
+                      background: "rgba(255,255,255,0.05)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "6px",
+                      padding: "3px 8px",
+                      color: "rgba(255,255,255,0.7)",
+                      fontSize: "11px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleSaveNote}
+                    disabled={isSaving}
+                    style={{
+                      background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "3px 10px",
+                      color: "white",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {isSaving ? "Simpan..." : "Simpan"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: "8px",
+                padding: "8px 12px",
+                fontSize: "12px",
+                color: team.note ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.44)",
+                fontStyle: team.note ? "normal" : "italic",
+                lineHeight: "1.4",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              {team.note || "Belum ada catatan tim."}
+            </div>
+          )}
         </div>
       )}
 

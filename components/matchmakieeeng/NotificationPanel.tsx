@@ -44,8 +44,7 @@ export default function NotificationPanel({
         .select(
           `
           *,
-          team:teams(*, leader:members(*), competition:competitions(*)),
-          role:member_roles(*)
+          team:teams(*, leader:members(*), competition:competitions(*))
           `
         )
         .eq("member_id", currentUser.id)
@@ -249,7 +248,6 @@ export default function NotificationPanel({
                   <strong style={{ color: "white" }}>
                     {invite.team?.name}
                   </strong>
-                  {invite.role && ` sebagai ${invite.role.name}`}
                 </p>
 
                 <div style={{ display: "flex", gap: "8px" }}>

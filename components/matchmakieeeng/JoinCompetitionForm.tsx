@@ -4,7 +4,6 @@ import { createClient } from "@/utils/supabase/client";
 import type {
   Competition,
   CompetitionType,
-  MemberRole,
   Member,
 } from "@/types/database";
 
@@ -23,7 +22,6 @@ export default function JoinCompetitionForm({
   const [step, setStep] = useState(1);
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [compTypes, setCompTypes] = useState<CompetitionType[]>([]);
-  const [roles, setRoles] = useState<MemberRole[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
 
   const [selectedComp, setSelectedComp] = useState<Competition | null>(null);
@@ -41,12 +39,8 @@ export default function JoinCompetitionForm({
   const [hasTeam, setHasTeam] = useState(false);
   const [deadline, setDeadline] = useState("");
   const [memberSearch, setMemberSearch] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<
-    { member: Member; role: string }[]
-  >([]);
-  const [neededRoles, setNeededRoles] = useState<
-    { roleId: string; count: number }[]
-  >([]);
+  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [teamNote, setTeamNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -56,18 +50,16 @@ export default function JoinCompetitionForm({
   }, []);
 
   const fetchData = async () => {
-    const [compsRes, typesRes, rolesRes, membersRes] = await Promise.all([
+    const [compsRes, typesRes, membersRes] = await Promise.all([
       supabase
         .from("competitions")
         .select("*, competition_type:competition_types(*)")
         .order("name"),
       supabase.from("competition_types").select("*").order("name"),
-      supabase.from("member_roles").select("*").order("name"),
       supabase.from("members").select("*").order("username"),
     ]);
     setCompetitions(compsRes.data ?? []);
     setCompTypes(typesRes.data ?? []);
-    setRoles(rolesRes.data ?? []);
     setMembers((membersRes.data ?? []).filter((m) => m.id !== currentUser.id));
   };
 
@@ -123,6 +115,7 @@ export default function JoinCompetitionForm({
           name: teamName,
           competition_id: competitionId,
           leader_id: currentUser.id,
+          note: teamNote || null,
         })
         .select()
         .single();
@@ -138,26 +131,12 @@ export default function JoinCompetitionForm({
 
       // Add other members
       if (hasTeam && selectedMembers.length > 0) {
-        const memberInserts = selectedMembers.map((sm) => ({
+        const memberInserts = selectedMembers.map((m) => ({
           team_id: team.id,
-          member_id: sm.member.id,
-          role_id: sm.role || null,
+          member_id: m.id,
           status: "pending" as const,
         }));
         await supabase.from("team_members").insert(memberInserts);
-      }
-
-      // Add needed roles
-      if (neededRoles.length > 0) {
-        await supabase
-          .from("team_needed_roles")
-          .insert(
-            neededRoles.map((nr) => ({
-              team_id: team.id,
-              role_id: nr.roleId,
-              count: nr.count,
-            })),
-          );
       }
 
       setVisible(false);
@@ -556,11 +535,11 @@ export default function JoinCompetitionForm({
                         key={m.id}
                         onClick={() => {
                           if (
-                            !selectedMembers.some((sm) => sm.member.id === m.id)
+                            !selectedMembers.some((sm) => sm.id === m.id)
                           ) {
                             setSelectedMembers((p) => [
                               ...p,
-                              { member: m, role: "" },
+                              m,
                             ]);
                           }
                           setMemberSearch("");
@@ -603,9 +582,9 @@ export default function JoinCompetitionForm({
                       gap: "8px",
                     }}
                   >
-                    {selectedMembers.map((sm, i) => (
+                    {selectedMembers.map((m, i) => (
                       <div
-                        key={sm.member.id}
+                        key={m.id}
                         style={{
                           display: "flex",
                           alignItems: "center",
@@ -623,31 +602,8 @@ export default function JoinCompetitionForm({
                             flex: 1,
                           }}
                         >
-                          @{sm.member.username}
+                          @{m.username}
                         </span>
-                        <select
-                          value={sm.role}
-                          onChange={(e) =>
-                            setSelectedMembers((p) =>
-                              p.map((x, idx) =>
-                                idx === i ? { ...x, role: e.target.value } : x,
-                              ),
-                            )
-                          }
-                          style={{
-                            ...selectStyle,
-                            width: "auto",
-                            padding: "4px 8px",
-                            fontSize: "12px",
-                          }}
-                        >
-                          <option value="">Role...</option>
-                          {roles.map((r) => (
-                            <option key={r.id} value={r.id}>
-                              {r.name}
-                            </option>
-                          ))}
-                        </select>
                         <button
                           onClick={() =>
                             setSelectedMembers((p) =>
@@ -672,104 +628,25 @@ export default function JoinCompetitionForm({
               </div>
             )}
 
-            {/* Needed roles */}
+            {/* Team Note */}
             <div>
-              <label style={labelStyle}>Role yang Dibutuhkan</label>
-              <div style={{ display: "flex", gap: "8px" }}>
-                <select
-                  style={{ ...selectStyle, flex: 1 }}
-                  onChange={(e) => {
-                    if (
-                      e.target.value &&
-                      !neededRoles.some((nr) => nr.roleId === e.target.value)
-                    ) {
-                      setNeededRoles((p) => [
-                        ...p,
-                        { roleId: e.target.value, count: 1 },
-                      ]);
-                    }
-                    e.target.value = "";
-                  }}
-                >
-                  <option value="">+ Tambah role...</option>
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                <label style={labelStyle}>Catatan Tim</label>
+                <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)" }}>
+                  {teamNote.length}/200
+                </span>
               </div>
-              {neededRoles.length > 0 && (
-                <div
-                  style={{
-                    marginTop: "8px",
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "6px",
-                  }}
-                >
-                  {neededRoles.map((nr, i) => (
-                    <div
-                      key={nr.roleId}
-                      style={{
-                        background: "rgba(139,92,246,0.12)",
-                        border: "1px solid rgba(139,92,246,0.25)",
-                        borderRadius: "8px",
-                        padding: "4px 10px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        fontSize: "12px",
-                        color: "#c4b5fd",
-                      }}
-                    >
-                      <span style={{ fontWeight: 600 }}>
-                        {roles.find((r) => r.id.toString() === nr.roleId.toString())?.name || "Role"}
-                      </span>
-                      <input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={nr.count}
-                        onChange={(e) =>
-                          setNeededRoles((p) =>
-                            p.map((x, idx) =>
-                              idx === i
-                                ? { ...x, count: parseInt(e.target.value) || 1 }
-                                : x,
-                            ),
-                          )
-                        }
-                        style={{
-                          width: "30px",
-                          background: "rgba(255,255,255,0.1)",
-                          border: "none",
-                          borderRadius: "4px",
-                          color: "white",
-                          textAlign: "center",
-                          padding: "2px",
-                          fontSize: "11px",
-                        }}
-                      />
-                      <button
-                        onClick={() =>
-                          setNeededRoles((p) => p.filter((_, idx) => idx !== i))
-                        }
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "#f87171",
-                          cursor: "pointer",
-                          fontSize: "14px",
-                          lineHeight: 1,
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <textarea
+                style={{
+                  ...inputStyle,
+                  resize: "vertical",
+                  minHeight: "80px",
+                }}
+                placeholder="Tulis catatan tim (misal: butuh UI/UX designer, target juara, dll.)"
+                maxLength={200}
+                value={teamNote}
+                onChange={(e) => setTeamNote(e.target.value)}
+              />
             </div>
 
             <div style={{ display: "flex", gap: "10px" }}>
