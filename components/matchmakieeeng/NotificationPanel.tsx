@@ -133,46 +133,31 @@ export default function NotificationPanel({
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 500,
-        display: "flex",
-        justifyContent: "flex-end",
-      }}
-      onClick={onClose}
-    >
+    <>
+      {/* Invisible backdrop to capture clicks outside */}
       <div
-        style={{
-          width: "360px",
-          maxWidth: "100vw",
-          height: "100vh",
-          background: "#121820",
-          borderLeft: "1px solid rgba(255,255,255,0.08)",
-          padding: "24px",
-          overflowY: "auto",
-          animation: "slideIn 0.25s ease-out",
-        }}
+        className="fixed inset-0 z-40 bg-transparent cursor-default"
+        onClick={onClose}
+      />
+
+      {/* Floating panel container */}
+      <div
+        className="absolute top-[calc(100%+12px)] left-[-100px] sm:left-0 w-[380px] max-w-[calc(100vw-32px)] max-h-[450px] bg-[#1E2638] border border-white/10 rounded-[20px] shadow-2xl p-5 overflow-y-auto z-50 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <style>{`
-          @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        `}</style>
-
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: "24px",
+            marginBottom: "20px",
           }}
         >
           <h2
             style={{
               color: "white",
               fontWeight: 700,
-              fontSize: "18px",
+              fontSize: "16px",
               margin: 0,
             }}
           >
@@ -223,7 +208,7 @@ export default function NotificationPanel({
                 <div
                   key={n.id}
                   style={{
-                    background: n.is_read ? "#1E2638" : "rgba(22, 53, 123, 0.15)",
+                    background: n.is_read ? "#121820" : "rgba(22, 53, 123, 0.15)",
                     border: `1px solid ${n.is_read ? "rgba(255,255,255,0.08)" : "rgba(22, 53, 123, 0.4)"}`,
                     borderRadius: "14px",
                     padding: "14px",
@@ -337,10 +322,10 @@ export default function NotificationPanel({
                           }}
                         >
                           {req.status === "accepted"
-                            ? "Permintaan disetujui"
-                            : req.status === "rejected"
-                              ? "Permintaan ditolak"
-                              : "Dibatalkan"}
+                             ? "Permintaan disetujui"
+                             : req.status === "rejected"
+                               ? "Permintaan ditolak"
+                               : "Dibatalkan"}
                         </span>
                       )}
                     </>
@@ -507,6 +492,6 @@ export default function NotificationPanel({
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

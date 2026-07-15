@@ -268,20 +268,161 @@ export default function MatchmakingClient({
   );
 
   return (
-    <div className="min-h-screen bg-[#121820] text-white">
-      <nav className="sticky top-0 left-0 right-0 z-50 transition-all duration-500 py-3 bg-[#121820]/90 border-b border-white/10 backdrop-blur-[18px]">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center space-x-2 group">
-              <div className="text-2xl font-bold tracking-tight text-white transition-colors hover:text-white/70">
-                IEEE{" "}
-                <span className="text-blue-400 group-hover:text-blue-500 transition-colors">
-                  IPB
-                </span>
-              </div>
+    <div className="min-h-screen md:h-screen md:overflow-hidden bg-[#121820] text-white flex flex-col">
+      <style>{`
+        .lomba-scroll-container {
+          direction: rtl;
+          overflow-y: auto;
+        }
+        .lomba-scroll-container > * {
+          direction: ltr;
+        }
+        .lomba-scroll-container::-webkit-scrollbar {
+          width: 5px;
+        }
+        .lomba-scroll-container::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 99px;
+        }
+        .lomba-scroll-container::-webkit-scrollbar-thumb {
+          background: rgba(22, 53, 123, 0.7);
+          border-radius: 99px;
+          border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        .lomba-scroll-container::-webkit-scrollbar-thumb:hover {
+          background: #16357B;
+        }
+        /* Firefox */
+        .lomba-scroll-container {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(22, 53, 123, 0.7) rgba(255, 255, 255, 0.02);
+        }
+
+        /* Animated Brand Aura */
+        .brand-aura-container {
+          position: relative;
+          background: #121820;
+          overflow: hidden;
+        }
+        .brand-aura-bg {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            90deg,
+            rgba(22, 53, 123, 0) 0%,
+            rgba(22, 53, 123, 0.25) 25%,
+            rgba(59, 130, 246, 0.2) 50%,
+            rgba(22, 53, 123, 0.25) 75%,
+            rgba(22, 53, 123, 0) 100%
+          );
+          background-size: 200% 100%;
+          animation: aura-shift 8s linear infinite;
+          opacity: 0.8;
+        }
+        .brand-aura-radial {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 250px;
+          height: 60px;
+          background: radial-gradient(
+            circle,
+            rgba(59, 130, 246, 0.22) 0%,
+            rgba(22, 53, 123, 0.08) 50%,
+            rgba(0, 0, 0, 0) 100%
+          );
+          filter: blur(12px);
+          animation: aura-pulse 3s ease-in-out infinite alternate;
+        }
+        .brand-aura-border {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.04) 0%,
+            rgba(59, 130, 246, 0.35) 50%,
+            rgba(255, 255, 255, 0.04) 100%
+          );
+          background-size: 200% 100%;
+          animation: aura-shift 6s linear infinite;
+        }
+        @keyframes aura-shift {
+          0% {
+            background-position: 0% 50%;
+          }
+          100% {
+            background-position: -200% 50%;
+          }
+        }
+        @keyframes aura-pulse {
+          0% {
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 0.6;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1.15);
+            opacity: 1.0;
+          }
+        }
+
+        /* Button Hover Aura */
+        .btn-aura-hover {
+          position: relative !important;
+          overflow: hidden !important;
+          transition: all 0.3s ease !important;
+        }
+        .btn-aura-hover::after {
+          content: '' !important;
+          position: absolute !important;
+          inset: 0 !important;
+          background: linear-gradient(
+            90deg,
+            rgba(59, 130, 246, 0) 0%,
+            rgba(59, 130, 246, 0.35) 50%,
+            rgba(59, 130, 246, 0) 100%
+          ) !important;
+          background-size: 200% 100% !important;
+          opacity: 0 !important;
+          transition: opacity 0.3s ease !important;
+          pointer-events: none !important;
+          z-index: 1 !important;
+        }
+        .btn-aura-hover:hover::after {
+          opacity: 1 !important;
+          animation: aura-shift 2s linear infinite !important;
+        }
+        .btn-aura-hover:hover {
+          box-shadow: 0 0 15px rgba(59, 130, 246, 0.4) !important;
+        }
+      `}</style>
+      <nav className="brand-aura-container sticky top-0 left-0 right-0 z-50 transition-all duration-500 py-3 bg-[#121820]/90 backdrop-blur-[18px] shrink-0">
+        <div className="brand-aura-bg pointer-events-none" />
+        <div className="brand-aura-radial pointer-events-none hidden md:block" />
+        <div className="brand-aura-border pointer-events-none" />
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex items-center justify-between relative">
+            <Link href="/" className="flex items-center space-x-2 group shrink-0">
+              <span
+                aria-label="IEEE IPB Student Branch"
+                role="img"
+                className="block aspect-[679/116] w-32 shrink-0 bg-current sm:w-40 text-white [mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [mask-position:left_center] [mask-repeat:no-repeat] [mask-size:contain] [-webkit-mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [-webkit-mask-position:left_center] [-webkit-mask-repeat:no-repeat] [-webkit-mask-size:contain]"
+              />
             </Link>
 
-            <div className="flex items-center gap-3 md:gap-8">
+            {/* Centered MatchmakIEEEng.png (Desktop Only) */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden md:block">
+              <img
+                src="/images/matchmakieeeng/MatchmakIEEEng.png"
+                alt="MatchmakIEEEng Logo"
+                className="h-7 w-auto object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 md:gap-8 shrink-0">
               <button
                 onClick={() => {
                   setEditUsername(userState.username);
@@ -304,26 +445,50 @@ export default function MatchmakingClient({
         </div>
       </nav>
 
-      <div className="max-w-[1400px] mx-auto px-3 py-4 md:px-6 md:py-8 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 md:gap-8">
+      {/* Sub-header Brand Banner with Cool Aura & Animation (Mobile Only) */}
+      <div className="brand-aura-container w-full flex justify-center py-4 shrink-0 md:hidden">
+        <div className="brand-aura-bg pointer-events-none" />
+        <div className="brand-aura-radial pointer-events-none" />
+        <div className="brand-aura-border pointer-events-none" />
+        <img
+          src="/images/matchmakieeeng/MatchmakIEEEng.png"
+          alt="MatchmakIEEEng Logo"
+          className="h-7 w-auto object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
+        />
+      </div>
+
+      <div className="max-w-[1400px] w-full mx-auto px-3 md:px-6 flex-1 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 md:gap-8 min-h-0 md:overflow-hidden box-border">
         {/* LEFT: Teams */}
-        <div className="flex flex-col gap-8 md:block md:space-y-10">
+        <div className="flex flex-col gap-6 md:h-full md:overflow-y-auto md:pr-4 pb-16">
           {/* My Teams */}
           <div className="md:mb-10">
-            <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-3 mb-5 pt-6">
               <h2 className="text-white font-bold text-xl">
                 My Teams
               </h2>
-              <button
-                onClick={() => setShowNotifs(true)}
-                className="relative bg-[#1E2638] border border-white/10 rounded-xl w-9 h-9 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors duration-200"
-              >
-                <Bell size={18} className="text-white" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowNotifs(!showNotifs)}
+                  className="relative bg-[#1E2638] border border-white/10 rounded-xl w-9 h-9 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-colors duration-200"
+                >
+                  <Bell size={18} className="text-white" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {showNotifs && (
+                  <NotificationPanel
+                    currentUser={userState}
+                    onClose={() => {
+                      setShowNotifs(false);
+                      fetchData();
+                    }}
+                  />
                 )}
-              </button>
+              </div>
             </div>
 
             {myActiveTeams.length === 0 ? (
@@ -398,31 +563,35 @@ export default function MatchmakingClient({
         </div>
 
         {/* RIGHT: Competitions */}
-        <div className="hidden md:block">
-          <div className="sticky top-20">
-            <button
-              onClick={() => setShowForm(true)}
-              className="w-full bg-[#16357B] border-none rounded-xl px-4 py-4 text-white text-sm font-bold cursor-pointer mb-4 text-center hover:bg-[#16357B]/80 transition-colors duration-200"
-            >
-              Ikut Lomba
-            </button>
-            <h2 className="text-white font-bold text-xl mb-3">
-              Lomba Aktif
-            </h2>
+        <div className="hidden md:flex md:flex-col md:h-full min-h-0">
+          {/* Stationary button and heading */}
+          <button
+            onClick={() => setShowForm(true)}
+            className="w-full bg-[#16357B] border-none rounded-xl px-4 mt-6 py-4 text-white text-sm font-bold cursor-pointer mb-4 text-center hover:bg-[#16357B]/80 transition-colors duration-200 shrink-0 btn-aura-hover"
+          >
+            <span className="relative z-10">Ikut Lomba</span>
+          </button>
+          <h2 className="text-white font-bold text-xl mb-3 shrink-0">
+            Lomba Aktif
+          </h2>
 
-            {competitions.length === 0 ? (
-              <div className="bg-[#1E2638] border border-dashed border-white/10 rounded-2xl p-8 text-center">
-                <p className="text-white/70 text-xs">
-                  Belum ada lomba aktif
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {competitions.slice(0, 8).map((comp) => (
-                  <CompetitionCard key={comp.id} competition={comp} />
-                ))}
-              </div>
-            )}
+          {/* Scrollable list with left-aligned custom scrollbar */}
+          <div className="lomba-scroll-container flex-1 min-h-0 md:overflow-y-auto pr-1">
+            <div className="pl-3">
+              {competitions.length === 0 ? (
+                <div className="bg-[#1E2638] border border-dashed border-white/10 rounded-2xl p-8 text-center">
+                  <p className="text-white/70 text-xs">
+                    Belum ada lomba aktif
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {competitions.slice(0, 8).map((comp) => (
+                    <CompetitionCard key={comp.id} competition={comp} />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -435,15 +604,7 @@ export default function MatchmakingClient({
         />
       )}
 
-      {showNotifs && (
-        <NotificationPanel
-          currentUser={userState}
-          onClose={() => {
-            setShowNotifs(false);
-            fetchData();
-          }}
-        />
-      )}
+
 
       {/* Confirm Join Modal */}
       {confirmJoinTeam && (
@@ -608,10 +769,8 @@ export default function MatchmakingClient({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center mb-6">
-              <div className="w-16 h-16 rounded-full bg-[#16357B]/20 border border-[#16357B]/40 flex items-center justify-center mx-auto mb-3">
-                <User size={32} className="text-[#93c5fd]" />
-              </div>
-              <h3 className="text-white font-bold text-lg mb-1">
+              <h3 className="text-white flex justify-center gap-2 font-bold text-lg mb-1">
+                <span><User size={24} className="text-[#FFFFFF]" /></span>
                 {userState.real_name || "Nama Lengkap"}
               </h3>
               <p className="text-white/60 text-xs m-0">

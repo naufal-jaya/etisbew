@@ -4,16 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
 
-const particles = Array.from({ length: 20 }, (_, i) => {
-  const seed = i + 1
-  return {
-    left: `${(seed * 37) % 100}%`,
-    '--dur': `${4 + ((seed * 17) % 80) / 10}s`,
-    '--delay': `-${((seed * 29) % 100) / 10}s`,
-    '--drift': `${((seed * 53) % 100) - 50}px`,
-  } as React.CSSProperties
-})
-
 export default function ResetPasswordPage() {
   const supabase = useMemo(() => createClient(), [])
   const [mode, setMode] = useState<'request' | 'update'>('request')
@@ -104,231 +94,79 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#0f0f1a]">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
-        * { font-family: 'Space Grotesk', sans-serif; box-sizing: border-box; }
+    <main className="min-h-screen flex items-center justify-center bg-[#121820] px-4">
+      <div className="relative w-full max-w-[440px] z-10 flex flex-col items-center gap-6">
+        {/* MatchmakIEEEng Logo on Top */}
+        <div className="relative w-full flex justify-center py-2">
+          <img
+            src="/images/matchmakieeeng/MatchmakIEEEng.png"
+            alt="MatchmakIEEEng Logo"
+            className="h-12 md:h-14 w-auto object-contain relative z-10 filter drop-shadow-[0_0_12px_rgba(59,130,246,0.3)]"
+          />
+        </div>
 
-        .reset-card {
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 20px;
-          padding: 48px;
-          width: 100%;
-          max-width: 440px;
-          backdrop-filter: blur(20px);
-        }
-
-        .glow-ring {
-          position: absolute;
-          width: 300px; height: 300px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(20,184,166,0.28) 0%, transparent 70%);
-          top: -100px; left: 50%;
-          transform: translateX(-50%);
-          pointer-events: none;
-          filter: blur(40px);
-        }
-
-        .logo-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: rgba(20,184,166,0.14);
-          border: 1px solid rgba(20,184,166,0.28);
-          border-radius: 100px;
-          padding: 6px 14px;
-          color: #99f6e4;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          margin-bottom: 24px;
-        }
-
-        .title {
-          font-size: 32px;
-          font-weight: 700;
-          color: white;
-          margin: 0 0 8px;
-          line-height: 1.2;
-        }
-
-        .subtitle {
-          color: rgba(255,255,255,0.48);
-          font-size: 14px;
-          line-height: 1.6;
-          margin: 0 0 32px;
-        }
-
-        .field { margin-bottom: 16px; }
-        .field label {
-          display: block;
-          font-size: 13px;
-          font-weight: 500;
-          color: rgba(255,255,255,0.65);
-          margin-bottom: 8px;
-        }
-
-        .field input {
-          width: 100%;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 12px;
-          padding: 12px 16px;
-          color: white;
-          font-size: 14px;
-          font-family: 'DM Mono', monospace;
-          outline: none;
-          transition: all 0.2s;
-        }
-
-        .field input:focus {
-          border-color: rgba(20,184,166,0.65);
-          background: rgba(20,184,166,0.08);
-          box-shadow: 0 0 0 3px rgba(20,184,166,0.12);
-        }
-
-        .field input::placeholder { color: rgba(255,255,255,0.2); }
-
-        .status-msg {
-          border-radius: 10px;
-          padding: 10px 14px;
-          font-size: 13px;
-          line-height: 1.5;
-          margin-bottom: 16px;
-        }
-
-        .error-msg {
-          background: rgba(239,68,68,0.12);
-          border: 1px solid rgba(239,68,68,0.25);
-          color: #fca5a5;
-        }
-
-        .success-msg {
-          background: rgba(20,184,166,0.12);
-          border: 1px solid rgba(20,184,166,0.25);
-          color: #99f6e4;
-        }
-
-        .btn-reset {
-          width: 100%;
-          background: linear-gradient(135deg, #14b8a6, #6366f1);
-          color: white;
-          font-weight: 600;
-          font-size: 15px;
-          border: none;
-          border-radius: 12px;
-          padding: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
-          margin-top: 8px;
-        }
-
-        .btn-reset:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 8px 24px rgba(20,184,166,0.28);
-        }
-
-        .btn-reset:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .divider {
-          text-align: center;
-          color: rgba(255,255,255,0.28);
-          font-size: 12px;
-          margin-top: 24px;
-        }
-
-        .divider a {
-          color: #99f6e4;
-          text-decoration: none;
-        }
-
-        .divider a:hover { text-decoration: underline; }
-
-        .particles {
-          position: fixed; inset: 0;
-          pointer-events: none;
-          overflow: hidden;
-        }
-
-        .particle {
-          position: absolute;
-          width: 2px; height: 2px;
-          background: rgba(20,184,166,0.55);
-          border-radius: 50%;
-          animation: float var(--dur) var(--delay) infinite linear;
-        }
-
-        @keyframes float {
-          0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(-100px) translateX(var(--drift)); opacity: 0; }
-        }
-
-        @media (max-width: 520px) {
-          .reset-card { padding: 32px 24px; }
-          .title { font-size: 28px; }
-        }
-      `}</style>
-
-      <div className="particles">
-        {particles.map((style, i) => (
-          <div key={i} className="particle" style={style} />
-        ))}
-      </div>
-
-      <div style={{ position: 'relative', width: '100%', maxWidth: 440, padding: '0 20px' }}>
-        <div className="glow-ring" />
-        <div className="reset-card">
-          <div className="logo-badge">
-            <span>Reset Password</span>
-          </div>
-
+        <div className="w-full bg-[#1E2638] border border-white/5 rounded-[24px] p-8 md:p-12 shadow-2xl">
           {mode === 'request' ? (
             <>
-              <h1 className="title">Atur ulang password</h1>
-              <p className="subtitle">
+              <h1 className="text-3xl font-bold text-white mb-2 leading-tight">Atur ulang password</h1>
+              <p className="text-white/40 text-sm leading-relaxed mb-8">
                 Masukkan email IPB kamu. Kami akan kirim link sementara untuk membuat password baru.
               </p>
 
-              <form onSubmit={handleResetRequest}>
-                {error && <div className="status-msg error-msg">{error}</div>}
-                {success && <div className="status-msg success-msg">{success}</div>}
+              <form onSubmit={handleResetRequest} className="flex flex-col gap-5">
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3.5 text-red-300 text-xs">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="bg-[#16357B]/10 border border-[#16357B]/20 rounded-xl p-3.5 text-[#93c5fd] text-xs font-semibold">
+                    {success}
+                  </div>
+                )}
 
-                <div className="field">
-                  <label>Email IPB</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-white/60">Email IPB</label>
                   <input
                     type="email"
                     placeholder="nama@apps.ipb.ac.id"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     required
+                    className="w-full bg-[#121820] border border-white/5 rounded-xl px-4 py-3 text-white text-sm font-mono placeholder-white/20 outline-none focus:border-[#16357B] focus:bg-[#16357B]/10 transition-all duration-200"
                   />
                 </div>
 
-                <button type="submit" className="btn-reset" disabled={loading}>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#16357B] hover:bg-[#1a4299] text-white font-semibold text-sm rounded-xl py-3.5 mt-2 transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                >
                   {loading ? 'Mengirim...' : 'Kirim link reset'}
                 </button>
               </form>
             </>
           ) : (
             <>
-              <h1 className="title">Buat password baru</h1>
-              <p className="subtitle">
+              <h1 className="text-3xl font-bold text-white mb-2 leading-tight">Buat password baru</h1>
+              <p className="text-white/40 text-sm leading-relaxed mb-8">
                 Gunakan password minimal 8 karakter agar akun member kamu tetap aman.
               </p>
 
-              <form onSubmit={handlePasswordUpdate}>
-                {error && <div className="status-msg error-msg">{error}</div>}
-                {success && <div className="status-msg success-msg">{success}</div>}
+              <form onSubmit={handlePasswordUpdate} className="flex flex-col gap-5">
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3.5 text-red-300 text-xs">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="bg-[#16357B]/10 border border-[#16357B]/20 rounded-xl p-3.5 text-[#93c5fd] text-xs font-semibold">
+                    {success}
+                  </div>
+                )}
 
-                <div className="field">
-                  <label>Password baru</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-white/60">Password baru</label>
                   <input
                     type="password"
                     placeholder="Minimal 8 karakter"
@@ -336,11 +174,12 @@ export default function ResetPasswordPage() {
                     onChange={e => setPassword(e.target.value)}
                     required
                     minLength={8}
+                    className="w-full bg-[#121820] border border-white/5 rounded-xl px-4 py-3 text-white text-sm font-mono placeholder-white/20 outline-none focus:border-[#16357B] focus:bg-[#16357B]/10 transition-all duration-200"
                   />
                 </div>
 
-                <div className="field">
-                  <label>Konfirmasi password</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-semibold text-white/60">Konfirmasi password</label>
                   <input
                     type="password"
                     placeholder="Ulangi password baru"
@@ -348,18 +187,23 @@ export default function ResetPasswordPage() {
                     onChange={e => setConfirmPassword(e.target.value)}
                     required
                     minLength={8}
+                    className="w-full bg-[#121820] border border-white/5 rounded-xl px-4 py-3 text-white text-sm font-mono placeholder-white/20 outline-none focus:border-[#16357B] focus:bg-[#16357B]/10 transition-all duration-200"
                   />
                 </div>
 
-                <button type="submit" className="btn-reset" disabled={loading}>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#16357B] hover:bg-[#1a4299] text-white font-semibold text-sm rounded-xl py-3.5 mt-2 transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                >
                   {loading ? 'Menyimpan...' : 'Simpan password baru'}
                 </button>
               </form>
             </>
           )}
 
-          <p className="divider">
-            Sudah ingat password? <Link href="/member-login">Kembali login</Link>
+          <p className="text-center text-white/30 text-xs mt-8">
+            Sudah ingat password? <Link href="/member-login" className="text-[#93c5fd] hover:underline ml-1">Kembali login</Link>
           </p>
         </div>
       </div>

@@ -709,8 +709,10 @@ export default function JoinCompetitionForm({
                 ← Kembali
               </button>
               <button
+                type="submit"
                 onClick={handleSubmit}
                 disabled={!teamName || submitting}
+                className="btn-aura-hover"
                 style={{
                   flex: 2,
                   background: "#16357B",
@@ -724,7 +726,9 @@ export default function JoinCompetitionForm({
                   opacity: !teamName ? 0.5 : 1,
                 }}
               >
-                {submitting ? "Membuat tim..." : "Buat Tim"}
+                <span className="relative z-10">
+                  {submitting ? "Membuat tim..." : "Buat Tim"}
+                </span>
               </button>
             </div>
           </div>

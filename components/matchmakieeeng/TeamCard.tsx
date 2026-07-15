@@ -74,12 +74,12 @@ export default function TeamCard({
             <h3 className="text-white font-semibold flex items-center gap-2 flex-wrap text-[15px] m-0">
               {team.name}
               {isLeader && (
-                <span className="inline-flex items-center justify-center bg-amber-500/15 border border-amber-500/30 text-[#fbbf24] text-[10px] font-bold px-2 py-1 rounded-full tracking-wider leading-none">
+                <span className="inline-flex items-center justify-center border border-amber-500 text-[#fbbf24] text-[10px] font-bold px-2 py-1 rounded-full tracking-wider leading-none">
                   KETUA
                 </span>
               )}
               {isPending && (
-                <span className="inline-flex items-center justify-center bg-yellow-500/15 border border-yellow-500/30 text-yellow-500 text-[10px] font-bold px-2 py-1 rounded-full leading-none">
+                <span className="inline-flex items-center justify-center border border-amber-500  text-yellow-500 text-[10px] font-bold px-2 py-1 rounded-full leading-none">
                   PENDING
                 </span>
               )}
@@ -169,8 +169,8 @@ export default function TeamCard({
               <div
                 key={m.id}
                 className={`group relative inline-flex items-center gap-1 border rounded-lg px-2.5 py-0.5 text-xs select-none cursor-default ${m.member_id === team.leader_id
-                  ? "bg-[#16357B]/40 border-[#16357B] text-[#93c5fd]"
-                  : "bg-white/8 border-white/8 text-white/78"
+                  ? "bg-[#16357B]/60 text-[#93c5fd]"
+                  : "bg-white/10 text-white/78"
                   }`}
                 tabIndex={0}
               >
@@ -263,9 +263,9 @@ export default function TeamCard({
       {!isMyTeam && !isMember && !isPending && currentCount < maxMembers && (
         <button
           onClick={() => onAskToJoin?.(team.id)}
-          className="w-full bg-[#16357B]/25 border border-[#16357B]/60 rounded-xl p-2 text-[#93c5fd] text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-[#16357B]/45"
+          className="w-full bg-[#121820]/50 rounded-xl p-2 text-[#93c5fd] text-xs font-semibold cursor-pointer transition-all duration-200 hover:bg-[#16357B]/20 btn-aura-hover"
         >
-          Gabung
+          <span className="relative z-10">Gabung</span>
         </button>
       )}
 
