@@ -133,7 +133,7 @@ export default function MemberLoginPage() {
           </form>
 
           <p className="text-center text-white/20 text-xs mt-8">
-            Akun dibuat oleh admin, hubungi jika ada masalah
+            Akun dibuat oleh admin, hubungi irham jika ada masalah
           </p>
         </div>
       </div>

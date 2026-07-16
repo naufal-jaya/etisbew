@@ -822,6 +822,9 @@ export default function MatchmakingClient({
               <p className="text-white/60 text-xs m-0">
                 @{userState.username}
               </p>
+              <p className="text-white/60 text-xs m-0">
+                {userState.email}
+              </p>
             </div>
 
             <form onSubmit={handleUpdateProfile} className="flex flex-col gap-4">
@@ -867,6 +870,7 @@ export default function MatchmakingClient({
                   </button>
                 </div>
               </div>
+
 
               <div>
                 <label className="block text-xs font-semibold text-white/60 mb-1.5">
