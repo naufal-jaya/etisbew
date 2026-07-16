@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { Member, Team, Competition } from "@/types/database";
-import { X, User, Pencil, Bell, Flag, Trophy } from "lucide-react";
+import { X, User, Pencil, Check, Bell, Flag, Trophy } from "lucide-react";
 import TeamCard from "@/components/matchmakieeeng/TeamCard";
 import CompetitionCard from "@/components/matchmakieeeng/CompetitionCard";
 import JoinCompetitionForm from "@/components/matchmakieeeng/JoinCompetitionForm";
@@ -32,6 +32,35 @@ export default function MatchmakingClient({
   const [editUsername, setEditUsername] = useState(currentUser.username);
   const [editWhatsapp, setEditWhatsapp] = useState(currentUser.wa_number || "");
   const [updatingProfile, setUpdatingProfile] = useState(false);
+
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [isEditingWhatsapp, setIsEditingWhatsapp] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [resetStatus, setResetStatus] = useState<'confirm' | 'sending' | 'success' | 'error'>('confirm');
+  const [resetError, setResetError] = useState('');
+
+  const usernameInputRef = useRef<HTMLInputElement>(null);
+  const whatsappInputRef = useRef<HTMLInputElement>(null);
+
+  const handleToggleEditUsername = () => {
+    setIsEditingUsername((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => usernameInputRef.current?.focus(), 50);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleEditWhatsapp = () => {
+    setIsEditingWhatsapp((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => whatsappInputRef.current?.focus(), 50);
+      }
+      return next;
+    });
+  };
 
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [competitions, setCompetitions] =
@@ -254,6 +283,25 @@ export default function MatchmakingClient({
     router.push("/member-login");
   };
 
+  const handleSendResetEmail = async () => {
+    if (!userState.email) {
+      setResetError("Email tidak ditemukan");
+      setResetStatus('error');
+      return;
+    }
+    setResetStatus('sending');
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(userState.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setResetStatus('success');
+    } catch (err: any) {
+      setResetError(err.message || "Terjadi kesalahan");
+      setResetStatus('error');
+    }
+  };
+
   // Categorize teams
   const myActiveTeams = teams.filter((t) =>
     t.members?.some(
@@ -399,62 +447,60 @@ export default function MatchmakingClient({
           box-shadow: 0 0 15px rgba(59, 130, 246, 0.4) !important;
         }
       `}</style>
-      <nav className="brand-aura-container sticky top-0 left-0 right-0 z-50 transition-all duration-500 py-3 bg-[#121820]/90 backdrop-blur-[18px] shrink-0">
-        <div className="brand-aura-bg pointer-events-none" />
-        <div className="brand-aura-radial pointer-events-none hidden md:block" />
-        <div className="brand-aura-border pointer-events-none" />
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex items-center justify-between relative">
-            <Link href="/" className="flex items-center space-x-2 group shrink-0">
-              <span
-                aria-label="IEEE IPB Student Branch"
-                role="img"
-                className="block aspect-[679/116] w-32 shrink-0 bg-current sm:w-40 text-white [mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [mask-position:left_center] [mask-repeat:no-repeat] [mask-size:contain] [-webkit-mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [-webkit-mask-position:left_center] [-webkit-mask-repeat:no-repeat] [-webkit-mask-size:contain]"
-              />
-            </Link>
+      <div className="sticky top-0 left-0 right-0 z-50 flex flex-col shrink-0">
+        <nav className="brand-aura-container transition-all duration-500 py-3 bg-[#121820]/90 backdrop-blur-[18px]">
+          <div className="brand-aura-bg pointer-events-none" />
+          <div className="brand-aura-radial pointer-events-none hidden md:block" />
+          <div className="brand-aura-border pointer-events-none" />
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="flex items-center justify-between relative">
+              <Link href="/" className="flex items-center space-x-2 group shrink-0">
+                <span
+                  aria-label="IEEE IPB Student Branch"
+                  role="img"
+                  className="block aspect-[679/116] w-32 shrink-0 bg-current sm:w-40 text-white [mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [mask-position:left_center] [mask-repeat:no-repeat] [mask-size:contain] [-webkit-mask-image:url('/images/layout/Logo_IEEE_IPB.svg')] [-webkit-mask-position:left_center] [-webkit-mask-repeat:no-repeat] [-webkit-mask-size:contain]"
+                />
+              </Link>
 
-            {/* Centered MatchmakIEEEng.png (Desktop Only) */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden md:block">
-              <img
-                src="/images/matchmakieeeng/MatchmakIEEEng.png"
-                alt="MatchmakIEEEng Logo"
-                className="h-7 w-auto object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
-              />
-            </div>
+              {/* Centered MatchmakIEEEng.png (Desktop Only) */}
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden md:block">
+                <img
+                  src="/images/matchmakieeeng/MatchmakIEEEng.png"
+                  alt="MatchmakIEEEng Logo"
+                  className="h-7 w-auto object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
+                />
+              </div>
 
-            <div className="flex items-center gap-3 md:gap-8 shrink-0">
-              <button
-                onClick={() => {
-                  setEditUsername(userState.username);
-                  setEditWhatsapp(userState.wa_number || "");
-                  setShowProfile(true);
-                }}
-                className="bg-transparent border-none flex items-center gap-1.5 text-white/70 text-xs cursor-pointer px-2 py-1 rounded-lg transition-colors duration-200 hover:bg-white/10"
-              >
-                <User size={16} strokeWidth={2} className="text-white/60" />
-                <span>@{userState.username}</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="bg-[#1E2638] border border-white/10 rounded-lg px-3 py-1.5 text-white/80 text-xs cursor-pointer hover:bg-white/10 transition-colors duration-200"
-              >
-                Logout
-              </button>
+              <div className="flex items-center gap-3 md:gap-8 shrink-0">
+                <button
+                  onClick={() => {
+                    setEditUsername(userState.username);
+                    setEditWhatsapp(userState.wa_number || "");
+                    setIsEditingUsername(false);
+                    setIsEditingWhatsapp(false);
+                    setShowProfile(true);
+                  }}
+                  className="bg-transparent border-none flex items-center gap-1.5 text-white/70 text-xs cursor-pointer px-2 py-1 rounded-lg transition-colors duration-200 hover:bg-white/10"
+                >
+                  <User size={16} strokeWidth={2} className="text-white/60" />
+                  <span>@{userState.username}</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Sub-header Brand Banner with Cool Aura & Animation (Mobile Only) */}
-      <div className="brand-aura-container w-full flex justify-center py-4 shrink-0 md:hidden">
-        <div className="brand-aura-bg pointer-events-none" />
-        <div className="brand-aura-radial pointer-events-none" />
-        <div className="brand-aura-border pointer-events-none" />
-        <img
-          src="/images/matchmakieeeng/MatchmakIEEEng.png"
-          alt="MatchmakIEEEng Logo"
-          className="h-7 w-auto object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
-        />
+        {/* Sub-header Brand Banner with Cool Aura & Animation (Mobile Only) */}
+        <div className="brand-aura-container w-full flex justify-center py-4 shrink-0 md:hidden">
+          <div className="brand-aura-bg pointer-events-none" />
+          <div className="brand-aura-radial pointer-events-none" />
+          <div className="brand-aura-border pointer-events-none" />
+          <img
+            src="/images/matchmakieeeng/MatchmakIEEEng.png"
+            alt="MatchmakIEEEng Logo"
+            className="h-7 w-auto object-contain relative z-10 filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
+          />
+        </div>
       </div>
 
       <div className="max-w-[1400px] w-full mx-auto px-3 md:px-6 flex-1 grid grid-cols-1 md:grid-cols-[1fr_320px] gap-4 md:gap-8 min-h-0 md:overflow-hidden box-border">
@@ -797,13 +843,28 @@ export default function MatchmakingClient({
                 </label>
                 <div className="relative">
                   <input
+                    ref={usernameInputRef}
                     type="text"
                     value={editUsername}
                     onChange={(e) => setEditUsername(e.target.value)}
                     required
-                    className="w-full bg-[#121820] border border-white/10 rounded-xl pl-3.5 pr-10 py-2.5 text-white text-sm outline-none focus:border-[#16357B]"
+                    disabled={!isEditingUsername}
+                    className={`w-full border rounded-xl pl-3.5 pr-10 py-2.5 text-sm outline-none transition-all duration-200 ${isEditingUsername
+                      ? "bg-[#121820] border-white/10 text-white focus:border-[#16357B]"
+                      : "bg-white/5 border-white/5 text-white/50 cursor-not-allowed"
+                      }`}
                   />
-                  <Pencil size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+                  <button
+                    type="button"
+                    onClick={handleToggleEditUsername}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all duration-200"
+                  >
+                    {isEditingUsername ? (
+                      <Check size={14} />
+                    ) : (
+                      <Pencil size={14} />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -813,13 +874,28 @@ export default function MatchmakingClient({
                 </label>
                 <div className="relative">
                   <input
+                    ref={whatsappInputRef}
                     type="text"
                     placeholder="Contoh: 08123456789"
                     value={editWhatsapp}
                     onChange={(e) => setEditWhatsapp(e.target.value)}
-                    className="w-full bg-[#121820] border border-white/10 rounded-xl pl-3.5 pr-10 py-2.5 text-white text-sm outline-none focus:border-[#16357B]"
+                    disabled={!isEditingWhatsapp}
+                    className={`w-full border rounded-xl pl-3.5 pr-10 py-2.5 text-sm outline-none transition-all duration-200 ${isEditingWhatsapp
+                      ? "bg-[#121820] border-white/10 text-white focus:border-[#16357B]"
+                      : "bg-white/5 border-white/5 text-white/50 cursor-not-allowed"
+                      }`}
                   />
-                  <Pencil size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+                  <button
+                    type="button"
+                    onClick={handleToggleEditWhatsapp}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-all duration-200"
+                  >
+                    {isEditingWhatsapp ? (
+                      <Check size={14} />
+                    ) : (
+                      <Pencil size={14} />
+                    )}
+                  </button>
                 </div>
               </div>
 
@@ -842,7 +918,119 @@ export default function MatchmakingClient({
                   {updatingProfile ? "Menyimpan..." : "Simpan"}
                 </button>
               </div>
+              <div className="flex flex-col items-center gap-1 mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResetStatus('confirm');
+                    setResetError('');
+                    setShowResetConfirm(true);
+                  }}
+                  className="w-fit px-4 text-xs text-white hover:text-white/80 hover:bg-white/5 rounded-xl py-2 text-center cursor-pointer font-semibold transition-colors duration-200"
+                >
+                  Reset Password
+                </button>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-fit px-4 text-xs text-red-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl py-2 cursor-pointer font-semibold transition-colors duration-200"
+                >
+                  Keluar
+                </button>
+              </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showResetConfirm && (
+        <div
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] backdrop-blur-md"
+          onClick={() => {
+            if (resetStatus !== 'sending') setShowResetConfirm(false);
+          }}
+        >
+          <div
+            className="bg-[#1E2638] border border-[#16357B]/60 rounded-[20px] p-8 max-w-[360px] w-[90%] text-center flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {resetStatus === 'confirm' && (
+              <>
+                <h3 className="text-white font-bold text-lg mb-2">
+                  Atur Ulang Password?
+                </h3>
+                <p className="text-white/70 text-sm mb-6 leading-relaxed">
+                  Link reset password akan dikirim ke email kamu:<br />
+                  <strong className="text-white font-bold">{userState.email || "email kamu"}</strong>
+                </p>
+                <div className="flex gap-2.5 w-full">
+                  <button
+                    onClick={() => setShowResetConfirm(false)}
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleSendResetEmail}
+                    className="flex-1 bg-[#16357B] border-none rounded-xl py-2.5 text-white cursor-pointer text-sm font-semibold hover:bg-[#16357B]/80 transition-colors duration-200"
+                  >
+                    Kirim
+                  </button>
+                </div>
+              </>
+            )}
+
+            {resetStatus === 'sending' && (
+              <div className="py-6 flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-2 border-t-blue-500 border-white/10 rounded-full animate-spin" />
+                <p className="text-white/70 text-sm">Mengirim link reset password...</p>
+              </div>
+            )}
+
+            {resetStatus === 'success' && (
+              <>
+                <h3 className="text-emerald-400 font-bold text-lg mb-2">
+                  Link Dikirim!
+                </h3>
+                <p className="text-white/70 text-sm mb-6 leading-relaxed">
+                  Link reset password sudah dikirim ke email kamu. Silakan periksa inbox atau spam email IPB kamu.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowResetConfirm(false);
+                    setShowProfile(false);
+                  }}
+                  className="w-full bg-[#16357B] border-none rounded-xl py-2.5 text-white cursor-pointer text-sm font-semibold hover:bg-[#16357B]/80 transition-colors duration-200"
+                >
+                  Tutup
+                </button>
+              </>
+            )}
+
+            {resetStatus === 'error' && (
+              <>
+                <h3 className="text-red-400 font-bold text-lg mb-2">
+                  Gagal Mengirim
+                </h3>
+                <p className="text-red-300/80 text-sm mb-6 leading-relaxed">
+                  {resetError || "Terjadi kesalahan"}
+                </p>
+                <div className="flex gap-2.5 w-full">
+                  <button
+                    onClick={() => setShowResetConfirm(false)}
+                    className="flex-1 bg-white/5 border border-white/10 rounded-xl py-2.5 text-white/80 cursor-pointer text-sm font-medium hover:bg-white/10 transition-colors duration-200"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleSendResetEmail}
+                    className="flex-1 bg-[#16357B] border-none rounded-xl py-2.5 text-white cursor-pointer text-sm font-semibold hover:bg-[#16357B]/80 transition-colors duration-200"
+                  >
+                    Coba Lagi
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
