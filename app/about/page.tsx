@@ -11,9 +11,18 @@ import VisionMission from "@/components/about/VisionMission";
 import RoadmapHistory from "@/components/about/RoadmapHistory"
 
 export const metadata: Metadata = {
-  title: "About Us | IEEE Student Branch IPB",
+  title: "About Us | IEEE Student Branch IPB University",
   description:
-    "Learn about IEEE Student Branch IPB - our mission, vision, divisions, and commitment to advancing technology for humanity.",
+    "Discover the mission, vision, and leadership divisions of IEEE Student Branch IPB University (IEEE SB IPB). Learn how we advance technology for humanity.",
+  keywords: [
+    "About IEEE IPB",
+    "IEEE SB IPB Profile",
+    "IEEE Student Branch IPB Committee",
+    "IPB University Engineering",
+  ],
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 // Helper to convert Portable Text to string

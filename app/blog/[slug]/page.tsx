@@ -8,6 +8,13 @@ import Link from 'next/link';
 import { Calendar, User, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "https://ieee-orm.ipb.ac.id");
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -51,13 +58,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) {
     return {
-      title: 'Post Not Found',
+      title: 'Post Not Found | IEEE Student Branch IPB Blog',
     };
   }
 
+  const title = `${post.title} | IEEE Student Branch IPB Blog`;
+  const description = post.excerpt || "Read the latest publication from the IEEE Student Branch IPB.";
+  const url = `${siteUrl}/blog/${resolvedParams.slug}`;
+  const ogImage = post.coverImage ? urlFor(post.coverImage).width(1200).height(630).url() : undefined;
+
   return {
-    title: `${post.title} | IEEE Student Branch IPB Blog`,
-    description: post.excerpt,
+    title,
+    description,
+    alternates: {
+      canonical: `/blog/${resolvedParams.slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      url,
+      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: post.title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ogImage ? [ogImage] : undefined,
+    },
   };
 }
 
