@@ -401,7 +401,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
             </h1>
 
             {/* Meta Info */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-8 mb-2 w-full">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-4 border-b border-slate-100 pb-8 mb-2 w-full">
               <div className="text-[#888888] font-medium">
                 {post.author && (
                   <>
@@ -413,7 +413,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
                 )}
               </div>
 
-              <div className="text-[#888888] font-medium text-right">
+              <div className="text-[#888888] font-medium text-left md:text-right">
                 Published on{" "}
                 <time dateTime={post.publishedAt}>
                   {(() => {
