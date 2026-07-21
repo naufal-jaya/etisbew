@@ -9,18 +9,8 @@ import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
-  title: "Blog & Publications | IEEE Student Branch IPB University",
-  description:
-    "Explore technology articles, student projects, coding tutorials, and research publications from members of the IEEE Student Branch IPB (IEEE SB IPB).",
-  keywords: [
-    "IEEE SB IPB Blog",
-    "IEEE IPB Articles",
-    "IEEE Student Branch IPB Publications",
-    "IPB Student Technology Blog",
-  ],
-  alternates: {
-    canonical: "/blog",
-  },
+  title: 'Blog | IEEE Student Branch IPB',
+  description: 'Read the latest articles, insights, and news from IEEE Student Branch IPB',
 };
 
 export const dynamic = 'force-dynamic';

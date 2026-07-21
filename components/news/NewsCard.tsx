@@ -40,7 +40,7 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
         </span>
       )}
 
-      <h3 className="font-bold text-navy-900 mb-1 leading-tight text-3xl md:text-4xl line-clamp-2 md:line-clamp-3">
+      <h3 className="font-bold text-navy-900 mb-1 leading-tight text-2xl line-clamp-2">
         {post.title}
       </h3>
 
@@ -56,7 +56,7 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
         </time>
       </div>
 
-      <p className="text-slate-600 line-clamp-3 text-md">{post.excerpt}</p>
+      <p className="text-slate-600 line-clamp-2 text-md">{post.excerpt}</p>
 
       <div className="mt-auto pt-1">
         <Button
@@ -134,7 +134,16 @@ const NewsCard = ({ post }: { post: any }) => {
   const href = `/news/${post.slug.current}`;
 
   if (post.featured) {
-    return <FeaturedCard post={post} href={href} />;
+    return (
+      <>
+        <div className="hidden md:block">
+          <FeaturedCard post={post} href={href} />
+        </div>
+        <div className="block md:hidden">
+          <NormalCard post={post} href={href} />
+        </div>
+      </>
+    );
   }
 
   return <NormalCard post={post} href={href} />;

@@ -5,28 +5,17 @@ import NewsCard from "@/components/news/NewsCard";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FilteredRecentPosts from "@/components/news/FilteredRecentPosts";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Latest News & Insights | IEEE Student Branch IPB",
-  description:
-    "Stay updated with the latest technological developments, event reviews, awards, and insights from the IEEE Student Branch IPB University.",
-  keywords: [
-    "IEEE IPB News",
-    "IEEE SB IPB Blog",
-    "IEEE Student Branch IPB Achievements",
-    "IPB Technology Blog",
-  ],
-  alternates: {
-    canonical: "/news",
-  },
-};
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function NewsPage() {
-  const fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+  let fetchedPosts: any[] = [];
+  try {
+    fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+  } catch (error) {
+    console.error("Error fetching posts from Sanity:", error);
+  }
 
   const placeholderPosts = [
     {

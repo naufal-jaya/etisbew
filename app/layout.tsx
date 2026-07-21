@@ -11,51 +11,30 @@ const playfair = Playfair_Display({
   style: ["italic"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ieee-orm.ipb.ac.id";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: "IEEE Student Branch IPB University",
+  title: "IEEE Student Branch IPB | Innovation & Technology Excellence",
   description:
-    "IEEE Student Branch IPB University - Advancing technology for humanity. Join us in fostering innovation, technical excellence, and professional development.",
+    "IEEE Student Branch IPB - Advancing technology for humanity. Join us in fostering innovation, technical excellence, and professional development.",
   keywords: [
     "IEEE",
     "IPB",
     "Student Branch",
-    "IEEE SB IPB",
-    "IEEE IPB",
-    "IEEE Student Branch IPB",
-    "IEEE Student Branch IPB University",
-    "IEEE SB IPB University",
-    "IEEE Indonesia",
-    "IPB University",
     "Technology",
     "Innovation",
     "Engineering",
   ],
   authors: [{ name: "IEEE Student Branch IPB" }],
-  alternates: {
-    canonical: "/",
-  },
   icons: {
     icon: "/images/layout/Logo_IEEE_IPB_Icon.png",
     shortcut: "/images/layout/Logo_IEEE_IPB_Icon.png",
     apple: "/images/layout/Logo_IEEE_IPB_Icon.png",
   },
   openGraph: {
-    title: "IEEE Student Branch IPB University",
+    title: "IEEE Student Branch IPB",
     description:
-      "IEEE Student Branch IPB University - Advancing technology for humanity through innovation and excellence.",
+      "Advancing technology for humanity through innovation and excellence",
     type: "website",
     locale: "en_US",
-    url: siteUrl,
-    siteName: "IEEE Student Branch IPB University",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "IEEE Student Branch IPB University",
-    description:
-      "IEEE Student Branch IPB University - Advancing technology for humanity through innovation and excellence.",
   },
 };
 

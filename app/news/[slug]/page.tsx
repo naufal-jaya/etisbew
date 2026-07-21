@@ -9,7 +9,6 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Calendar, User, ArrowLeft } from "lucide-react";
 import SharePost from "@/components/news/SharePost";
-import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -28,50 +27,16 @@ interface PageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const resolvedParams = await params;
-  const post = await sanityFetch<any>(postBySlugQuery, {
-    slug: resolvedParams.slug,
-  });
-
-  if (!post) {
-    return {
-      title: "News Article Not Found | IEEE Student Branch IPB",
-    };
-  }
-
-  const title = `${post.title} | IEEE Student Branch IPB News`;
-  const description = post.excerpt || "Read the latest news and updates from the IEEE Student Branch IPB.";
-  const url = `${siteUrl}/news/${resolvedParams.slug}`;
-  const ogImage = post.coverImage ? urlFor(post.coverImage).width(1200).height(630).url() : undefined;
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: `/news/${resolvedParams.slug}`,
-    },
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      url,
-      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: post.title }] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ogImage ? [ogImage] : undefined,
-    },
-  };
-}
-
 export default async function SingleNewsPage({ params }: PageProps) {
   const resolvedParams = await params;
-  let post = await sanityFetch<any>(postBySlugQuery, {
-    slug: resolvedParams.slug,
-  });
+  let post = null;
+  try {
+    post = await sanityFetch<any>(postBySlugQuery, {
+      slug: resolvedParams.slug,
+    });
+  } catch (error) {
+    console.error("Error fetching post from Sanity:", error);
+  }
 
   if (!post) {
     // Placeholder data for when Sanity is empty
@@ -463,7 +428,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
         </div>
 
         <SharePost
-          url={`${siteUrl}/news/${post.slug.current}`}
+          url={`https://ieee-orm.ipb.ac.id/news/${post.slug.current}`}
           title={post.title}
         />
         {/* Content Layout */}

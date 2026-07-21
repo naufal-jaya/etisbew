@@ -2,6 +2,9 @@ import { MetadataRoute } from "next";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { groq } from "next-sanity";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const sitemapPostsQuery = groq`
   *[_type == "post" && defined(slug.current)] {
     "slug": slug.current,
