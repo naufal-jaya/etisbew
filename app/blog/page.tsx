@@ -1,4 +1,4 @@
-import { client } from '@/sanity/lib/client';
+import { sanityFetch } from '@/sanity/lib/fetch';
 import { allPostsQuery } from '@/sanity/lib/queries';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: 'Blog | IEEE Student Branch IPB',
   description: 'Read the latest articles, insights, and news from IEEE Student Branch IPB',
 };
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 interface Post {
   _id: string;
@@ -31,7 +34,7 @@ interface Post {
 }
 
 async function getPosts(): Promise<Post[]> {
-  const posts = await client.fetch(allPostsQuery);
+  const posts = await sanityFetch<Post[]>(allPostsQuery);
   return posts;
 }
 

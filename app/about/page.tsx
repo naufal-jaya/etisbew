@@ -1,4 +1,4 @@
-import { client } from "@/sanity/lib/client";
+import { sanityFetch } from "@/sanity/lib/fetch";
 import {
   aboutPageQuery,
   divisionsWithMembersQuery,
@@ -28,13 +28,14 @@ function blocksToText(blocks: any[] = []) {
     .join("\n\n");
 }
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function AboutPage() {
   // Fetch all data in parallel
   const [aboutData, fetchedDivisions] = await Promise.all([
-    client.fetch(aboutPageQuery),
-    client.fetch(divisionsWithMembersQuery),
+    sanityFetch<any>(aboutPageQuery),
+    sanityFetch<any[]>(divisionsWithMembersQuery),
   ]);
 
   // Placeholder divisions if Sanity is empty

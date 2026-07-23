@@ -1,4 +1,4 @@
-import { client } from "@/sanity/lib/client";
+import { sanityFetch } from "@/sanity/lib/fetch";
 import { urlFor } from "@/sanity/lib/image";
 import Hero from "@/components/home/Hero";
 import HomeDivisions from "@/components/home/__archive/HomeDivisions";
@@ -17,15 +17,16 @@ import {
   allPostsQuery,
 } from "@/sanity/lib/queries";
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Home() {
-  const divisions = await client.fetch(allDivisionsQuery);
-  const posts = await client.fetch(allPostsQuery);
+  const divisions = await sanityFetch<any[]>(allDivisionsQuery);
+  const posts = await sanityFetch<any[]>(allPostsQuery);
   const featuredPost = posts.find((p: any) => p.featured);
   const remainingPosts = posts.filter((p: any) => !p.featured);
-  const impacts = await client.fetch(impactQuery);
-  const partnersData = await client.fetch(impactPartnersQuery);
+  const impacts = await sanityFetch<any[]>(impactQuery);
+  const partnersData = await sanityFetch<any[]>(impactPartnersQuery);
   const partner = (partnersData || []).map((p: any, i: number) => ({
     id: i + 1,
     src: p.logo ? urlFor(p.logo).url() : "",

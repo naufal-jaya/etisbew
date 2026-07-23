@@ -1,4 +1,4 @@
-import { client } from "@/sanity/lib/client";
+import { sanityFetch } from "@/sanity/lib/fetch";
 import { allPostsQuery } from "@/sanity/lib/queries";
 import Image from "next/image";
 import NewsCard from "@/components/news/NewsCard";
@@ -6,10 +6,16 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FilteredRecentPosts from "@/components/news/FilteredRecentPosts";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function NewsPage() {
-  const fetchedPosts = await client.fetch(allPostsQuery);
+  let fetchedPosts: any[] = [];
+  try {
+    fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+  } catch (error) {
+    console.error("Error fetching posts from Sanity:", error);
+  }
 
   const placeholderPosts = [
     {

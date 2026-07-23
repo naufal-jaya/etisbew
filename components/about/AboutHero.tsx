@@ -1,15 +1,10 @@
-﻿"use client";
+"use client";
 
 import gsap from "gsap";
 import Image from "next/image";
-import { Playfair_Display } from "next/font/google";
 import { useEffect, useRef } from "react";
 import VisionMission from "./VisionMission";
 
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  style: ["italic"],
-});
 
 export default function AboutHero() {
   const shadowRef = useRef(null);
