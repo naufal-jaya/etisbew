@@ -16,13 +16,13 @@ const historyData = [
     year: "2021",
     title: "First Milestone",
     description:
-      "IEEE SB IPB held its inaugural seminar series, attracting over 300 participants from engineering and computer science faculties.",
+      "IEEE SB IPB held its inaugural seminar series, attracting participants from engineering and computer science faculties.",
   },
   {
     year: "2022",
     title: "Expanding Reach",
     description:
-      "The branch launched three new technical chapters and forged partnerships with IEEE SB chapters across Indonesia.",
+      "The branch forged partnerships with IEEE SB chapters across Indonesia.",
   },
   {
     year: "2023",
@@ -34,19 +34,19 @@ const historyData = [
     year: "2024",
     title: "Innovation Drive",
     description:
-      "Launched the annual IEEE IPB Hackathon, fostering innovation and problem-solving among over 500 students nationwide.",
+      "Fostering innovation and problem-solving among students nationwide.",
   },
   {
     year: "2025",
     title: "Global Connections",
     description:
-      "Established official collaboration with IEEE Region 10 and hosted an international webinar series featuring speakers from 12 countries.",
+      "Exploring sustainable technologies and their real-world applications",
   },
   {
     year: "2026",
     title: "New Horizons",
     description:
-      "IEEE SB IPB embarks on a new chapter of digital transformation, advancing research programs and community-driven tech initiatives across the archipelago.",
+      "IEEE SB IPB embarks on a new chapter, advancing research programs and community-driven tech initiatives across the archipelago.",
   },
 ];
 
