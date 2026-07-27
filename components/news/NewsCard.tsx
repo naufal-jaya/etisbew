@@ -23,6 +23,7 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
           src={urlFor(post.coverImage).width(800).height(450).url()}
           alt={post.title}
           fill
+          unoptimized
           className="object-cover"
         />
       ) : (
@@ -90,6 +91,7 @@ export const NormalCard = ({ post, href }: NewsCardProps) => (
           src={urlFor(post.coverImage).width(800).height(450).url()}
           alt={post.title}
           fill
+          unoptimized
           className="object-cover"
         />
       ) : (

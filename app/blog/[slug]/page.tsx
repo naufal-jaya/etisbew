@@ -13,8 +13,7 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface Post {
   _id: string;
@@ -36,12 +35,12 @@ interface Post {
 }
 
 async function getPost(slug: string): Promise<Post | null> {
-  const post = await sanityFetch<Post | null>(postBySlugQuery, { slug });
+  const post = await sanityFetch<Post | null>(postBySlugQuery, { slug }, { revalidate: 60 });
   return post;
 }
 
 async function getRelatedPosts(slug: string): Promise<Post[]> {
-  const posts = await sanityFetch<Post[]>(relatedPostsQuery, { slug });
+  const posts = await sanityFetch<Post[]>(relatedPostsQuery, { slug }, { revalidate: 60 });
   return posts;
 }
 
@@ -191,6 +190,7 @@ export default async function BlogPostPage({ params }: Props) {
                     alt={post.author.name}
                     width={40}
                     height={40}
+                    unoptimized
                     className="rounded-full"
                   />
                 )}
@@ -211,6 +211,7 @@ export default async function BlogPostPage({ params }: Props) {
                 src={urlFor(post.coverImage).width(1200).height(600).url()}
                 alt={post.title}
                 fill
+                unoptimized
                 className="object-cover"
               />
             </div>
@@ -243,6 +244,7 @@ export default async function BlogPostPage({ params }: Props) {
                         src={urlFor(relatedPost.coverImage).width(400).height(300).url()}
                         alt={relatedPost.title}
                         fill
+                        unoptimized
                         className="object-cover"
                       />
                     </div>

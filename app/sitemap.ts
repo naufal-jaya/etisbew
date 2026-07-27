@@ -2,8 +2,7 @@ import { MetadataRoute } from "next";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { groq } from "next-sanity";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 3600;
 
 const sitemapPostsQuery = groq`
   *[_type == "post" && defined(slug.current)] {
@@ -22,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let posts: PostSitemapData[] = [];
   try {
-    posts = await sanityFetch<PostSitemapData[]>(sitemapPostsQuery);
+    posts = await sanityFetch<PostSitemapData[]>(sitemapPostsQuery, {}, { revalidate: 3600 });
   } catch (error) {
     console.error("Failed to fetch posts for sitemap:", error);
   }

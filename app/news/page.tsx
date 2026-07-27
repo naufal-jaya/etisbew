@@ -6,13 +6,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FilteredRecentPosts from "@/components/news/FilteredRecentPosts";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function NewsPage() {
   let fetchedPosts: any[] = [];
   try {
-    fetchedPosts = await sanityFetch<any[]>(allPostsQuery);
+    fetchedPosts = await sanityFetch<any[]>(allPostsQuery, {}, { revalidate: 60 });
   } catch (error) {
     console.error("Error fetching posts from Sanity:", error);
   }

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
@@ -60,7 +60,7 @@ const MemberCard = ({
             }
             alt={member.name}
             fill
-            sizes="(max-width: 768px) 100vw, 300px"
+            unoptimized
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
         ) : (

@@ -11,8 +11,7 @@ import { Calendar, User, ArrowLeft } from "lucide-react";
 import SharePost from "@/components/news/SharePost";
 import { Metadata } from "next";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
@@ -30,9 +29,11 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
-  const post = await sanityFetch<any>(postBySlugQuery, {
-    slug: resolvedParams.slug,
-  });
+  const post = await sanityFetch<any>(
+    postBySlugQuery,
+    { slug: resolvedParams.slug },
+    { revalidate: 60 }
+  );
 
   if (!post) {
     return {
@@ -69,9 +70,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function SingleNewsPage({ params }: PageProps) {
   const resolvedParams = await params;
-  let post = await sanityFetch<any>(postBySlugQuery, {
-    slug: resolvedParams.slug,
-  });
+  let post = await sanityFetch<any>(
+    postBySlugQuery,
+    { slug: resolvedParams.slug },
+    { revalidate: 60 }
+  );
 
   if (!post) {
     // Placeholder data for when Sanity is empty
@@ -450,7 +453,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
                 src={urlFor(post.coverImage).width(1200).height(600).url()}
                 alt={post.title}
                 fill
-                sizes="100vw"
+                unoptimized
                 className="object-cover"
                 priority
               />
