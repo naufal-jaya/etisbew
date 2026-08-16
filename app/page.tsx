@@ -17,16 +17,17 @@ import {
   allPostsQuery,
 } from "@/sanity/lib/queries";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function Home() {
-  const divisions = await sanityFetch<any[]>(allDivisionsQuery);
-  const posts = await sanityFetch<any[]>(allPostsQuery);
+  const [divisions, posts, impacts, partnersData] = await Promise.all([
+    sanityFetch<any[]>(allDivisionsQuery, {}, { revalidate: 60 }),
+    sanityFetch<any[]>(allPostsQuery, {}, { revalidate: 60 }),
+    sanityFetch<any[]>(impactQuery, {}, { revalidate: 60 }),
+    sanityFetch<any[]>(impactPartnersQuery, {}, { revalidate: 60 }),
+  ]);
   const featuredPost = posts.find((p: any) => p.featured);
   const remainingPosts = posts.filter((p: any) => !p.featured);
-  const impacts = await sanityFetch<any[]>(impactQuery);
-  const partnersData = await sanityFetch<any[]>(impactPartnersQuery);
   const partner = (partnersData || []).map((p: any, i: number) => ({
     id: i + 1,
     src: p.logo ? urlFor(p.logo).url() : "",

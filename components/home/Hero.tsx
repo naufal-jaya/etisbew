@@ -3,12 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { Playfair_Display } from "next/font/google";
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  style: ["italic"],
-});
+import { playfair } from "@/app/fonts";
 
 const Hero = () => {
   return (

@@ -13,8 +13,7 @@ export const metadata: Metadata = {
   description: 'Read the latest articles, insights, and news from IEEE Student Branch IPB',
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface Post {
   _id: string;
@@ -34,7 +33,7 @@ interface Post {
 }
 
 async function getPosts(): Promise<Post[]> {
-  const posts = await sanityFetch<Post[]>(allPostsQuery);
+  const posts = await sanityFetch<Post[]>(allPostsQuery, {}, { revalidate: 60 });
   return posts;
 }
 
@@ -73,6 +72,7 @@ export default async function BlogPage() {
                       src={urlFor(post.coverImage).width(600).height(400).url()}
                       alt={post.title}
                       fill
+                      unoptimized
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>

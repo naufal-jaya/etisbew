@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sparkle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavbarProps {
@@ -12,6 +12,7 @@ interface NavbarProps {
 const Navbar = ({ variant = "default" }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showMatchmakingModal, setShowMatchmakingModal] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +26,7 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/news", label: "News" },
+    { href: "https://ieee-ipb-matchmakieeeng.vercel.app", isExternal: true },
   ];
 
   const useDarkText = variant === "light" && !isScrolled;
@@ -56,20 +58,39 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-4 py-2 text-sm font-medium rounded-full transition-all",
-                  useDarkText
-                    ? "text-slate-700 hover:text-black hover:bg-black/5"
-                    : "text-slate-300 hover:text-white hover:bg-white/5",
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              if (link.isExternal) {
+                return (
+                  <button
+                    key={link.href}
+                    onClick={() => setShowMatchmakingModal(true)}
+                    className={cn(
+                      "flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full transition-all cursor-pointer",
+                      useDarkText
+                        ? "text-slate-700 hover:text-black hover:bg-black/5"
+                        : "text-slate-300 hover:text-white hover:bg-white/5",
+                    )}
+                  >
+                    <Sparkle size={26} fill="currentColor" stroke="none" className="-translate-y-[0.5px]" />
+                    {link.label}
+                  </button>
+                );
+              }
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "px-4 py-2 text-sm font-medium rounded-full transition-all",
+                    useDarkText
+                      ? "text-slate-700 hover:text-black hover:bg-black/5"
+                      : "text-slate-300 hover:text-white hover:bg-white/5",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <div className="pl-4"></div>
           </div>
 
@@ -98,26 +119,85 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
             )}
           >
             <div className="flex flex-col p-4 space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "block py-3 px-4 rounded-lg transition-colors font-medium",
-                    useDarkText
-                      ? "text-navy-900 hover:bg-slate-100"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white",
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                if (link.isExternal) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setShowMatchmakingModal(true);
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 w-full text-left py-3 px-4 rounded-lg transition-colors font-medium cursor-pointer",
+                        useDarkText
+                          ? "text-navy-900 hover:bg-slate-100"
+                          : "text-slate-300 hover:bg-white/5 hover:text-white",
+                      )}
+                    >
+                      <Sparkle size={30} fill="currentColor" stroke="none" />
+                      {link.label}
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "block py-3 px-4 rounded-lg transition-colors font-medium",
+                      useDarkText
+                        ? "text-navy-900 hover:bg-slate-100"
+                        : "text-slate-300 hover:bg-white/5 hover:text-white",
+                    )}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
               <div className="pt-4"></div>
             </div>
           </div>
         )}
       </div>
+
+      {showMatchmakingModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+            onClick={() => setShowMatchmakingModal(false)}
+          />
+
+          {/* Card */}
+          <div className="relative w-full max-w-md bg-[#121820] rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 z-10 flex flex-col items-center text-center">
+            <h3 className="text-white font-bold text-lg mb-2">Redirect to MatchmakIEEEng</h3>
+
+            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+              This will take you to Matchmakieeeng app featured for IEEE SB IPB members only
+            </p>
+
+            <div className="flex items-center gap-3 w-full">
+              <button
+                onClick={() => setShowMatchmakingModal(false)}
+                className="flex-1 py-2.5 border border-white/10 hover:bg-white/5 text-white/80 rounded-xl transition-all cursor-pointer text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowMatchmakingModal(false);
+                  window.open("https://ieee-ipb-matchmakieeeng.vercel.app", "_blank");
+                }}
+                className="flex-1 py-2.5 bg-[#16357B] hover:bg-[#1a4299] text-white rounded-xl transition-all cursor-pointer text-sm font-medium"
+              >
+                Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

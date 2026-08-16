@@ -28,14 +28,13 @@ function blocksToText(blocks: any[] = []) {
     .join("\n\n");
 }
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function AboutPage() {
   // Fetch all data in parallel
   const [aboutData, fetchedDivisions] = await Promise.all([
-    sanityFetch<any>(aboutPageQuery),
-    sanityFetch<any[]>(divisionsWithMembersQuery),
+    sanityFetch<any>(aboutPageQuery, {}, { revalidate: 60 }),
+    sanityFetch<any[]>(divisionsWithMembersQuery, {}, { revalidate: 60 }),
   ]);
 
   // Placeholder divisions if Sanity is empty

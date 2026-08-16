@@ -23,6 +23,7 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
           src={urlFor(post.coverImage).width(800).height(450).url()}
           alt={post.title}
           fill
+          unoptimized
           className="object-cover"
         />
       ) : (
@@ -33,32 +34,34 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-l from-navy-900/60 to-transparent" />
     </div>
 
-    <div className="flex flex-col p-8 md:p-8 justify-center">
+    <div className="flex flex-col p-6 md:p-8 justify-center">
       {post.categories?.length > 0 && (
-        <span className="text-navy-500 mb-1 font-medium">
+        <span className="text-navy-500 mb-1 font-medium text-sm">
           {post.categories[0].title}
         </span>
       )}
 
-      <h3 className="font-bold text-navy-900 mb-1 leading-tight text-2xl line-clamp-2">
+      <h3 className="font-bold text-navy-900 mb-1 leading-tight text-xl line-clamp-2">
         {post.title}
       </h3>
 
       <div className="flex items-center gap-2 mb-3 text-sm text-slate-500">
         <User className="text-navy-500 w-4 h-4" />
         <span className="text-navy-500 font-medium">{post.author?.name}</span>
-        <time dateTime={post.publishedAt}>
-          {new Date(post.publishedAt).toLocaleDateString("en-UK", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </time>
+        {post.publishedAt && (
+          <time dateTime={post.publishedAt}>
+            {new Date(post.publishedAt).toLocaleDateString("en-UK", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </time>
+        )}
       </div>
 
-      <p className="text-slate-600 line-clamp-2 text-md">{post.excerpt}</p>
+      <p className="text-slate-600 line-clamp-2 text-sm md:text-md">{post.excerpt}</p>
 
-      <div className="mt-auto pt-1">
+      <div className="mt-auto flex justify-end md:justify-start pt-1">
         <Button
           variant="ghost"
           className="p-0 h-auto text-navy-500 font-semibold group/btn"
@@ -69,7 +72,7 @@ const FeaturedCard = ({ post, href }: NewsCardProps) => (
             className="flex items-center hover:text-navy-800 transition-colors"
           >
             Read more
-            <ArrowRight className="ml-2 w-4 h-4 group-hover/btn:translate-x-1" />
+            <ArrowRight className="ml-1.5 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
           </Link>
         </Button>
       </div>
@@ -88,6 +91,7 @@ export const NormalCard = ({ post, href }: NewsCardProps) => (
           src={urlFor(post.coverImage).width(800).height(450).url()}
           alt={post.title}
           fill
+          unoptimized
           className="object-cover"
         />
       ) : (
@@ -134,16 +138,7 @@ const NewsCard = ({ post }: { post: any }) => {
   const href = `/news/${post.slug.current}`;
 
   if (post.featured) {
-    return (
-      <>
-        <div className="hidden md:block">
-          <FeaturedCard post={post} href={href} />
-        </div>
-        <div className="block md:hidden">
-          <NormalCard post={post} href={href} />
-        </div>
-      </>
-    );
+    return <FeaturedCard post={post} href={href} />;
   }
 
   return <NormalCard post={post} href={href} />;

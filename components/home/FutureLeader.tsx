@@ -3,13 +3,7 @@
 import { motion } from "framer-motion";
 import { Target, Globe, Zap, Cpu } from "lucide-react";
 import Image from "next/image";
-import { Playfair_Display } from "next/font/google";
-
-const playfair = Playfair_Display({
-  subsets: ["latin"],
-  weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
-});
+import { playfair } from "@/app/fonts";
 
 const Empowering = () => {
   return (
