@@ -67,7 +67,7 @@ export default async function NewsPage() {
     <main className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <section className="pt-32 pb-12 snap-start bg-deep-navy relative overflow-hidden">
+      <section className="pt-32 pb-12 md:snap-start bg-deep-navy relative overflow-hidden">
         <div className="absolute inset-0 circuit-pattern opacity-10" />
         <Image
           src="/images/news/header.png"

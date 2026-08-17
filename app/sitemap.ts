@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { sanityFetch } from "@/sanity/lib/fetch";
 import { groq } from "next-sanity";
+import { getSiteUrl } from "@/lib/utils";
 
 export const revalidate = 3600;
 
@@ -17,7 +18,7 @@ interface PostSitemapData {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://ieee-orm.ipb.ac.id";
+  const siteUrl = getSiteUrl();
 
   let posts: PostSitemapData[] = [];
   try {

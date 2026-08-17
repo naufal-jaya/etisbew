@@ -172,10 +172,17 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
 
           {/* Card */}
           <div className="relative w-full max-w-md bg-[#121820] rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200 z-10 flex flex-col items-center text-center">
-            <h3 className="text-white font-bold text-lg mb-2">Redirect to MatchmakIEEEng</h3>
+            <h3 className="text-white font-bold text-lg mb-2 flex items-center justify-center gap-2">
+              <span>Redirect to</span>
+              <img
+                src="/images/matchmakieeeng/MatchmakIEEEng.png"
+                alt="MatchmakIEEEng Logo"
+                className="h-4 sm:h-6 w-auto object-contain filter drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+              />
+            </h3>
 
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              This will take you to Matchmakieeeng app featured for IEEE SB IPB members only
+            <p className="text-slate-400 text-sm sm:w-3/4 leading-relaxed mb-6">
+              This will take you to MatchmakIEEEng app featured for <b>IEEE SB IPB members only</b>
             </p>
 
             <div className="flex items-center gap-3 w-full">
@@ -183,7 +190,7 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
                 onClick={() => setShowMatchmakingModal(false)}
                 className="flex-1 py-2.5 border border-white/10 hover:bg-white/5 text-white/80 rounded-xl transition-all cursor-pointer text-sm font-medium"
               >
-                Cancel
+                Close
               </button>
               <button
                 onClick={() => {

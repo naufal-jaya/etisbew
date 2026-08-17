@@ -6,7 +6,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-deep-navy text-slate-300 py-10 px-6 md:px-10 border-t border-slate-800 relative snap-start">
+    <footer className="bg-deep-navy text-slate-300 py-10 px-6 md:px-10 border-t border-slate-800 relative md:snap-start">
       {/* Background Pattern */}
       <div className="absolute inset-0 circuit-pattern opacity-5 pointer-events-none" />
 

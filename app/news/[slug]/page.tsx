@@ -10,16 +10,11 @@ import Footer from "@/components/layout/Footer";
 import { Calendar, User, ArrowLeft } from "lucide-react";
 import SharePost from "@/components/news/SharePost";
 import { Metadata } from "next";
+import { getSiteUrl } from "@/lib/utils";
 
 export const revalidate = 60;
 
-const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "https://ieee-orm.ipb.ac.id");
+const siteUrl = getSiteUrl();
 
 interface PageProps {
   params: Promise<{
@@ -372,7 +367,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
 
       <div className="container mx-auto px-4 max-w-5xl lg:px-8">
         {/* Header Section */}
-        <div className="pt-32 snap-start pb-12">
+        <div className="pt-32 md:snap-start pb-12">
           <div className=" ">
             {/* Breadcrumb / Back */}
             <div className="mb-8">
@@ -446,7 +441,7 @@ export default async function SingleNewsPage({ params }: PageProps) {
         </div>
 
         {/* Featured Image */}
-        <div className="snap-start max-w-5xl mx-auto mb-16">
+        <div className="md:snap-start max-w-5xl mx-auto mb-16">
           <div className="relative aspect-[21/9] w-full rounded-2xl overflow-hidden bg-slate-100 shadow-lg">
             {post.coverImage ? (
               <Image
@@ -466,11 +461,11 @@ export default async function SingleNewsPage({ params }: PageProps) {
         </div>
 
         <SharePost
-          url={`${siteUrl}/news/${post.slug.current}`}
+          url={`https://ieee-orm.ipb.ac.id/news/${post.slug.current}`}
           title={post.title}
         />
         {/* Content Layout */}
-        <div className="snap-start max-w-4xl mx-auto pb-24">
+        <div className="md:snap-start max-w-4xl mx-auto pb-24">
           {/* Main Content */}
           <article className="w-full">
             <div className="prose prose-lg prose-slate max-w-none prose-headings:text-navy-900 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-a:text-blue-600 hover:prose-a:text-blue-700 prose-img:rounded-xl text-slate-600">
