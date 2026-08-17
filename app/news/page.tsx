@@ -5,6 +5,13 @@ import NewsCard from "@/components/news/NewsCard";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import FilteredRecentPosts from "@/components/news/FilteredRecentPosts";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "News & Articles | IEEE Student Branch IPB",
+  description:
+    "Stay updated with the latest insights from IEEE Student Branch IPB University.",
+};
 
 export const revalidate = 60;
 

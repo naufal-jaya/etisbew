@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils";
 
 
 export const metadata: Metadata = {
-  title: "IEEE Student Branch IPB | Innovation & Technology Excellence",
+  title: "IEEE Student Branch IPB",
   description:
-    "IEEE Student Branch IPB - Advancing technology for humanity. Join us in fostering innovation, technical excellence, and professional development.",
+    "IEEE Student Branch IPB - Advancing technology for humanity",
   keywords: [
     "IEEE",
     "IPB",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "IEEE Student Branch IPB",
     description:
-      "Advancing technology for humanity through innovation and excellence",
+      "Advancing technology for humanity through innovation, engineering, and research",
     type: "website",
     locale: "en_US",
   },
