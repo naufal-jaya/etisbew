@@ -7,7 +7,7 @@ import { playfair } from "@/app/fonts";
 
 const Empowering = () => {
   return (
-    <section className="pt-24 pb-0 bg-navy-950 relative overflow-hidden snap-start">
+    <section className="pt-20 sm:pt-24 pb-0 bg-navy-950 relative overflow-hidden snap-start">
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-accent-cyan/10 rounded-full blur-[100px]" />
         <div className="absolute -top-30 -left-24 w-96 h-96 bg-accent-blue/10 rounded-full blur-[100px]" />
@@ -15,15 +15,15 @@ const Empowering = () => {
       </div>
 
       <div className="w-full relative z-10">
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-4">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="lg:col-spa n-4 mt-12 mb-[55px] sm:mt-0 sm:mb-0 flex flex-col items-center"
+            className="lg:col-spa n-4 my-6 sm:mt-0 sm:mb-5 flex flex-col items-center"
           >
-            <h2 className="text-3xl  md:text-5xl font-bold text-white mb-2 leading-tight text-center">
+            <h2 className="w-2/3 text-3xl md:text-5xl font-bold text-white mb-2 leading-tight text-center">
               Empowering{" "}
               <span className={`${playfair.className} tracking-wide italic`}>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-blue">
@@ -60,9 +60,7 @@ const Empowering = () => {
             </svg>
           </motion.div>
 
-          {/* Right Cards Grid */}
           <div className="lg:col-span-8 flex flex-col">
-            {/* Card 1 */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -71,7 +69,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[175px] bg-white shadow-sm overflow-hidden
+                className="relative h-[150px] sm:h-[175px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -93,7 +91,7 @@ const Empowering = () => {
                 />
 
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <h2 className="text-white text-4xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
+                  <h2 className="text-white text-2xl sm:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
                     <Zap className="w-8 h-8 md:w-[3rem] md:h-[3rem] text-white" />
                     Technical Excellence
                   </h2>
@@ -108,7 +106,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[175px] bg-white shadow-sm overflow-hidden
+                className="relative h-[155px] sm: h-[175px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -130,7 +128,7 @@ const Empowering = () => {
                 />
 
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <h2 className="text-white text-4xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
+                  <h2 className="text-white text-2xl sm:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
                     <Globe className="w-8 h-8 md:w-[3rem] md:h-[3rem] text-white" />
                     Global Network
                   </h2>
@@ -145,7 +143,7 @@ const Empowering = () => {
               className="group"
             >
               <div
-                className="relative h-[175px] bg-white shadow-sm overflow-hidden
+                className="relative h-[155px] sm:h-[175px] bg-white shadow-sm overflow-hidden
     [mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]
     [-webkit-mask-image:linear-gradient(to_right,transparent,black_50%,black_50%,transparent)]"
               >
@@ -167,7 +165,7 @@ const Empowering = () => {
                 />
 
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
-                  <h2 className="text-white text-4xl sm:text-5xl md:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
+                  <h2 className="text-white text-2xl sm:text-5xl font-bold flex items-center gap-2 drop-shadow-lg text-center">
                     <Target className="w-8 h-8 md:w-[3rem] md:h-[3rem] text-white" />
                     Leadership
                   </h2>

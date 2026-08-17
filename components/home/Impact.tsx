@@ -21,16 +21,16 @@ type ImpactItem = {
   value: string;
   suffix?: string;
   icon:
-    | "users"
-    | "userPlus"
-    | "calendarCheck"
-    | "calendar"
-    | "trophy"
-    | "award"
-    | "fileText"
-    | "bookOpen"
-    | "cpu"
-    | "layers";
+  | "users"
+  | "userPlus"
+  | "calendarCheck"
+  | "calendar"
+  | "trophy"
+  | "award"
+  | "fileText"
+  | "bookOpen"
+  | "cpu"
+  | "layers";
 };
 
 type Partner = {
@@ -218,7 +218,7 @@ const Impact = ({
                 className="relative group"
               >
                 <div
-                  className={`h-full p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 transition-all duration-300`}
+                  className={`h-full items-center py-2 px-8 sm:p-8 flex transition-all duration-300`}
                 >
                   <div
                     className="pointer-events-none absolute inset-0 z-20 transition-opacity duration-500 mix-blend-soft-light"
@@ -227,27 +227,27 @@ const Impact = ({
                       filter: "blur(40px)",
                       background: `radial-gradient(
                                   250px circle at ${pos.x}px ${pos.y}px,
-                                  rgba(255, 255, 255, 0.06),
+                                  rgba(255, 255, 255, 0.1),
                                   transparent 100%
                                 )`,
                     }}
                   />
-                  <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center mb-6 transition-transform duration-300">
-                    <Icon className="w-7 h-7 text-white">{item.icon}</Icon>
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center transition-transform duration-300">
+                    <Icon className="w-14 h-14 text-white">{item.icon}</Icon>
                   </div>
 
-                  <div className="flex items-baseline gap-1 mb-2">
+                  <div className="flex items-baseline gap-1 ml-4">
                     <span className="text-4xl md:text-5xl font-bold text-white tracking-tight">
                       {item.value}
                     </span>
                     {item.suffix && (
-                      <span className="text-2xl font-bold text-accent-cyan">
+                      <span className="text-3xl my-auto font-bold text-accent-cyan">
                         {item.suffix}
                       </span>
                     )}
                   </div>
 
-                  <div className="text-gray-400 font-medium text-sm uppercase tracking-wider">
+                  <div className="text-white ml-2 font-medium text-sm uppercase tracking-wider">
                     {item.label}
                   </div>
                 </div>

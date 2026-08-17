@@ -85,9 +85,8 @@ const Hero = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 mb-10 max-w-xl leading-relaxed">
-              We are a global community of student innovators, engineers, and
-              researchers dedicated to shaping a sustainable and ethical
-              technological future.
+              We are a community of students dedicated to shaping a sustainable and ethical
+              technological future through innovation, engineering, and research.
             </p>
           </motion.div>
 
