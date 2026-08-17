@@ -32,14 +32,15 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
   const useDarkText = variant === "light" && !isScrolled;
 
   return (
-    <nav
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b",
-        isScrolled
-          ? "glass-nav py-3 border-white/10"
-          : "bg-transparent py-5 border-transparent",
-      )}
-    >
+    <>
+      <nav
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b",
+          isScrolled
+            ? "glass-nav py-3 border-white/10"
+            : "bg-transparent py-5 border-transparent",
+        )}
+      >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -162,6 +163,8 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
         )}
       </div>
 
+      </nav>
+
       {showMatchmakingModal && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
           {/* Backdrop */}
@@ -205,7 +208,7 @@ const Navbar = ({ variant = "default" }: NavbarProps) => {
           </div>
         </div>
       )}
-    </nav>
+    </>
   );
 };
 

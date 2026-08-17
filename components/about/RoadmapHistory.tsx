@@ -211,11 +211,10 @@ export default function OurJourneyPage() {
         Our Journey
       </h1>
 
-      <div className="relative z-10 w-full mx-auto select-none">
+      <div className="relative z-10 mx-auto select-none">
         <svg
           viewBox={`0 0 ${VW} ${SVG_H}`}
-          width="100%"
-          className="overflow-visible block mt-4"
+          className="overflow-visible w-[130%] sm:w-full mt-4 relative left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0"
         >
           {PATH_POINTS.map((p, i) => (
             <g key={i}>
