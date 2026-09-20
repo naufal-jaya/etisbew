@@ -1,0 +1,37 @@
+---
+---
+<section class="relative w-full h-screen bg-black overflow-hidden font-sans">
+  <!-- Background Image -->
+  <img src="/hero-rafid.png" alt="Hero Background" class="absolute inset-0 w-full h-full object-cover" />
+
+  <!-- Content Container -->
+  <div class="relative z-10 w-full h-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col justify-center pb-16 pt-24">
+    
+    <!-- Left side (Logo) -->
+    <div class="flex-1 flex flex-col justify-center max-w-md">
+      <img src="/ieee-ipb.svg" alt="IPB University IEEE Student Branch" class="w-[400px] h-auto drop-shadow-lg" />
+    </div>
+
+    <!-- Bottom right side (Latest Article) -->
+    <div class="absolute bottom-12 right-6 lg:right-12 flex flex-col items-end">
+      <span class="text-white text-lg font-medium mb-3 mr-2 drop-shadow-md">Latest article</span>
+      <!-- Card -->
+      <div class="flex items-stretch bg-[#0a0a0a] overflow-hidden max-w-[340px] shadow-2xl relative border border-gray-800/50">
+        <!-- Text Content -->
+        <div class="p-4 pr-1 flex-1 relative z-20 flex flex-col justify-center w-3/5">
+          <h3 class="text-white text-xs font-bold leading-snug mb-2 pr-2">
+            How the Activated Sludge Process Powers Modern Urban Wastewater Treatment
+          </h3>
+          <p class="text-gray-400 text-[10px] font-medium">Mikailia Khiva</p>
+        </div>
+        
+        <!-- Image with Fade -->
+        <div class="relative w-2/5 min-h-[120px] flex-shrink-0">
+          <!-- Fade overlay (from dark #0a0a0a on left to transparent on right) -->
+          <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10"></div>
+          <img src="/post-cover-dummy.png" alt="Article thumbnail" class="absolute inset-0 w-full h-full object-cover z-0" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
