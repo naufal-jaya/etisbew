@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" class="w-full h-full">
+  <circle cx="80" cy="80" r="70" fill="#0284c7" />
+  <circle cx="80" cy="80" r="63" fill="#ffffff" />
+  <circle cx="80" cy="80" r="58" fill="#0284c7" />
+  
+  <!-- Text in ring -->
+  <path id="curve" d="M 35,80 A 45,45 0 0,1 125,80" fill="none" />
+  <text font-family="system-ui, sans-serif" font-weight="800" font-size="9" fill="#ffffff" letter-spacing="2">
+    <textPath href="#curve" startOffset="50%" text-anchor="middle">SAGA UNIVERSITY</textPath>
+  </text>
+  
+  <!-- Bird Emblem -->
+  <g transform="translate(48, 55)">
+    <!-- Wings -->
+    <path d="M 0,22 Q 18,6 32,16 Q 46,6 64,22 C 54,34 44,28 32,38 C 20,28 10,34 0,22 Z" fill="#0369a1" />
+    <!-- Bird Body -->
+    <ellipse cx="32" cy="30" rx="9" ry="16" fill="#0f172a" />
+    <ellipse cx="32" cy="31" rx="5" ry="9" fill="#ffffff" />
+    <circle cx="32" cy="14" r="7" fill="#0f172a" />
+    <!-- Beak -->
+    <polygon points="32,7 28,14 36,14" fill="#f59e0b" />
+    <!-- Tail -->
+    <polygon points="28,45 32,65 36,45" fill="#0f172a" />
+    <line x1="30" y1="46" x2="26" y2="60" stroke="#0f172a" stroke-width="2" />
+    <line x1="34" y1="46" x2="38" y2="60" stroke="#0f172a" stroke-width="2" />
+  </g>
+</svg>
