@@ -1,0 +1,281 @@
+---
+import { sanityClient, isSanityConfigured } from '../sanity/client';
+import { urlForImage } from '../sanity/image';
+import {
+  fallbackPartners,
+  fallbackMilestones,
+  type PartnerItem,
+  type MilestoneItem,
+} from '../sanity/mockData';
+
+// GROQ Queries specified in the requirement
+const PARTNERS_QUERY = `*[_type == "partner"] | order(order asc, _createdAt asc) { name, logo }`;
+const MILESTONES_QUERY = `*[_type == "milestone"] | order(year asc) { year, description, floatingImages }`;
+
+let partners: PartnerItem[] = [];
+let milestones: MilestoneItem[] = [];
+
+if (isSanityConfigured) {
+  try {
+    const [fetchedPartners, fetchedMilestones] = await Promise.all([
+      sanityClient.fetch(PARTNERS_QUERY),
+      sanityClient.fetch(MILESTONES_QUERY),
+    ]);
+
+    if (Array.isArray(fetchedPartners) && fetchedPartners.length > 0) {
+      partners = fetchedPartners;
+    } else {
+      partners = fallbackPartners;
+    }
+
+    if (Array.isArray(fetchedMilestones) && fetchedMilestones.length > 0) {
+      milestones = fetchedMilestones;
+    } else {
+      milestones = fallbackMilestones;
+    }
+  } catch (err) {
+    console.warn('Could not fetch from Sanity CMS, falling back to local data:', err);
+    partners = fallbackPartners;
+    milestones = fallbackMilestones;
+  }
+} else {
+  partners = fallbackPartners;
+  milestones = fallbackMilestones;
+}
+
+// Grid layout parameters (8 columns desktop as requested)
+const totalCols = 8;
+const totalRows = 2;
+const minSlots = totalRows * totalCols; // 16 partner slots (2 full rows of 8)
+
+const sourcePartners = partners.length > 0 ? partners : fallbackPartners;
+const displayPartners: PartnerItem[] = [];
+while (displayPartners.length < minSlots) {
+  displayPartners.push(...sourcePartners);
+}
+displayPartners.length = minSlots;
+
+// Milestone mapping
+const milestone2025 = milestones.find((m) => m.year === '2025') || milestones[0] || { year: '2025', description: '' };
+const milestone2026 = milestones.find((m) => m.year === '2026') || milestones[1] || {
+  year: '2026',
+  description:
+    'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini',
+};
+
+// Flatten floating images across milestones
+const floatingImagesList: { url: string; alt?: string }[] = [];
+milestones.forEach((m) => {
+  if (Array.isArray(m.floatingImages)) {
+    m.floatingImages.forEach((img) => {
+      const url = urlForImage(img) || (typeof img === 'string' ? img : img?.url);
+      if (url) {
+        floatingImagesList.push({ url, alt: img.alt || 'Milestone memory' });
+      }
+    });
+  }
+});
+
+// Default backup floating images matching design placement
+const fallbackFloatingImgs = [
+  { url: '/hero-rafid.png', alt: 'IEEE group photo 1' },
+  { url: '/post-cover-dummy.png', alt: 'IEEE event photo 2' },
+  { url: '/hero-rafid.png', alt: 'IEEE group photo 3' },
+  { url: '/post-cover-dummy.png', alt: 'IEEE ceremony photo 4' },
+  { url: '/hero-rafid.png', alt: 'IEEE campus photo 5' },
+];
+
+const activeFloating = floatingImagesList.length > 0 ? floatingImagesList : fallbackFloatingImgs;
+
+---
+
+<section class="relative z-20 w-full bg-white text-gray-900 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-2 sm:pt-3 md:pt-4 pb-0 overflow-hidden border-t-[2.5px] border-[#C8CAD4]">
+  
+  <!-- ========================================== -->
+  <!-- SECTION A: Partners Throughout The Years  -->
+  <!-- Full Width Edge-to-Edge (Mentok Kanan-Kiri)-->
+  <!-- ========================================== -->
+  <div class="w-full flex flex-col items-center">
+    <!-- Section Title (centered) -->
+    <div class="w-full text-center px-4 mb-1.5 sm:mb-2 md:mb-3">
+      <h2 class="text-center text-3xl md:text-4xl lg:text-[46px] xl:text-[54px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
+        Partners Throughout The Years
+      </h2>
+    </div>
+
+    <!-- Connected Grid: Edge-to-edge square containers with 2.5px borders in #C8CAD4 -->
+    <div class="w-full">
+      <!-- Grid Container: 8 columns spanning 100% width with 2.5px borders in #C8CAD4 -->
+      <div class="relative w-full grid grid-cols-8 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none">
+        {displayPartners.map((partner, index) => {
+          const row = Math.floor(index / totalCols);
+          const col = index % totalCols;
+          const isFirstCol = col === 0;
+          const isLastCol = col === totalCols - 1;
+          const isLastRow = row === totalRows - 1;
+          const logoSrc = urlForImage(partner.logo);
+
+          return (
+            <div
+              class={`group relative flex items-center justify-center p-2 sm:p-3 md:p-4 aspect-square bg-white ${
+                !isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''
+              } ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
+            >
+              <!-- Circular Node: Top-Left vertex (thicker 2.5px border in #C8CAD4) -->
+              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+
+              <!-- Circular Node: Top-Right vertex (for rightmost column) -->
+              {isLastCol && (
+                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              )}
+
+              <!-- Circular Node: Bottom-Left vertex (for bottom row) -->
+              {isLastRow && (
+                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              )}
+
+              <!-- Circular Node: Bottom-Right vertex (for bottom-right corner) -->
+              {isLastRow && isLastCol && (
+                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              )}
+
+              <!-- Logo Content (Square proportion with balanced margin) -->
+              <div class="w-full h-full flex items-center justify-center">
+                {logoSrc ? (
+                  <img
+                    src={logoSrc}
+                    alt={partner.name}
+                    title={partner.name}
+                    loading="lazy"
+                    class="max-h-[58%] max-w-[72%] object-contain"
+                  />
+                ) : (
+                  <span class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider text-center px-2">
+                    {partner.name}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- SECTION B: Our Persistent Growth           -->
+  <!-- Full Width Edge-to-Edge (Mentok Kanan-Kiri)-->
+  <!-- ========================================== -->
+  <div class="relative w-full flex-1 flex flex-col justify-end pt-1 sm:pt-2 pb-0 overflow-hidden select-none">
+    
+    <!-- Section Title (centered) -->
+    <div class="w-full text-center px-4 mb-1 sm:mb-2">
+      <h2 class="relative z-10 inline-block text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[48px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
+        Our Persistent Growth
+      </h2>
+    </div>
+
+    <!-- Floating Scattered Images (styled with scrapbook offset frame/shadow as shown in reference) -->
+    <div class="pointer-events-none select-none absolute inset-0 z-0 overflow-hidden">
+      <!-- Floating 1: Left above 2025 -->
+      {activeFloating[0] && (
+        <div class="absolute left-[5%] md:left-[6%] top-[25%] md:top-[28%] w-28 h-18 sm:w-36 sm:h-22 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+          <img src={activeFloating[0].url} alt={activeFloating[0].alt || ''} class="w-full h-full object-cover" />
+        </div>
+      )}
+
+      <!-- Floating 2: Top-left center (above title) -->
+      {activeFloating[1] && (
+        <div class="absolute left-[24%] md:left-[26%] top-[2%] md:top-[4%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+          <img src={activeFloating[1].url} alt={activeFloating[1].alt || ''} class="w-full h-full object-cover" />
+        </div>
+      )}
+
+      <!-- Floating 3: Right of Title (wide group photo) -->
+      {activeFloating[2] && (
+        <div class="absolute left-[64%] md:left-[67%] top-[4%] md:top-[6%] w-32 h-20 sm:w-40 sm:h-24 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+          <img src={activeFloating[2].url} alt={activeFloating[2].alt || ''} class="w-full h-full object-cover" />
+        </div>
+      )}
+
+      <!-- Floating 4: Far Right Top/Mid -->
+      {activeFloating[3] && (
+        <div class="absolute right-[4%] md:right-[5%] top-[22%] md:top-[26%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+          <img src={activeFloating[3].url} alt={activeFloating[3].alt || ''} class="w-full h-full object-cover" />
+        </div>
+      )}
+
+      <!-- Floating 5: Bottom Right under description text -->
+      {activeFloating[4] && (
+        <div class="absolute left-[85%] md:left-[86%] bottom-[16px] md:bottom-[20px] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+          <img src={activeFloating[4].url} alt={activeFloating[4].alt || ''} class="w-full h-full object-cover" />
+        </div>
+      )}
+    </div>
+
+    <!-- Timeline & Time Slider Container (Directly at the bottom edge, cut at bottom) -->
+    <div class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px]">
+      
+      <!-- 1. Ruler Ticks from 0% (Left Edge) to 48% (Stops cleanly at 2026 stem) -->
+      <!-- 2.5px thick ticks in #C8CAD4 -->
+      <div class="absolute inset-0 pointer-events-none">
+        <!-- Ticks before 2025 (at 0%, 4%, 8%, 12%, 16%) -->
+        <span class="absolute bottom-0 left-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[4%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[8%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[12%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[16%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+
+        <!-- Ticks between 2025 (at ~20%) and 2026 (at ~48%) -->
+        <span class="absolute bottom-0 left-[25.5%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[31%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[36.5%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <span class="absolute bottom-0 left-[42%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+        <!-- Note: After 48%, absolutely NO ticks exist, matching reference image -->
+      </div>
+
+      <!-- 2. Milestone 2025 (Stem + Circular Node + Year Number) -->
+      <div class="absolute bottom-0 left-[20%] -translate-x-1/2 flex flex-col items-center">
+        <!-- Year Number -->
+        <span class="font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-semibold text-slate-700 tracking-wider leading-none mb-1.5 sm:mb-2 select-none">
+          {milestone2025.year}
+        </span>
+        <!-- Circular Node -->
+        <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white ring-4 ring-white z-10"></div>
+        <!-- Vertical Stem touching bottom-0 -->
+        <div class="w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></div>
+      </div>
+
+      <!-- 3. Milestone 2026 (Stem + Circular Node + Year Number) -->
+      <div class="absolute bottom-0 left-[48%] -translate-x-1/2 flex flex-col items-center">
+        <!-- Year Number -->
+        <span class="font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-semibold text-slate-700 tracking-wider leading-none mb-1.5 sm:mb-2 select-none">
+          {milestone2026.year}
+        </span>
+        <!-- Circular Node -->
+        <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white ring-4 ring-white z-10"></div>
+        <!-- Vertical Stem touching bottom-0 -->
+        <div class="w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></div>
+      </div>
+
+      <!-- 4. Description Text (Aligned to the right of 2026) -->
+      <div class="absolute left-[60%] sm:left-[62%] bottom-[35px] sm:bottom-[44px] md:bottom-[52px] lg:bottom-[58px] max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-md select-none pr-4">
+        <p class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal">
+          {milestone2026.description ||
+            'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini'}
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<style>
+  /* Import technical segmented font for the year display */
+  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap');
+
+  .font-tech {
+    font-family: 'Chakra Petch', monospace, sans-serif;
+  }
+</style>
