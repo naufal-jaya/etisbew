@@ -1,0 +1,392 @@
+---
+// Members Section with dual-row infinite marquee
+// - Section height: 1400px (each row 700px, image height auto from aspect ratio)
+// - Gap: 0px horizontal & vertical (seamless photo wall)
+// - Motion: always moving, does NOT pause on hover
+// - Click: shows a looping video (cannot be paused), marquee stops
+// - Click again on active card: hides video, marquee resumes
+
+interface MemberCard {
+  id: string;
+  division: string;
+  image: string;
+  video: string;
+  isPixel?: boolean;
+}
+
+const row1Members: MemberCard[] = [
+  {
+    id: "r1-1",
+    division: "Creative n Marketing",
+    image: "/foto-CnM.jpeg",
+    video: "/cnm.mov",
+  },
+  {
+    id: "r1-2",
+    division: "External Relations",
+    image: "/foto-external.jpeg",
+    video: "/external.mov",
+  },
+  {
+    id: "r1-3",
+    division: "Executives",
+    image: "/foto-bph.jpeg",
+    video: "/bph.mov",
+    isPixel: true,
+  },
+  {
+    id: "r1-4",
+    division: "Human Resources",
+    image: "/foto-hr.jpeg",
+    video: "/hr.mov",
+  },
+  {
+    id: "r1-5",
+    division: "Tech n Information",
+    image: "/foto-infor.jpeg",
+    video: "/infor.mov",
+  },
+  {
+    id: "r1-6",
+    division: "Education",
+    image: "/foto-edu.jpeg",
+    video: "/edu.mov",
+  },
+];
+
+const row2Members: MemberCard[] = [
+  {
+    id: "r2-1",
+    division: "Tech n Information",
+    image: "/foto-infor.jpeg",
+    video: "/infor.mov",
+  },
+  {
+    id: "r2-2",
+    division: "Human Resources",
+    image: "/foto-hr.jpeg",
+    video: "/hr.mov",
+  },
+  {
+    id: "r2-3",
+    division: "Creative n Marketing",
+    image: "/foto-CnM.jpeg",
+    video: "/cnm.mov",
+  },
+  {
+    id: "r2-4",
+    division: "Education",
+    image: "/foto-edu.jpeg",
+    video: "/edu.mov",
+  },
+  {
+    id: "r2-5",
+    division: "External Relations",
+    image: "/foto-external.jpeg",
+    video: "/external.mov",
+  },
+  {
+    id: "r2-6",
+    division: "Executives",
+    image: "/foto-bph.jpeg",
+    video: "/bph.mov",
+    isPixel: true,
+  },
+];
+
+// Quadruple each row for seamless infinite loop coverage on any screen width
+const row1Track = [...row1Members, ...row1Members, ...row1Members, ...row1Members];
+const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Members];
+---
+
+<section
+  class="relative z-20 w-full h-[1400px] bg-black overflow-hidden select-none flex flex-col justify-stretch p-0 m-0"
+  id="members-section"
+  aria-label="Meet Our People"
+>
+  <!-- Floating Section Title -->
+  <div class="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-center whitespace-nowrap">
+    <h2 class="pixel-heading text-2xl sm:text-3xl md:text-5xl font-bold tracking-wider text-white">
+      Meet Our People!
+    </h2>
+  </div>
+
+  <!-- Row 1: Scrolling Right (->) - 700px tall -->
+  <div class="marquee-row relative w-full h-1/2 overflow-hidden flex items-stretch p-0 m-0">
+    <div class="marquee-track marquee-track-right flex h-full w-max p-0 m-0">
+      {row1Track.map((member, i) => (
+        <div
+          class="member-card relative h-full aspect-[15/19] flex-shrink-0 cursor-pointer overflow-hidden p-0 m-0"
+          data-member-id={member.id}
+          data-division={member.division}
+          data-video={member.video}
+          data-track-index={i}
+          role="button"
+          tabindex="0"
+          aria-label={`View ${member.division}`}
+        >
+          <!-- Photo layer -->
+          <img
+            src={member.image}
+            alt={`${member.division} photo`}
+            width="594"
+            height="781"
+            loading="lazy"
+            decoding="async"
+            class="card-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+          />
+
+          <!-- Video layer (hidden by default, shown on click) -->
+          <video
+            class="card-video absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0"
+            src={member.video}
+            loop
+            muted
+            playsinline
+            preload="none"
+          ></video>
+
+          <!-- Gradient overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none"></div>
+
+          <!-- Division label -->
+          <div class="absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none">
+            <span class={member.isPixel
+              ? "font-pixel text-white text-sm sm:text-base md:text-lg block"
+              : "text-white text-base sm:text-lg md:text-xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
+              {member.division}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Row 2: Scrolling Left (<-) - 700px tall -->
+  <div class="marquee-row relative w-full h-1/2 overflow-hidden flex items-stretch p-0 m-0">
+    <div class="marquee-track marquee-track-left flex h-full w-max p-0 m-0">
+      {row2Track.map((member, i) => (
+        <div
+          class="member-card relative h-full aspect-[15/19] flex-shrink-0 cursor-pointer overflow-hidden p-0 m-0"
+          data-member-id={member.id}
+          data-division={member.division}
+          data-video={member.video}
+          data-track-index={i}
+          role="button"
+          tabindex="0"
+          aria-label={`View ${member.division}`}
+        >
+          <!-- Photo layer -->
+          <img
+            src={member.image}
+            alt={`${member.division} photo`}
+            width="594"
+            height="781"
+            loading="lazy"
+            decoding="async"
+            class="card-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+          />
+
+          <!-- Video layer (hidden by default, shown on click) -->
+          <video
+            class="card-video absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0"
+            src={member.video}
+            loop
+            muted
+            playsinline
+            preload="none"
+          ></video>
+
+          <!-- Gradient overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none"></div>
+
+          <!-- Division label -->
+          <div class="absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none">
+            <span class={member.isPixel
+              ? "font-pixel text-white text-sm sm:text-base md:text-lg block"
+              : "text-white text-base sm:text-lg md:text-xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
+              {member.division}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  function initMarqueeInteraction() {
+    const section = document.getElementById('members-section');
+    if (!section) return;
+
+    const tracks = Array.from(section.querySelectorAll<HTMLElement>('.marquee-track'));
+    const cards = Array.from(section.querySelectorAll<HTMLElement>('.member-card'));
+
+    // Track which card is currently active (showing video)
+    let activeCard: HTMLElement | null = null;
+    let activeVideo: HTMLVideoElement | null = null;
+
+    function deactivateCard() {
+      if (activeCard) {
+        activeCard.classList.remove('is-active');
+        // Stop & hide video, show photo
+        if (activeVideo) {
+          activeVideo.pause();
+          activeVideo.currentTime = 0;
+          activeVideo.classList.add('opacity-0');
+          activeVideo.classList.remove('opacity-100');
+        }
+        const photo = activeCard.querySelector<HTMLElement>('.card-photo');
+        if (photo) {
+          photo.classList.remove('opacity-0');
+          photo.classList.add('opacity-100');
+        }
+        activeCard = null;
+        activeVideo = null;
+      }
+      // Resume marquee
+      section!.removeAttribute('data-paused');
+      tracks.forEach(t => t.classList.remove('is-paused'));
+    }
+
+    function activateCard(card: HTMLElement) {
+      // Deactivate any currently active card first
+      deactivateCard();
+
+      // Pause marquee
+      section!.setAttribute('data-paused', 'true');
+      tracks.forEach(t => t.classList.add('is-paused'));
+
+      // Mark card as active
+      card.classList.add('is-active');
+      activeCard = card;
+
+      // Show video, hide photo
+      const photo = card.querySelector<HTMLElement>('.card-photo');
+      const video = card.querySelector<HTMLVideoElement>('.card-video');
+
+      if (photo) {
+        photo.classList.add('opacity-0');
+        photo.classList.remove('opacity-100');
+      }
+
+      if (video) {
+        activeVideo = video;
+        video.classList.remove('opacity-0');
+        video.classList.add('opacity-100');
+        // Force play from start, loop is set in HTML attr
+        video.currentTime = 0;
+        video.play().catch(() => {
+          // Autoplay blocked: try muted play (already muted)
+          video.muted = true;
+          video.play();
+        });
+      }
+    }
+
+    cards.forEach((card) => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (activeCard === card) {
+          // Clicking the active card → close video & resume
+          deactivateCard();
+        } else {
+          // Clicking a different card → play its video
+          activateCard(card);
+        }
+      });
+
+      // Keyboard accessibility
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.click();
+        }
+      });
+    });
+
+    // Click outside section → resume
+    document.addEventListener('click', (e) => {
+      if (activeCard && !section!.contains(e.target as Node)) {
+        deactivateCard();
+      }
+    });
+  }
+
+  initMarqueeInteraction();
+  document.addEventListener('astro:page-load', initMarqueeInteraction);
+</script>
+
+<style>
+  .pixel-heading {
+    font-family: 'Press Start 2P', 'Silkscreen', monospace;
+    text-shadow:
+      -2px -2px 0 #000,
+       2px -2px 0 #000,
+      -2px  2px 0 #000,
+       2px  2px 0 #000,
+       0 4px 14px rgba(0, 0, 0, 0.95);
+    letter-spacing: 0.05em;
+  }
+
+  .font-pixel {
+    font-family: 'Press Start 2P', 'Silkscreen', monospace;
+    text-shadow:
+      -1px -1px 0 #000,
+       1px -1px 0 #000,
+      -1px  1px 0 #000,
+       1px  1px 0 #000,
+       0 2px 4px rgba(0, 0, 0, 0.9);
+  }
+
+  /* Photo/video fade transition */
+  .card-photo,
+  .card-video {
+    transition: opacity 0.4s ease;
+  }
+
+  /* Row 1: scrolls right (track moves from -50% → 0%) */
+  @keyframes marquee-to-right {
+    0%   { transform: translate3d(-50%, 0, 0); }
+    100% { transform: translate3d(0%, 0, 0); }
+  }
+
+  /* Row 2: scrolls left (track moves from 0% → -50%) */
+  @keyframes marquee-to-left {
+    0%   { transform: translate3d(0%, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
+  .marquee-track-right {
+    animation: marquee-to-right 55s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-track-left {
+    animation: marquee-to-left 55s linear infinite;
+    will-change: transform;
+  }
+
+  /* Pause ONLY when clicked (not on hover) */
+  .marquee-track.is-paused,
+  [data-paused="true"] .marquee-track {
+    animation-play-state: paused !important;
+  }
+
+  /* Active card ring indicator */
+  .member-card.is-active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.85);
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track-right,
+    .marquee-track-left {
+      animation-play-state: paused !important;
+    }
+  }
+</style>
