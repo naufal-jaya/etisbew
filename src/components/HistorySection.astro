@@ -8,9 +8,16 @@ import {
   type MilestoneItem,
 } from '../sanity/mockData';
 
-// GROQ Queries specified in the requirement
+// GROQ Queries
 const PARTNERS_QUERY = `*[_type == "partner"] | order(order asc, _createdAt asc) { name, logo }`;
-const MILESTONES_QUERY = `*[_type == "milestone"] | order(year asc) { year, description, floatingImages }`;
+const MILESTONES_QUERY = `*[_type == "milestone"] | order(year asc) { 
+  year, 
+  description, 
+  floatingImages[] {
+    ...,
+    "url": asset->url
+  }
+}`;
 
 let partners: PartnerItem[] = [];
 let milestones: MilestoneItem[] = [];
@@ -43,10 +50,10 @@ if (isSanityConfigured) {
   milestones = fallbackMilestones;
 }
 
-// Grid layout parameters (8 columns desktop as requested)
-const totalCols = 8;
+// Grid layout parameters (10 columns to match reference design)
+const totalCols = 10;
 const totalRows = 2;
-const minSlots = totalRows * totalCols; // 16 partner slots (2 full rows of 8)
+const minSlots = totalRows * totalCols; // 20 partner slots (2 full rows of 10)
 
 const sourcePartners = partners.length > 0 ? partners : fallbackPartners;
 const displayPartners: PartnerItem[] = [];
@@ -55,58 +62,75 @@ while (displayPartners.length < minSlots) {
 }
 displayPartners.length = minSlots;
 
-// Milestone mapping
-const milestone2025 = milestones.find((m) => m.year === '2025') || milestones[0] || { year: '2025', description: '' };
-const milestone2026 = milestones.find((m) => m.year === '2026') || milestones[1] || {
-  year: '2026',
-  description:
-    'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini',
-};
+// Default backup floating images matching design placement
+const fallbackFloatingImgs = [
+  { url: '/history-bg-1.png', alt: 'IEEE group photo 1' },
+  { url: '/history-bg-2.png', alt: 'IEEE event photo 2' },
+  { url: '/history-bg-3.png', alt: 'IEEE group photo 3' },
+  { url: '/history-bg-4.png', alt: 'IEEE ceremony photo 4' },
+  { url: '/history-bg-1.png', alt: 'IEEE campus photo 5' },
+];
 
-// Flatten floating images across milestones
-const floatingImagesList: { url: string; alt?: string }[] = [];
-milestones.forEach((m) => {
-  if (Array.isArray(m.floatingImages)) {
-    m.floatingImages.forEach((img) => {
+// Process milestones dynamically from Sanity CMS or fallback
+const rawMilestones = milestones.length > 0 ? milestones : fallbackMilestones;
+const sortedMilestones = [...rawMilestones].sort(
+  (a, b) => parseInt(String(a.year), 10) - parseInt(String(b.year), 10)
+);
+
+const resolvedMilestones = sortedMilestones.map((m) => {
+  const images: { url: string; alt?: string }[] = [];
+  if (Array.isArray(m.floatingImages) && m.floatingImages.length > 0) {
+    m.floatingImages.forEach((img: any) => {
       const url = urlForImage(img) || (typeof img === 'string' ? img : img?.url);
       if (url) {
-        floatingImagesList.push({ url, alt: img.alt || 'Milestone memory' });
+        images.push({ url, alt: img.alt || `Memory of ${m.year}` });
       }
     });
   }
+  // Fill up to 5 images using fallback if not enough images in CMS
+  const finalImages = [...images];
+  while (finalImages.length < 5) {
+    finalImages.push(fallbackFloatingImgs[finalImages.length % fallbackFloatingImgs.length]);
+  }
+
+  return {
+    year: String(m.year),
+    description: m.description || '',
+    floatingImages: finalImages,
+  };
 });
 
-// Default backup floating images matching design placement
-const fallbackFloatingImgs = [
-  { url: '/hero-rafid.png', alt: 'IEEE group photo 1' },
-  { url: '/post-cover-dummy.png', alt: 'IEEE event photo 2' },
-  { url: '/hero-rafid.png', alt: 'IEEE group photo 3' },
-  { url: '/post-cover-dummy.png', alt: 'IEEE ceremony photo 4' },
-  { url: '/hero-rafid.png', alt: 'IEEE campus photo 5' },
-];
-
-const activeFloating = floatingImagesList.length > 0 ? floatingImagesList : fallbackFloatingImgs;
+// Set default active milestone (2026 if present, otherwise the last milestone)
+const defaultYear = '2026';
+const initialActiveIdx = resolvedMilestones.findIndex((m) => m.year === defaultYear);
+const activeIndex = initialActiveIdx !== -1 ? initialActiveIdx : resolvedMilestones.length - 1;
+const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0];
+const initialFloating = initialMilestone.floatingImages;
 
 ---
 
 <section class="relative z-20 w-full bg-white text-gray-900 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-2 sm:pt-3 md:pt-4 pb-0 overflow-hidden border-t-[2.5px] border-[#C8CAD4]">
   
+  <!-- Left & Right blur/fade overlays (Spans full height of HistorySection to the very bottom) -->
+  <div class="history-fade-left"></div>
+  <div class="history-fade-right"></div>
+
   <!-- ========================================== -->
   <!-- SECTION A: Partners Throughout The Years  -->
   <!-- Full Width Edge-to-Edge (Mentok Kanan-Kiri)-->
   <!-- ========================================== -->
   <div class="w-full flex flex-col items-center">
     <!-- Section Title (centered) -->
-    <div class="w-full text-center px-4 mb-1.5 sm:mb-2 md:mb-3">
-      <h2 class="text-center text-3xl md:text-4xl lg:text-[46px] xl:text-[54px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
+    <div class="w-full text-center px-4 pt-6 sm:pt-8 md:pt-10 mb-1.5 sm:mb-2 md:mb-3">
+      <h2 class="text-center text-3xl md:text-4xl lg:text-[35px] xl:text-[35px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
         Partners Throughout The Years
       </h2>
     </div>
 
     <!-- Connected Grid: Edge-to-edge square containers with 2.5px borders in #C8CAD4 -->
-    <div class="w-full">
-      <!-- Grid Container: 8 columns spanning 100% width with 2.5px borders in #C8CAD4 -->
-      <div class="relative w-full grid grid-cols-8 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none">
+    <div class="relative w-full overflow-x-clip overflow-y-visible py-2">
+      <!-- Grid Container: 10 columns spanning 100% width with 2.5px borders in #C8CAD4 -->
+      <div class="relative w-full grid grid-cols-10 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none">
         {displayPartners.map((partner, index) => {
           const row = Math.floor(index / totalCols);
           const col = index % totalCols;
@@ -116,11 +140,7 @@ const activeFloating = floatingImagesList.length > 0 ? floatingImagesList : fall
           const logoSrc = urlForImage(partner.logo);
 
           return (
-            <div
-              class={`group relative flex items-center justify-center p-2 sm:p-3 md:p-4 aspect-square bg-white ${
-                !isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''
-              } ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
-            >
+            <div class={`group relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : '' }`}>
               <!-- Circular Node: Top-Left vertex (thicker 2.5px border in #C8CAD4) -->
               <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
 
@@ -147,7 +167,7 @@ const activeFloating = floatingImagesList.length > 0 ? floatingImagesList : fall
                     alt={partner.name}
                     title={partner.name}
                     loading="lazy"
-                    class="max-h-[58%] max-w-[72%] object-contain"
+                    class="max-h-[65%] max-w-[78%] object-contain"
                   />
                 ) : (
                   <span class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider text-center px-2">
@@ -161,107 +181,147 @@ const activeFloating = floatingImagesList.length > 0 ? floatingImagesList : fall
       </div>
     </div>
   </div>
-
   <!-- ========================================== -->
   <!-- SECTION B: Our Persistent Growth           -->
   <!-- Full Width Edge-to-Edge (Mentok Kanan-Kiri)-->
   <!-- ========================================== -->
-  <div class="relative w-full flex-1 flex flex-col justify-end pt-1 sm:pt-2 pb-0 overflow-hidden select-none">
+  <div id="history-growth-section" class="relative w-full flex-1 flex flex-col justify-end pt-6 sm:pt-8 pb-0 overflow-hidden select-none">
     
     <!-- Section Title (centered) -->
     <div class="w-full text-center px-4 mb-1 sm:mb-2">
-      <h2 class="relative z-10 inline-block text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[48px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
+      <h2 class="relative z-10 inline-block text-2xl sm:text-3xl md:text-4xl lg:text-[35px] xl:text-[40px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
         Our Persistent Growth
       </h2>
     </div>
-
+    
     <!-- Floating Scattered Images (styled with scrapbook offset frame/shadow as shown in reference) -->
     <div class="pointer-events-none select-none absolute inset-0 z-0 overflow-hidden">
       <!-- Floating 1: Left above 2025 -->
-      {activeFloating[0] && (
-        <div class="absolute left-[5%] md:left-[6%] top-[25%] md:top-[28%] w-28 h-18 sm:w-36 sm:h-22 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
-          <img src={activeFloating[0].url} alt={activeFloating[0].alt || ''} class="w-full h-full object-cover" />
+      {initialFloating[0] && (
+        <div class="absolute left-[5%] md:left-[6%] top-[25%] md:top-[28%] w-28 h-18 sm:w-36 sm:h-22 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
+          <img id="floating-img-0" src={initialFloating[0].url} alt={initialFloating[0].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
         </div>
       )}
 
       <!-- Floating 2: Top-left center (above title) -->
-      {activeFloating[1] && (
-        <div class="absolute left-[24%] md:left-[26%] top-[2%] md:top-[4%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
-          <img src={activeFloating[1].url} alt={activeFloating[1].alt || ''} class="w-full h-full object-cover" />
+      {initialFloating[1] && (
+        <div class="absolute left-[24%] md:left-[26%] top-[2%] md:top-[4%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
+          <img id="floating-img-1" src={initialFloating[1].url} alt={initialFloating[1].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
         </div>
       )}
 
       <!-- Floating 3: Right of Title (wide group photo) -->
-      {activeFloating[2] && (
-        <div class="absolute left-[64%] md:left-[67%] top-[4%] md:top-[6%] w-32 h-20 sm:w-40 sm:h-24 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
-          <img src={activeFloating[2].url} alt={activeFloating[2].alt || ''} class="w-full h-full object-cover" />
+      {initialFloating[2] && (
+        <div class="absolute left-[64%] md:left-[67%] top-[4%] md:top-[6%] w-32 h-20 sm:w-40 sm:h-24 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
+          <img id="floating-img-2" src={initialFloating[2].url} alt={initialFloating[2].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
         </div>
       )}
 
       <!-- Floating 4: Far Right Top/Mid -->
-      {activeFloating[3] && (
-        <div class="absolute right-[4%] md:right-[5%] top-[22%] md:top-[26%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
-          <img src={activeFloating[3].url} alt={activeFloating[3].alt || ''} class="w-full h-full object-cover" />
+      {initialFloating[3] && (
+        <div class="absolute right-[4%] md:right-[5%] top-[22%] md:top-[26%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
+          <img id="floating-img-3" src={initialFloating[3].url} alt={initialFloating[3].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
         </div>
       )}
 
       <!-- Floating 5: Bottom Right under description text -->
-      {activeFloating[4] && (
-        <div class="absolute left-[85%] md:left-[86%] bottom-[16px] md:bottom-[20px] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
-          <img src={activeFloating[4].url} alt={activeFloating[4].alt || ''} class="w-full h-full object-cover" />
+      {initialFloating[4] && (
+        <div class="absolute left-[85%] md:left-[86%] bottom-[16px] md:bottom-[20px] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
+          <img id="floating-img-4" src={initialFloating[4].url} alt={initialFloating[4].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
         </div>
       )}
     </div>
+    
 
     <!-- Timeline & Time Slider Container (Directly at the bottom edge, cut at bottom) -->
-    <div class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px]">
+    <!-- Supports direct click, mouse drag & touch swipe to slide through years -->
+    <div
+      id="history-timeline-track"
+      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab active:cursor-grabbing select-none"
+      title="Geser atau klik tahun untuk melihat milestone"
+    >
       
-      <!-- 1. Ruler Ticks from 0% (Left Edge) to 48% (Stops cleanly at 2026 stem) -->
+      <!-- 1. Ruler Ticks: Leading ticks before first milestone + intermediate ticks between milestones -->
       <!-- 2.5px thick ticks in #C8CAD4 -->
       <div class="absolute inset-0 pointer-events-none">
-        <!-- Ticks before 2025 (at 0%, 4%, 8%, 12%, 16%) -->
+        <!-- Ticks before first milestone (at 0%, 4%) -->
         <span class="absolute bottom-0 left-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
         <span class="absolute bottom-0 left-[4%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[8%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[12%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[16%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
 
-        <!-- Ticks between 2025 (at ~20%) and 2026 (at ~48%) -->
-        <span class="absolute bottom-0 left-[25.5%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[31%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[36.5%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[42%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <!-- Note: After 48%, absolutely NO ticks exist, matching reference image -->
+        <!-- Ticks between milestones (each step 20%, 3 ticks at +5%, +10%, +15%) -->
+        {resolvedMilestones.slice(0, -1).map((_, i) => {
+          const base = 8 + i * 20;
+          return (
+            <>
+              <span style={`left: ${base + 5}%`} class="absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+              <span style={`left: ${base + 10}%`} class="absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+              <span style={`left: ${base + 15}%`} class="absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+            </>
+          );
+        })}
+        <!-- Note: After the last milestone stem, absolutely NO ticks exist, matching reference image -->
       </div>
 
-      <!-- 2. Milestone 2025 (Stem + Circular Node + Year Number) -->
-      <div class="absolute bottom-0 left-[20%] -translate-x-1/2 flex flex-col items-center">
-        <!-- Year Number -->
-        <span class="font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-semibold text-slate-700 tracking-wider leading-none mb-1.5 sm:mb-2 select-none">
-          {milestone2025.year}
-        </span>
-        <!-- Circular Node -->
-        <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white ring-4 ring-white z-10"></div>
-        <!-- Vertical Stem touching bottom-0 -->
-        <div class="w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></div>
-      </div>
+      <!-- 2. Dynamic Milestones: Render each year with stem, circular node, and year number -->
+      {resolvedMilestones.map((milestone, idx) => {
+        const leftPercent = 8 + idx * 20;
+        const isActive = idx === activeIndex;
 
-      <!-- 3. Milestone 2026 (Stem + Circular Node + Year Number) -->
-      <div class="absolute bottom-0 left-[48%] -translate-x-1/2 flex flex-col items-center">
-        <!-- Year Number -->
-        <span class="font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-semibold text-slate-700 tracking-wider leading-none mb-1.5 sm:mb-2 select-none">
-          {milestone2026.year}
-        </span>
-        <!-- Circular Node -->
-        <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white ring-4 ring-white z-10"></div>
-        <!-- Vertical Stem touching bottom-0 -->
-        <div class="w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></div>
-      </div>
+        return (
+          <button
+            type="button"
+            style={`left: ${leftPercent}%`}
+            class="milestone-btn absolute bottom-0 -translate-x-1/2 flex flex-col items-center cursor-pointer group focus:outline-none transition-transform duration-200 select-none z-20"
+            data-index={idx}
+            data-year={milestone.year}
+            aria-label={`Pilih tahun ${milestone.year}`}
+          >
+            <!-- Year Number -->
+            <span
+              class={`milestone-year-text font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-normal tracking-widest leading-none mb-1.5 sm:mb-2 select-none uppercase transition-colors duration-200 ${
+                isActive ? 'text-[#1E2029]' : 'text-[#8F94A6] group-hover:text-gray-700'
+              }`}
+            >
+              {milestone.year}
+            </span>
 
-      <!-- 4. Description Text (Aligned to the right of 2026) -->
-      <div class="absolute left-[60%] sm:left-[62%] bottom-[35px] sm:bottom-[44px] md:bottom-[52px] lg:bottom-[58px] max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-md select-none pr-4">
-        <p class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal">
-          {milestone2026.description ||
+            <!-- Circular Node -->
+            <div
+              class={`milestone-node w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] bg-white z-10 flex items-center justify-center transition-all duration-200 ${
+                isActive ? 'border-[#1E2029] ring-2 ring-gray-300' : 'border-[#C8CAD4] group-hover:border-gray-500'
+              }`}
+            >
+              <div
+                class={`milestone-inner-dot w-2 h-2 rounded-full transition-all duration-200 ${
+                  isActive ? 'bg-[#1E2029]' : 'bg-transparent'
+                }`}
+              ></div>
+            </div>
+
+            <!-- Vertical Stem touching bottom-0 -->
+            <div
+              class={`milestone-stem w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 -mt-[2px] transition-colors duration-200 ${
+                isActive ? 'bg-[#1E2029]' : 'bg-[#C8CAD4]'
+              }`}
+            ></div>
+          </button>
+        );
+      })}
+
+      <!-- 3. Description Text (Aligned to the right of the milestones) -->
+      <div class="absolute left-[58%] sm:left-[60%] md:left-[62%] bottom-[32px] sm:bottom-[40px] md:bottom-[48px] lg:bottom-[54px] max-w-[280px] sm:max-w-xs md:max-w-sm lg:max-w-md select-none pr-4 z-20">
+        <div class="flex items-center gap-2 mb-1.5 text-[11px] sm:text-xs font-mono tracking-wider text-gray-400 uppercase select-none">
+          <span>// Milestone</span>
+          <span id="active-year-badge" class="font-bold text-gray-900 px-1.5 py-0.5 bg-gray-100 rounded text-[10px] sm:text-[11px]">
+            {initialMilestone.year}
+          </span>
+          <span class="text-gray-400 hidden sm:inline">• Scroll Wheel / Klik</span>
+        </div>
+        <p
+          id="milestone-desc-text"
+          class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal transition-opacity duration-200"
+        >
+          {initialMilestone.description ||
             'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini'}
         </p>
       </div>
@@ -271,11 +331,265 @@ const activeFloating = floatingImagesList.length > 0 ? floatingImagesList : fall
   </div>
 </section>
 
+<!-- Client Script: Interactive Milestone Scroll Wheel / Click / Drag Handler -->
+<script is:inline define:vars={{ milestonesData: resolvedMilestones, initialIdx: activeIndex }}>
+  (function () {
+    const milestones = milestonesData || [];
+    let currentIndex = typeof initialIdx === 'number' ? initialIdx : milestones.length - 1;
+
+    const growthSection = document.getElementById('history-growth-section');
+    const track = document.getElementById('history-timeline-track');
+    const descText = document.getElementById('milestone-desc-text');
+    const yearBadge = document.getElementById('active-year-badge');
+    const buttons = document.querySelectorAll('.milestone-btn');
+
+    // Floating images elements
+    const floatingImgs = [
+      document.getElementById('floating-img-0'),
+      document.getElementById('floating-img-1'),
+      document.getElementById('floating-img-2'),
+      document.getElementById('floating-img-3'),
+      document.getElementById('floating-img-4'),
+    ];
+
+    function updateActiveMilestone(index) {
+      if (index < 0 || index >= milestones.length) return;
+      currentIndex = index;
+      const target = milestones[index];
+
+      // 1. Update Buttons / Nodes UI
+      buttons.forEach((btn, idx) => {
+        const yearText = btn.querySelector('.milestone-year-text');
+        const node = btn.querySelector('.milestone-node');
+        const innerDot = btn.querySelector('.milestone-inner-dot');
+        const stem = btn.querySelector('.milestone-stem');
+
+        if (idx === index) {
+          btn.setAttribute('aria-current', 'true');
+          if (yearText) {
+            yearText.classList.remove('text-[#8F94A6]');
+            yearText.classList.add('text-[#1E2029]');
+          }
+          if (node) {
+            node.classList.remove('border-[#C8CAD4]');
+            node.classList.add('border-[#1E2029]', 'ring-2', 'ring-gray-300');
+          }
+          if (innerDot) {
+            innerDot.classList.remove('bg-transparent');
+            innerDot.classList.add('bg-[#1E2029]');
+          }
+          if (stem) {
+            stem.classList.remove('bg-[#C8CAD4]');
+            stem.classList.add('bg-[#1E2029]');
+          }
+        } else {
+          btn.removeAttribute('aria-current');
+          if (yearText) {
+            yearText.classList.remove('text-[#1E2029]');
+            yearText.classList.add('text-[#8F94A6]');
+          }
+          if (node) {
+            node.classList.remove('border-[#1E2029]', 'ring-2', 'ring-gray-300');
+            node.classList.add('border-[#C8CAD4]');
+          }
+          if (innerDot) {
+            innerDot.classList.remove('bg-[#1E2029]');
+            innerDot.classList.add('bg-transparent');
+          }
+          if (stem) {
+            stem.classList.remove('bg-[#1E2029]');
+            stem.classList.add('bg-[#C8CAD4]');
+          }
+        }
+      });
+
+      // 2. Update Description with Fade Transition
+      if (descText) {
+        descText.style.opacity = '0';
+        setTimeout(() => {
+          descText.textContent = target.description || '';
+          if (yearBadge) {
+            yearBadge.textContent = target.year;
+          }
+          descText.style.opacity = '1';
+        }, 150);
+      }
+
+      // 3. Update Floating Scrapbook Background Images
+      if (Array.isArray(target.floatingImages)) {
+        target.floatingImages.forEach((imgObj, i) => {
+          const imgEl = floatingImgs[i];
+          if (imgEl && imgObj && imgObj.url) {
+            imgEl.style.opacity = '0';
+            setTimeout(() => {
+              imgEl.src = imgObj.url;
+              imgEl.alt = imgObj.alt || `Memory of ${target.year}`;
+              imgEl.style.opacity = '1';
+            }, 180);
+          }
+        });
+      }
+    }
+
+    // Direct Click on Year
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
+        updateActiveMilestone(idx);
+      });
+    });
+
+    // ========================================================
+    // Scroll Wheel Engine to cycle between years
+    // ========================================================
+    let isWheelLocked = false;
+    let wheelCooldownTimer = null;
+    let accumulatedDelta = 0;
+
+    function handleWheel(e) {
+      // Prefer vertical delta, fall back to horizontal delta
+      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+
+      if (Math.abs(delta) < 4) return;
+
+      const isScrollingDown = delta > 0;
+      const isScrollingUp = delta < 0;
+
+      const canAdvance = isScrollingDown && currentIndex < milestones.length - 1;
+      const canRetreat = isScrollingUp && currentIndex > 0;
+
+      // Prevent page scroll only if we can still change years
+      if (canAdvance || canRetreat) {
+        e.preventDefault();
+      } else {
+        // At edges (e.g. at 2026 and scrolling down, or at 2024 and scrolling up), let natural page scroll continue
+        return;
+      }
+
+      if (isWheelLocked) return;
+
+      accumulatedDelta += delta;
+
+      // Threshold to trigger year change (prevents twitchy jumps on trackpads or high-res mice)
+      if (Math.abs(accumulatedDelta) >= 30) {
+        isWheelLocked = true;
+
+        if (accumulatedDelta > 0 && currentIndex < milestones.length - 1) {
+          updateActiveMilestone(currentIndex + 1);
+        } else if (accumulatedDelta < 0 && currentIndex > 0) {
+          updateActiveMilestone(currentIndex - 1);
+        }
+
+        accumulatedDelta = 0;
+
+        // Reset lock after 400ms cooldown
+        clearTimeout(wheelCooldownTimer);
+        wheelCooldownTimer = setTimeout(() => {
+          isWheelLocked = false;
+          accumulatedDelta = 0;
+        }, 400);
+      }
+    }
+
+    if (growthSection) {
+      growthSection.addEventListener('wheel', handleWheel, { passive: false });
+    }
+    if (track) {
+      track.addEventListener('wheel', handleWheel, { passive: false });
+    }
+
+    // Touch & Pointer Drag / Swipe Engine
+    if (track) {
+      let isPointerDown = false;
+      let startX = 0;
+      let startY = 0;
+
+      track.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        startX = e.clientX;
+        startY = e.clientY;
+      });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!isPointerDown) return;
+        isPointerDown = false;
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX < 0) {
+            if (currentIndex < milestones.length - 1) {
+              updateActiveMilestone(currentIndex + 1);
+            }
+          } else {
+            if (currentIndex > 0) {
+              updateActiveMilestone(currentIndex - 1);
+            }
+          }
+        }
+      });
+
+      // Keyboard arrow navigation
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          if (currentIndex < milestones.length - 1) {
+            updateActiveMilestone(currentIndex + 1);
+          }
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          if (currentIndex > 0) {
+            updateActiveMilestone(currentIndex - 1);
+          }
+        }
+      });
+    }
+  })();
+</script>
+
 <style>
-  /* Import technical segmented font for the year display */
-  @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap');
+  /* Agency FB font for year display with Bebas Neue fallback */
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
   .font-tech {
-    font-family: 'Chakra Petch', monospace, sans-serif;
+    font-family: 'Agency FB', 'Bebas Neue', 'Impact', sans-serif;
+  }
+
+  /* Side blur & fade overlays for the partners grid */
+  .history-fade-left,
+  .history-fade-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 14%;
+    min-width: 90px;
+    max-width: 220px;
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  .history-fade-left {
+    left: 0;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.85) 40%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    backdrop-filter: blur(2.5px);
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
+  }
+
+  .history-fade-right {
+    right: 0;
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.85) 40%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    backdrop-filter: blur(2.5px);
+    -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
   }
 </style>

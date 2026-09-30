@@ -1,11 +1,11 @@
-import imageUrlBuilder from '@sanity/image-url';
+import { createImageUrlBuilder } from '@sanity/image-url';
 import { sanityClient, isSanityConfigured } from './client';
 
-let builder: ReturnType<typeof imageUrlBuilder> | null = null;
+let builder: any = null;
 
 if (isSanityConfigured) {
   try {
-    builder = imageUrlBuilder(sanityClient);
+    builder = createImageUrlBuilder(sanityClient);
   } catch (err) {
     console.warn('Failed to initialize Sanity image builder:', err);
   }
