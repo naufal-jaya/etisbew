@@ -1,13 +1,20 @@
 ---
-// Members Section with dual-row infinite marquee
-// - Section height: 1400px (each row 700px, image height auto from aspect ratio)
-// - Gap: 0px horizontal & vertical (seamless photo wall)
-// - Motion: always moving, does NOT pause on hover
-// - Click: shows a looping video (cannot be paused), marquee stops
-// - Click again on active card: hides video, marquee resumes
+// Members Section with dual-row infinite marquee & interactive division showcase drawer
+// - Marquee rows: seamless photo cards that loop infinitely
+// - Click card: plays looping video on that card, pauses marquee, opens division detail drawer
+// - Text on card disappears when video is playing
+// - Video plays without any white borders or outlines
+// - Drawer: white background, size 1918x367.36px, sharp corners (rounded-none)
+// - Division photo: 415x257px, no text, no hover effect
+// - White fading overlay on the left side of the carousel
+// - Member photo: 185x257px, click to blur photo and reveal LinkedIn logo with "Connect in LinkedIn"
+// - Draggable: mouse drag & touch swipe left/right across all members
+
+import { divisionsData } from "../data/divisions";
 
 interface MemberCard {
   id: string;
+  divisionId: string;
   division: string;
   image: string;
   video: string;
@@ -17,18 +24,21 @@ interface MemberCard {
 const row1Members: MemberCard[] = [
   {
     id: "r1-1",
+    divisionId: "cnm",
     division: "Creative n Marketing",
     image: "/foto-CnM.jpeg",
     video: "/cnm.mov",
   },
   {
     id: "r1-2",
+    divisionId: "external",
     division: "External Relations",
     image: "/foto-external.jpeg",
     video: "/external.mov",
   },
   {
     id: "r1-3",
+    divisionId: "executives",
     division: "Executives",
     image: "/foto-bph.jpeg",
     video: "/bph.mov",
@@ -36,18 +46,21 @@ const row1Members: MemberCard[] = [
   },
   {
     id: "r1-4",
+    divisionId: "hr",
     division: "Human Resources",
     image: "/foto-hr.jpeg",
     video: "/hr.mov",
   },
   {
     id: "r1-5",
+    divisionId: "infor",
     division: "Tech n Information",
     image: "/foto-infor.jpeg",
     video: "/infor.mov",
   },
   {
     id: "r1-6",
+    divisionId: "edu",
     division: "Education",
     image: "/foto-edu.jpeg",
     video: "/edu.mov",
@@ -57,36 +70,42 @@ const row1Members: MemberCard[] = [
 const row2Members: MemberCard[] = [
   {
     id: "r2-1",
+    divisionId: "infor",
     division: "Tech n Information",
     image: "/foto-infor.jpeg",
     video: "/infor.mov",
   },
   {
     id: "r2-2",
+    divisionId: "hr",
     division: "Human Resources",
     image: "/foto-hr.jpeg",
     video: "/hr.mov",
   },
   {
     id: "r2-3",
+    divisionId: "cnm",
     division: "Creative n Marketing",
     image: "/foto-CnM.jpeg",
     video: "/cnm.mov",
   },
   {
     id: "r2-4",
+    divisionId: "edu",
     division: "Education",
     image: "/foto-edu.jpeg",
     video: "/edu.mov",
   },
   {
     id: "r2-5",
+    divisionId: "external",
     division: "External Relations",
     image: "/foto-external.jpeg",
     video: "/external.mov",
   },
   {
     id: "r2-6",
+    divisionId: "executives",
     division: "Executives",
     image: "/foto-bph.jpeg",
     video: "/bph.mov",
@@ -100,7 +119,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 ---
 
 <section
-  class="relative z-20 w-full h-[1400px] bg-black overflow-hidden select-none flex flex-col justify-stretch p-0 m-0"
+  class="relative z-20 w-full bg-black select-none flex flex-col justify-stretch p-0 m-0"
   id="members-section"
   aria-label="Meet Our People"
 >
@@ -111,19 +130,20 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     </h2>
   </div>
 
-  <!-- Row 1: Scrolling Right (->) - 700px tall -->
-  <div class="marquee-row relative w-full h-1/2 overflow-hidden flex items-stretch p-0 m-0">
+  <!-- Row 1: Scrolling Right (->) -->
+  <div class="marquee-row relative w-full h-[520px] sm:h-[600px] md:h-[680px] lg:h-[700px] flex-shrink-0 overflow-hidden flex items-stretch p-0 m-0">
     <div class="marquee-track marquee-track-right flex h-full w-max p-0 m-0">
       {row1Track.map((member, i) => (
         <div
-          class="member-card relative h-full aspect-[15/19] flex-shrink-0 cursor-pointer overflow-hidden p-0 m-0"
+          class="member-card relative h-full aspect-[15/19] flex-shrink-0 cursor-pointer overflow-hidden p-0 m-0 group border-0 outline-none"
           data-member-id={member.id}
+          data-division-id={member.divisionId}
           data-division={member.division}
           data-video={member.video}
           data-track-index={i}
           role="button"
           tabindex="0"
-          aria-label={`View ${member.division}`}
+          aria-label={`Lihat divisi ${member.division}`}
         >
           <!-- Photo layer -->
           <img
@@ -133,12 +153,12 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
             height="781"
             loading="lazy"
             decoding="async"
-            class="card-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+            class="card-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none border-0 outline-none"
           />
 
-          <!-- Video layer (hidden by default, shown on click) -->
+          <!-- Video layer (hidden by default, shown on click, no borders) -->
           <video
-            class="card-video absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0"
+            class="card-video absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0 border-0 outline-none"
             src={member.video}
             loop
             muted
@@ -147,13 +167,13 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
           ></video>
 
           <!-- Gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none"></div>
 
-          <!-- Division label -->
-          <div class="absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none">
+          <!-- Bottom Division Label (disappears when video is playing) -->
+          <div class="card-division-label absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none transition-all duration-300">
             <span class={member.isPixel
-              ? "font-pixel text-white text-sm sm:text-base md:text-lg block"
-              : "text-white text-base sm:text-lg md:text-xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
+              ? "font-pixel text-white text-base sm:text-lg md:text-xl block drop-shadow-md"
+              : "text-white text-lg sm:text-xl md:text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
               {member.division}
             </span>
           </div>
@@ -162,19 +182,152 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     </div>
   </div>
 
-  <!-- Row 2: Scrolling Left (<-) - 700px tall -->
-  <div class="marquee-row relative w-full h-1/2 overflow-hidden flex items-stretch p-0 m-0">
+  <!-- Division Detail Showcase Drawer (opens between Row 1 and Row 2) - Size: 1918x367.36px -->
+  <div
+    id="division-drawer"
+    class="division-drawer w-full bg-white text-black relative z-30 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-y border-neutral-200"
+  >
+    <div class="division-drawer-inner relative w-full overflow-hidden">
+
+
+      {Object.values(divisionsData).map((division) => (
+        <div
+          class="division-panel hidden w-full max-w-[1918px] mx-auto h-[367.36px] flex items-center px-6 sm:px-10 md:px-12 lg:px-16 box-border"
+          data-panel-id={division.id}
+        >
+          <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2 w-full h-full py-4 box-border">
+            
+            <!-- Left Column: Division Title, Description & Badge -->
+            <div class="w-full lg:w-[280px] xl:w-[320px] flex-shrink-0 flex flex-col justify-center h-full py-1">
+              <div>
+                <h3 class={division.isPixel
+                  ? "font-pixel text-2xl sm:text-3xl lg:text-4xl text-black tracking-tight leading-tight mb-2"
+                  : "text-3xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight leading-[0.93] mb-2"}>
+                  {division.nameLines.map((line) => (
+                    <span class="block">{line}</span>
+                  ))}
+                </h3>
+                <p class="text-xs sm:text-sm text-neutral-600 leading-relaxed max-w-sm mt-2 line-clamp-3">
+                  {division.description}
+                </p>
+              </div>
+
+              <!-- Badge/Avatar (matching the "M" circle from mockup) -->
+            </div>
+
+            <!-- Right Column: Draggable Horizontal Carousel of Cards -->
+            <div class="carousel-container relative flex-1 min-w-0 w-full overflow-hidden group flex items-center h-full">
+              
+              <!-- Left White Fading Overlay – sits right at the carousel edge, next to the text column -->
+              <div class="carousel-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-10 md:w-12 z-20 bg-gradient-to-r from-white via-white/60 to-transparent"></div>
+
+              <!-- Desktop Navigation Arrows -->
+              <button
+                class="carousel-nav-btn prev-btn absolute left-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/95 hover:bg-white text-black shadow-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer border border-neutral-200"
+                aria-label="Geser ke kiri"
+                type="button"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                class="carousel-nav-btn next-btn absolute right-2 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-white/95 hover:bg-white text-black shadow-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 hover:scale-110 active:scale-95 cursor-pointer border border-neutral-200"
+                aria-label="Geser ke kanan"
+                type="button"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <!-- Draggable Cards Track -->
+              <div
+                class="members-draggable-track flex items-center gap-3.5 sm:gap-4 overflow-x-auto select-none cursor-grab active:cursor-grabbing py-1 pl-16 pr-1 no-scrollbar h-[270px]"
+              >
+                <!-- Group Photo Card (Exact 415x257px, sharp corners: rounded-none, no text, no hover effect) -->
+                <div class="group-photo-card relative flex-shrink-0 w-[415px] h-[257px] rounded-none overflow-hidden bg-neutral-900 border-0 shadow-sm">
+                  <img
+                    src={division.groupPhoto}
+                    alt={division.groupCaption}
+                    class="w-full h-full object-cover select-none pointer-events-none rounded-none"
+                    loading="lazy"
+                  />
+                </div>
+
+                <!-- Member Cards (Exact 185x257px, sharp corners: rounded-none, click to blur & show LinkedIn) -->
+                {division.members.map((member) => (
+                  <div
+                    class="member-profile-card relative flex-shrink-0 w-[185px] h-[257px] rounded-none overflow-hidden bg-neutral-900 cursor-pointer border-0 select-none shadow-sm"
+                    data-member-name={member.name}
+                    role="button"
+                    tabindex="0"
+                    aria-label={`${member.name}, ${member.role}`}
+                  >
+                    <!-- Member photo with blur transition -->
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      class="member-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none rounded-none"
+                      loading="lazy"
+                      onerror="this.onerror=null; this.src='/dummy-avatar.svg'"
+                    />
+
+                    <!-- Member overlay gradient / vignette -->
+                    <div class="member-overlay absolute inset-0 pointer-events-none rounded-none"></div>
+
+                    <!-- Bottom Text & LinkedIn Link -->
+                    <div class="member-info-container absolute bottom-3.5 left-3.5 right-3.5 z-10 select-none flex flex-col justify-end">
+                      <h4 class="member-name text-xs sm:text-sm font-bold text-white leading-tight drop-shadow-md line-clamp-2 pointer-events-none">
+                        {member.name}
+                      </h4>
+
+                      <!-- Normal Role: visible when NOT blurred -->
+                      <p class="member-role text-[11px] text-neutral-300 font-medium leading-tight mt-1 line-clamp-2 pointer-events-none">
+                        {member.role}
+                      </p>
+
+                      <!-- LinkedIn Link: visible when blurred (replaces role, matching mockup!) -->
+                      <a
+                        href={member.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="member-linkedin-link flex items-center gap-1.5 mt-1 text-white text-[11.5px] font-medium leading-tight hover:opacity-80 transition-opacity pointer-events-auto"
+                        title={`Connect with ${member.name} in LinkedIn`}
+                      >
+                        <img
+                          src="/members/linkedin-white.svg"
+                          alt="LinkedIn"
+                          class="w-3.5 h-3.5 flex-shrink-0 object-contain"
+                        />
+                        <span class="tracking-tight text-white font-normal text-[11.5px] drop-shadow-sm">Connect in LinkedIn</span>
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- Row 2: Scrolling Left (<-) -->
+  <div class="marquee-row relative w-full h-[520px] sm:h-[600px] md:h-[680px] lg:h-[700px] flex-shrink-0 overflow-hidden flex items-stretch p-0 m-0">
     <div class="marquee-track marquee-track-left flex h-full w-max p-0 m-0">
       {row2Track.map((member, i) => (
         <div
-          class="member-card relative h-full aspect-[15/19] flex-shrink-0 cursor-pointer overflow-hidden p-0 m-0"
+          class="member-card relative h-full aspect-[15/19] flex-shrink-0 cursor-pointer overflow-hidden p-0 m-0 group border-0 outline-none"
           data-member-id={member.id}
+          data-division-id={member.divisionId}
           data-division={member.division}
           data-video={member.video}
           data-track-index={i}
           role="button"
           tabindex="0"
-          aria-label={`View ${member.division}`}
+          aria-label={`Lihat divisi ${member.division}`}
         >
           <!-- Photo layer -->
           <img
@@ -184,12 +337,12 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
             height="781"
             loading="lazy"
             decoding="async"
-            class="card-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+            class="card-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none border-0 outline-none"
           />
 
-          <!-- Video layer (hidden by default, shown on click) -->
+          <!-- Video layer (hidden by default, shown on click, no borders) -->
           <video
-            class="card-video absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0"
+            class="card-video absolute inset-0 w-full h-full object-cover select-none pointer-events-none opacity-0 border-0 outline-none"
             src={member.video}
             loop
             muted
@@ -198,13 +351,13 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
           ></video>
 
           <!-- Gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none"></div>
 
-          <!-- Division label -->
-          <div class="absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none">
+          <!-- Bottom Division Label (disappears when video is playing) -->
+          <div class="card-division-label absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none transition-all duration-300">
             <span class={member.isPixel
-              ? "font-pixel text-white text-sm sm:text-base md:text-lg block"
-              : "text-white text-base sm:text-lg md:text-xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
+              ? "font-pixel text-white text-base sm:text-lg md:text-xl block drop-shadow-md"
+              : "text-white text-lg sm:text-xl md:text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
               {member.division}
             </span>
           </div>
@@ -219,17 +372,21 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     const section = document.getElementById('members-section');
     if (!section) return;
 
+    const drawer = document.getElementById('division-drawer');
+    const closeBtn = document.getElementById('drawer-close-btn');
     const tracks = Array.from(section.querySelectorAll<HTMLElement>('.marquee-track'));
     const cards = Array.from(section.querySelectorAll<HTMLElement>('.member-card'));
+    const panels = Array.from(section.querySelectorAll<HTMLElement>('.division-panel'));
 
-    // Track which card is currently active (showing video)
+    // Track state
     let activeCard: HTMLElement | null = null;
     let activeVideo: HTMLVideoElement | null = null;
+    let activeDivisionId: string | null = null;
 
     function deactivateCard() {
       if (activeCard) {
         activeCard.classList.remove('is-active');
-        // Stop & hide video, show photo
+        // Stop & hide video, restore photo
         if (activeVideo) {
           activeVideo.pause();
           activeVideo.currentTime = 0;
@@ -244,20 +401,62 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
         activeCard = null;
         activeVideo = null;
       }
+
+      // Close drawer smoothly
+      if (drawer) {
+        drawer.classList.remove('is-open');
+      }
+
+      // Hide all panels after animation
+      setTimeout(() => {
+        if (!activeCard) {
+          panels.forEach((p) => {
+            p.classList.add('hidden');
+            // Reset any blurred member cards when drawer closes
+            p.querySelectorAll('.member-profile-card.is-blurred').forEach((c) => {
+              c.classList.remove('is-blurred');
+            });
+          });
+          activeDivisionId = null;
+        }
+      }, 400);
+
       // Resume marquee
       section!.removeAttribute('data-paused');
-      tracks.forEach(t => t.classList.remove('is-paused'));
+      tracks.forEach((t) => t.classList.remove('is-paused'));
     }
 
     function activateCard(card: HTMLElement) {
-      // Deactivate any currently active card first
-      deactivateCard();
+      const divisionId = card.getAttribute('data-division-id');
+      if (!divisionId) return;
+
+      // If clicking same card, toggle off
+      if (activeCard === card) {
+        deactivateCard();
+        return;
+      }
+
+      // If another card was active, reset that card first
+      if (activeCard && activeCard !== card) {
+        activeCard.classList.remove('is-active');
+        if (activeVideo) {
+          activeVideo.pause();
+          activeVideo.currentTime = 0;
+          activeVideo.classList.add('opacity-0');
+          activeVideo.classList.remove('opacity-100');
+        }
+        const photo = activeCard.querySelector<HTMLElement>('.card-photo');
+        if (photo) {
+          photo.classList.remove('opacity-0');
+          photo.classList.add('opacity-100');
+        }
+      }
 
       // Pause marquee
       section!.setAttribute('data-paused', 'true');
-      tracks.forEach(t => t.classList.add('is-paused'));
+      tracks.forEach((t) => t.classList.add('is-paused'));
 
-      // Mark card as active
+      // Mark clicked card as active (division label disappears, no white borders)
       card.classList.add('is-active');
       activeCard = card;
 
@@ -274,29 +473,46 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
         activeVideo = video;
         video.classList.remove('opacity-0');
         video.classList.add('opacity-100');
-        // Force play from start, loop is set in HTML attr
         video.currentTime = 0;
         video.play().catch(() => {
-          // Autoplay blocked: try muted play (already muted)
           video.muted = true;
           video.play();
         });
       }
-    }
 
-    cards.forEach((card) => {
-      card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (activeCard === card) {
-          // Clicking the active card → close video & resume
-          deactivateCard();
+      // Switch division panel in drawer
+      activeDivisionId = divisionId;
+      panels.forEach((p) => {
+        if (p.getAttribute('data-panel-id') === divisionId) {
+          p.classList.remove('hidden');
+          // Reset track scroll & blurred cards
+          const track = p.querySelector<HTMLElement>('.members-draggable-track');
+          if (track) track.scrollLeft = 0;
+          p.querySelectorAll('.member-profile-card.is-blurred').forEach((c) => {
+            c.classList.remove('is-blurred');
+          });
         } else {
-          // Clicking a different card → play its video
-          activateCard(card);
+          p.classList.add('hidden');
         }
       });
 
-      // Keyboard accessibility
+      // Expand drawer
+      if (drawer) {
+        drawer.classList.add('is-open');
+        // Scroll so drawer and active card are nicely framed
+        setTimeout(() => {
+          drawer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 120);
+      }
+    }
+
+    // Card click events
+    cards.forEach((card) => {
+      card.addEventListener('click', (e) => {
+        e.stopPropagation();
+        activateCard(card);
+      });
+
       card.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -305,10 +521,151 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
       });
     });
 
-    // Click outside section → resume
-    document.addEventListener('click', (e) => {
-      if (activeCard && !section!.contains(e.target as Node)) {
+    // Close button event
+    closeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deactivateCard();
+    });
+
+    // Escape key closes drawer
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && activeCard) {
         deactivateCard();
+      }
+    });
+
+    // Setup drag-to-scroll & member card click for all member tracks
+    initDraggableTracks();
+    initMemberCardInteraction();
+  }
+
+  function initMemberCardInteraction() {
+    const memberCards = Array.from(document.querySelectorAll<HTMLElement>('.member-profile-card'));
+
+    memberCards.forEach((card) => {
+      card.addEventListener('click', (e) => {
+        const track = card.closest<HTMLElement>('.members-draggable-track');
+        // If user was actively dragging, don't trigger click
+        if (track && (track as any).__hasDragged) {
+          return;
+        }
+
+        // If clicking on the LinkedIn link when already blurred, allow navigation
+        const target = e.target as HTMLElement;
+        if (target.closest('.member-linkedin-link') && card.classList.contains('is-blurred')) {
+          return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        // Toggle blur and LinkedIn reveal
+        card.classList.toggle('is-blurred');
+      });
+
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          card.classList.toggle('is-blurred');
+        }
+      });
+    });
+  }
+
+  function initDraggableTracks() {
+    const tracks = document.querySelectorAll<HTMLElement>('.members-draggable-track');
+
+    tracks.forEach((track) => {
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+
+      track.addEventListener('mousedown', (e) => {
+        isDown = true;
+        (track as any).__hasDragged = false;
+        startX = e.pageX;
+        scrollLeft = track.scrollLeft;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDown) {
+          isDown = false;
+          track.classList.remove('is-dragging');
+          setTimeout(() => {
+            (track as any).__hasDragged = false;
+          }, 80);
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX;
+        const diff = Math.abs(x - startX);
+        if (diff > 5) {
+          (track as any).__hasDragged = true;
+          track.classList.add('is-dragging');
+          e.preventDefault();
+          track.scrollLeft = scrollLeft - (x - startX) * 1.5;
+        }
+      });
+
+      // Touch swipe support
+      let touchStartX = 0;
+      track.addEventListener(
+        'touchstart',
+        (e) => {
+          touchStartX = e.touches[0].pageX;
+          (track as any).__hasDragged = false;
+        },
+        { passive: true }
+      );
+
+      track.addEventListener(
+        'touchmove',
+        (e) => {
+          if (Math.abs(e.touches[0].pageX - touchStartX) > 8) {
+            (track as any).__hasDragged = true;
+          }
+        },
+        { passive: true }
+      );
+
+      track.addEventListener(
+        'touchend',
+        () => {
+          setTimeout(() => {
+            (track as any).__hasDragged = false;
+          }, 80);
+        },
+        { passive: true }
+      );
+
+      // Mouse wheel horizontal scroll
+      track.addEventListener(
+        'wheel',
+        (e) => {
+          if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+            e.preventDefault();
+            track.scrollLeft += e.deltaY;
+          }
+        },
+        { passive: false }
+      );
+
+      // Desktop navigation arrows
+      const container = track.closest('.carousel-container');
+      if (container) {
+        const prevBtn = container.querySelector('.prev-btn');
+        const nextBtn = container.querySelector('.next-btn');
+
+        prevBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          track.scrollBy({ left: -280, behavior: 'smooth' });
+        });
+
+        nextBtn?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          track.scrollBy({ left: 280, behavior: 'smooth' });
+        });
       }
     });
   }
@@ -339,10 +696,115 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
        0 2px 4px rgba(0, 0, 0, 0.9);
   }
 
-  /* Photo/video fade transition */
+  /* Photo & video fade transition */
   .card-photo,
   .card-video {
     transition: opacity 0.4s ease;
+  }
+
+  /* NO white border on active card */
+  .member-card.is-active {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+    z-index: 25;
+  }
+
+  /* When card is active (video playing), hide the division text */
+  .card-division-label {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .member-card.is-active .card-division-label {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(10px);
+  }
+
+  /* Division Drawer Smooth Grid Expansion */
+  .division-drawer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .division-drawer.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .division-drawer-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Member Profile Card: Normal vs Blurred state */
+  .member-profile-card {
+    cursor: pointer;
+  }
+
+  .member-profile-card .member-photo {
+    transition: filter 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(1);
+    filter: blur(0px);
+  }
+
+  .member-profile-card .member-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+    transition: background 0.35s ease;
+  }
+
+  .member-profile-card .member-role {
+    display: block;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+  }
+
+  .member-profile-card .member-linkedin-link {
+    display: none !important;
+    opacity: 0;
+  }
+
+  /* BLURRED STATE (Identical to reference mockup Card 3) */
+  .member-profile-card.is-blurred .member-photo {
+    filter: blur(14px);
+    transform: scale(1.15); /* prevents blur clipping / white edge bleed */
+  }
+
+  .member-profile-card.is-blurred .member-overlay {
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.65) 100%),
+                linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.45) 100%);
+  }
+
+  .member-profile-card.is-blurred .member-role {
+    display: none !important;
+    opacity: 0;
+  }
+
+  .member-profile-card.is-blurred .member-linkedin-link {
+    display: flex !important;
+    opacity: 1;
+  }
+
+  /* Draggable track scrollbar hiding & smooth drag cursor */
+  .members-draggable-track {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .members-draggable-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .members-draggable-track.is-dragging {
+    cursor: grabbing !important;
+    scroll-behavior: auto !important;
   }
 
   /* Row 1: scrolls right (track moves from -50% → 0%) */
@@ -367,13 +829,11 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     will-change: transform;
   }
 
-  /* Pause ONLY when clicked (not on hover) */
+  /* Pause ONLY when card clicked */
   .marquee-track.is-paused,
   [data-paused="true"] .marquee-track {
     animation-play-state: paused !important;
   }
-
-
 
   @media (prefers-reduced-motion: reduce) {
     .marquee-track-right,
