@@ -11,22 +11,18 @@ export interface MilestoneItem {
 
 export const fallbackPartners: PartnerItem[] = [
   // Row 1
-  { name: 'Caffeine Singapore', logo: '/partners/caffeine.svg' },
-  { name: 'IEEE UB Student Branch', logo: '/partners/ieee-ub.svg' },
-  { name: 'idBattery', logo: '/partners/idbattery.svg' },
-  { name: 'Saga University', logo: '/partners/saga-university.svg' },
-  { name: 'CTSS', logo: '/partners/ctss.svg' },
-  { name: 'INFIEN', logo: '/partners/infien.svg' },
-  { name: 'Green Welfare .id', logo: '/partners/green-welfare.svg' },
+  { name: 'Caffeine Singapore', logo: '/partners/caffeine.png' },
+  { name: 'IEEE UB Student Branch', logo: '/partners/ieee-ub.png' },
+  { name: 'Saga University', logo: '/partners/saga-university.png' },
+  { name: 'CTSS', logo: '/partners/ctss.png' },
+  { name: 'Green Welfare .id', logo: '/partners/green-welfare.png' },
 
   // Row 2
-  { name: 'CTSS', logo: '/partners/ctss.svg' },
-  { name: 'Green Welfare .id', logo: '/partners/green-welfare.svg' },
-  { name: 'INFIEN', logo: '/partners/infien.svg' },
-  { name: 'Caffeine Singapore', logo: '/partners/caffeine.svg' },
-  { name: 'IEEE UB Student Branch', logo: '/partners/ieee-ub.svg' },
-  { name: 'idBattery', logo: '/partners/idbattery.svg' },
-  { name: 'Saga University', logo: '/partners/saga-university.svg' },
+  { name: 'CTSS', logo: '/partners/ctss.png' },
+  { name: 'Green Welfare .id', logo: '/partners/green-welfare.png' },
+  { name: 'Caffeine Singapore', logo: '/partners/caffeine.png' },
+  { name: 'IEEE UB Student Branch', logo: '/partners/ieee-ub.png' },
+  { name: 'Saga University', logo: '/partners/saga-university.png' },
 ];
 
 export const fallbackMilestones: MilestoneItem[] = [

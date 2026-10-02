@@ -56,11 +56,34 @@ const totalRows = 2;
 const minSlots = totalRows * totalCols; // 20 partner slots (2 full rows of 10)
 
 const sourcePartners = partners.length > 0 ? partners : fallbackPartners;
-const displayPartners: PartnerItem[] = [];
-while (displayPartners.length < minSlots) {
-  displayPartners.push(...sourcePartners);
-}
-displayPartners.length = minSlots;
+
+// Extract unique partners list with resolved image URLs
+const uniquePartnersMap = new Map<string, { name: string; logo: string }>();
+sourcePartners.forEach((p) => {
+  if (p && p.name && !uniquePartnersMap.has(p.name)) {
+    const logoUrl = urlForImage(p.logo) || (typeof p.logo === 'string' ? p.logo : '');
+    uniquePartnersMap.set(p.name, {
+      name: p.name,
+      logo: logoUrl,
+    });
+  }
+});
+const uniquePartnersList = Array.from(uniquePartnersMap.values());
+
+// Generate the 20 display cells, grouped by diagonal sets (diagSet = row + col, 0..10)
+const displayCells = Array.from({ length: minSlots }, (_, index) => {
+  const row = Math.floor(index / totalCols);
+  const col = index % totalCols;
+  const diagSet = row + col;
+  const initialPartner = uniquePartnersList[diagSet % uniquePartnersList.length] || { name: '', logo: '' };
+  return {
+    index,
+    row,
+    col,
+    diagSet,
+    initialPartner,
+  };
+});
 
 // Default backup floating images matching design placement
 const fallbackFloatingImgs = [
@@ -122,7 +145,7 @@ const initialFloating = initialMilestone.floatingImages;
   <div class="w-full flex flex-col items-center">
     <!-- Section Title (centered) -->
     <div class="w-full text-center px-4 pt-6 sm:pt-8 md:pt-10 mb-1.5 sm:mb-2 md:mb-3">
-      <h2 class="text-center text-3xl md:text-4xl font-normal tracking-tight text-gray-900 font-sans leading-tight">
+      <h2 class="text-center text-3xl md:text-4xl font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
         Partners Throughout The Years
       </h2>
     </div>
@@ -130,17 +153,23 @@ const initialFloating = initialMilestone.floatingImages;
     <!-- Connected Grid: Edge-to-edge square containers with 2.5px borders in #C8CAD4 -->
     <div class="relative w-full overflow-x-clip overflow-y-visible py-2">
       <!-- Grid Container: 10 columns spanning 100% width with 2.5px borders in #C8CAD4 -->
-      <div class="relative w-full grid grid-cols-10 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none">
-        {displayPartners.map((partner, index) => {
-          const row = Math.floor(index / totalCols);
-          const col = index % totalCols;
+      <div
+        id="partners-grid-root"
+        class="relative w-full grid grid-cols-10 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none"
+      >
+        {displayCells.map((cell) => {
+          const { index, row, col, diagSet, initialPartner } = cell;
           const isFirstCol = col === 0;
           const isLastCol = col === totalCols - 1;
           const isLastRow = row === totalRows - 1;
-          const logoSrc = urlForImage(partner.logo);
 
           return (
-            <div class={`group relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : '' }`}>
+            <div
+              class={`group relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
+              data-partner-cell
+              data-cell-index={index}
+              data-diag-set={diagSet}
+            >
               <!-- Circular Node: Top-Left vertex (thicker 2.5px border in #C8CAD4) -->
               <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
 
@@ -159,25 +188,47 @@ const initialFloating = initialMilestone.floatingImages;
                 <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
               )}
 
-              <!-- Logo Content (Square proportion with balanced margin) -->
-              <div class="w-full h-full flex items-center justify-center">
-                {logoSrc ? (
+              <!-- Logo Content (Double-buffered layers for seamless shrink & fade-in) -->
+              <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
+                <!-- Interactive Logo Target: sized precisely to logo, not the rectangle container -->
+                <div
+                  class="partner-logo-target relative flex items-center justify-center w-[70%] h-[70%] max-w-[78%] max-h-[65%] cursor-pointer group/logo"
+                  data-partner-target
+                >
                   <img
-                    src={logoSrc}
-                    alt={partner.name}
-                    title={partner.name}
-                    loading="lazy"
-                    class="max-h-[65%] max-w-[78%] object-contain"
+                    data-layer="a"
+                    src={initialPartner.logo}
+                    alt={initialPartner.name}
+                    loading="eager"
+                    class="partner-logo-layer absolute max-h-full max-w-full object-contain pointer-events-none transition-transform duration-200 group-hover/logo:scale-105"
                   />
-                ) : (
-                  <span class="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider text-center px-2">
-                    {partner.name}
-                  </span>
-                )}
+                  <img
+                    data-layer="b"
+                    src=""
+                    alt=""
+                    loading="eager"
+                    class="partner-logo-layer absolute max-h-full max-w-full object-contain opacity-0 pointer-events-none transition-transform duration-200 group-hover/logo:scale-105"
+                    style="transform: scale(0.85);"
+                  />
+                </div>
               </div>
             </div>
           );
         })}
+      </div>
+
+      <!-- Floating Tooltip for Partner Name (Appears when logo itself is hovered) -->
+      <div
+        id="partner-tooltip"
+        role="tooltip"
+        class="pointer-events-none fixed z-50 px-3.5 py-1.5 rounded-lg bg-[#1E2029] text-white text-xs sm:text-[13px] font-sans font-medium tracking-wide shadow-[0_8px_24px_rgba(0,0,0,0.35)] border border-[#383B47] transition-[opacity,transform] duration-200 ease-out opacity-0 scale-95 select-none"
+        style="transform: translate(-50%, -100%); top: -9999px; left: -9999px;"
+      >
+        <span id="partner-tooltip-text"></span>
+        <span
+          id="partner-tooltip-arrow"
+          class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-[#1E2029]"
+        ></span>
       </div>
     </div>
   </div>
@@ -189,7 +240,7 @@ const initialFloating = initialMilestone.floatingImages;
     
     <!-- Section Title (centered) -->
     <div class="w-full text-center px-4 mb-1 sm:mb-2">
-      <h2 class="relative z-10 inline-block text-2xl sm:text-3xl md:text-4xl lg:text-[35px] xl:text-[40px] font-normal tracking-tight text-gray-900 font-sans leading-tight">
+      <h2 class="relative z-10 inline-block text-2xl sm:text-3xl md:text-4xl lg:text-[35px] xl:text-[40px] font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
         Our Persistent Growth
       </h2>
     </div>
@@ -278,7 +329,7 @@ const initialFloating = initialMilestone.floatingImages;
           >
             <!-- Year Number -->
             <span
-              class={`milestone-year-text font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-normal tracking-widest leading-none mb-1.5 sm:mb-2 select-none uppercase transition-colors duration-200 ${
+              class={`milestone-year-text font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] tracking-wider leading-none mb-1.5 sm:mb-2 select-none uppercase transition-colors duration-200 ${
                 isActive ? 'text-[#1E2029]' : 'text-[#8F94A6] group-hover:text-gray-700'
               }`}
             >
@@ -319,7 +370,7 @@ const initialFloating = initialMilestone.floatingImages;
         </div>
         <p
           id="milestone-desc-text"
-          class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal transition-opacity duration-200"
+          class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal tracking-[0.015em] transition-opacity duration-200"
         >
           {initialMilestone.description ||
             'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini'}
@@ -546,12 +597,300 @@ const initialFloating = initialMilestone.floatingImages;
   })();
 </script>
 
+<!-- Client Script: Diagonal Wave Looping Animation & Partner Logo Tooltip -->
+<script is:inline define:vars={{ partnersPool: uniquePartnersList }}>
+  (function () {
+    const gridRoot = document.getElementById('partners-grid-root');
+    const tooltip = document.getElementById('partner-tooltip');
+    const tooltipText = document.getElementById('partner-tooltip-text');
+    const tooltipArrow = document.getElementById('partner-tooltip-arrow');
+
+    if (!gridRoot || !Array.isArray(partnersPool) || partnersPool.length < 2) return;
+
+    // Check user preference for reduced motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Preload all partner logo images to guarantee 0% flicker
+    partnersPool.forEach((p) => {
+      if (p && p.logo) {
+        const img = new Image();
+        img.src = p.logo;
+      }
+    });
+
+    const cells = Array.from(gridRoot.querySelectorAll('[data-partner-cell]'));
+    const targets = Array.from(gridRoot.querySelectorAll('[data-partner-target]'));
+
+    // Group cells by diagonal set (diagSet = 0 to 10)
+    // d = 0 is leftmost corner (1 cell)
+    // d = 1..9 are diagonal pairs (2 cells each)
+    // d = 10 is rightmost corner (1 cell)
+    const setsMap = new Map();
+    cells.forEach((cell) => {
+      const diagSet = parseInt(cell.getAttribute('data-diag-set') || '0', 10);
+      if (!setsMap.has(diagSet)) {
+        setsMap.set(diagSet, []);
+      }
+      setsMap.get(diagSet).push(cell);
+    });
+
+    // Track which layer is currently active ('a' or 'b') for each cell
+    const cellActiveLayer = new Map();
+    cells.forEach((cell) => {
+      cellActiveLayer.set(cell, 'a');
+    });
+
+    const totalSets = setsMap.size; // 11 sets: 0 through 10
+    const staggerDelay = 140; // ms delay between consecutive diagonal sets (wave ripple speed)
+    const shrinkDuration = 320; // ms for shrink animation
+    const fadeInDuration = 400; // ms for fade-in animation
+    const waveRestInterval = 2800; // ms pause between complete wave loops
+
+    let currentWave = 0;
+    let isWaveActive = false;
+    let isVisible = true;
+    let isHovered = false;
+    let nextWaveTimeout = null;
+    let stepTimer = null;
+    let currentSetIndex = 0;
+
+    // ========================================================
+    // Tooltip Engine (Targeted strictly to the logo element)
+    // ========================================================
+    function showTooltip(target) {
+      if (!tooltip || !tooltipText) return;
+
+      const cell = target.closest('[data-partner-cell]');
+      if (!cell) return;
+
+      const activeLayerKey = cellActiveLayer.get(cell) || 'a';
+      const activeImg = cell.querySelector(`[data-layer="${activeLayerKey}"]`);
+      const name = activeImg ? activeImg.getAttribute('alt') || '' : '';
+      if (!name) return;
+
+      tooltipText.textContent = name;
+
+      const rect = target.getBoundingClientRect();
+      const tooltipWidth = tooltip.offsetWidth || 140;
+      const tooltipHeight = tooltip.offsetHeight || 32;
+
+      // Center horizontally over the logo
+      let left = rect.left + rect.width / 2;
+      // Position above the logo by default
+      let top = rect.top - 8;
+      let isAbove = true;
+
+      // If too close to viewport top, show below the logo instead
+      if (rect.top < tooltipHeight + 16) {
+        top = rect.bottom + 8;
+        isAbove = false;
+      }
+
+      // Prevent horizontal overflow past viewport edges
+      const minLeft = tooltipWidth / 2 + 12;
+      const maxLeft = window.innerWidth - tooltipWidth / 2 - 12;
+      left = Math.max(minLeft, Math.min(left, maxLeft));
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+
+      if (tooltipArrow) {
+        if (isAbove) {
+          tooltip.style.transform = 'translate(-50%, -100%)';
+          tooltipArrow.className = 'absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-[#1E2029]';
+        } else {
+          tooltip.style.transform = 'translate(-50%, 0)';
+          tooltipArrow.className = 'absolute bottom-full left-1/2 -translate-x-1/2 -mb-[1px] border-4 border-transparent border-b-[#1E2029]';
+        }
+      }
+
+      tooltip.classList.remove('opacity-0', 'scale-95');
+      tooltip.classList.add('opacity-100', 'scale-100');
+    }
+
+    function hideTooltip() {
+      if (!tooltip) return;
+      tooltip.classList.remove('opacity-100', 'scale-100');
+      tooltip.classList.add('opacity-0', 'scale-95');
+    }
+
+    // Attach hover listeners ONLY to the logo interactive targets
+    targets.forEach((target) => {
+      target.addEventListener('mouseenter', () => {
+        isHovered = true;
+        showTooltip(target);
+      });
+
+      target.addEventListener('mouseleave', () => {
+        isHovered = false;
+        hideTooltip();
+        if (!isWaveActive) {
+          scheduleNextWave(1200);
+        }
+      });
+    });
+
+    window.addEventListener('scroll', hideTooltip, { passive: true });
+    window.addEventListener('resize', hideTooltip, { passive: true });
+
+    // ========================================================
+    // Looping Diagonal Wave Animation Engine with Pause Support
+    // ========================================================
+    function runWave() {
+      if (!isVisible || isHovered) {
+        scheduleNextWave(600);
+        return;
+      }
+
+      isWaveActive = true;
+      currentWave++;
+      currentSetIndex = 0;
+
+      stepNextSet();
+    }
+
+    function stepNextSet() {
+      if (stepTimer) clearTimeout(stepTimer);
+
+      // If user is hovering on a logo, pause the wave and check periodically
+      if (isHovered) {
+        stepTimer = setTimeout(stepNextSet, 120);
+        return;
+      }
+
+      if (currentSetIndex < totalSets) {
+        const d = currentSetIndex;
+        animateDiagonalSet(d);
+        currentSetIndex++;
+        stepTimer = setTimeout(stepNextSet, staggerDelay);
+      } else {
+        // All diagonal sets in this wave have been triggered; wait for transition to finish
+        setTimeout(() => {
+          isWaveActive = false;
+          scheduleNextWave(waveRestInterval);
+        }, shrinkDuration + fadeInDuration);
+      }
+    }
+
+    function animateDiagonalSet(d) {
+      const setCells = setsMap.get(d) || [];
+      const nextPartnerIndex = (d + currentWave) % partnersPool.length;
+      const nextPartner = partnersPool[nextPartnerIndex];
+
+      setCells.forEach((cell) => {
+        const activeLayerKey = cellActiveLayer.get(cell) || 'a';
+        const nextLayerKey = activeLayerKey === 'a' ? 'b' : 'a';
+
+        const activeImg = cell.querySelector(`[data-layer="${activeLayerKey}"]`);
+        const nextImg = cell.querySelector(`[data-layer="${nextLayerKey}"]`);
+
+        if (!activeImg || !nextImg) return;
+
+        // 1. Prepare nextImg with the new partner details while still hidden
+        nextImg.src = nextPartner.logo;
+        nextImg.alt = nextPartner.name;
+        nextImg.style.transition = 'none';
+        nextImg.style.transform = prefersReducedMotion ? 'scale(1)' : 'scale(0.85)';
+        nextImg.style.opacity = '0';
+
+        // 2. Shrink currently active image
+        if (prefersReducedMotion) {
+          activeImg.style.transition = `opacity ${shrinkDuration}ms ease-in`;
+          activeImg.style.opacity = '0';
+        } else {
+          activeImg.style.transition = `transform ${shrinkDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${Math.round(shrinkDuration * 0.85)}ms ease-in`;
+          activeImg.style.transform = 'scale(0)';
+          activeImg.style.opacity = '0';
+        }
+
+        // 3. Fade in replacing image as the previous image shrinks out
+        const fadeInDelay = Math.round(shrinkDuration * 0.8);
+        setTimeout(() => {
+          if (!isVisible) return;
+          void nextImg.offsetWidth; // Force reflow to commit prep styles
+
+          if (prefersReducedMotion) {
+            nextImg.style.transition = `opacity ${fadeInDuration}ms ease-out`;
+            nextImg.style.opacity = '1';
+          } else {
+            nextImg.style.transition = `transform ${fadeInDuration}ms cubic-bezier(0.16, 1, 0.3, 1), opacity ${fadeInDuration}ms ease-out`;
+            nextImg.style.transform = 'scale(1)';
+            nextImg.style.opacity = '1';
+          }
+
+          // 4. Update the active layer reference for this cell
+          cellActiveLayer.set(cell, nextLayerKey);
+
+          // 5. Clean up old active image once fade-in finishes
+          setTimeout(() => {
+            activeImg.style.transition = 'none';
+            activeImg.style.transform = 'scale(0.85)';
+            activeImg.style.opacity = '0';
+          }, fadeInDuration);
+        }, fadeInDelay);
+      });
+    }
+
+    function scheduleNextWave(delayMs) {
+      if (nextWaveTimeout) clearTimeout(nextWaveTimeout);
+      nextWaveTimeout = setTimeout(() => {
+        runWave();
+      }, delayMs);
+    }
+
+    // Initial start after 2.2 seconds
+    scheduleNextWave(2200);
+
+    // Viewport intersection observer to save CPU/battery when not visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting && document.visibilityState === 'visible';
+          if (isVisible && !isWaveActive && !nextWaveTimeout) {
+            scheduleNextWave(1000);
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(gridRoot);
+
+    document.addEventListener('visibilitychange', () => {
+      isVisible = document.visibilityState === 'visible';
+      if (isVisible && !isWaveActive && !nextWaveTimeout) {
+        scheduleNextWave(1000);
+      }
+    });
+  })();
+</script>
+
 <style>
-  /* Agency FB font for year display with Bebas Neue fallback */
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+  @font-face {
+    font-family: 'Agency FB';
+    src: url('/fonts/agency-fb-bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Agency FB';
+    src: url('/fonts/agency-fb-regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
 
   .font-tech {
-    font-family: 'Agency FB', 'Bebas Neue', 'Impact', sans-serif;
+    font-family: 'Agency FB', sans-serif;
+  }
+
+  /* Partner Logo Ping-Pong double-buffered layer styling */
+  .partner-logo-layer {
+    transform-origin: center center;
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   /* Side blur & fade overlays for the partners grid */
