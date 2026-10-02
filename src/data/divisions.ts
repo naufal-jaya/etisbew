@@ -201,7 +201,6 @@ export const divisionsData: Record<string, DivisionDetail> = {
     name: "Executive Board",
     nameLines: ["Executive", "Board"],
     shortName: "Executives",
-    isPixel: true,
     category: "Leadership & Governance",
     description:
       "Leads overall strategic roadmap, administrative governance, financial sustainability, and fosters cross-divisional synergy to achieve IEEE SB IPB's highest milestones.",

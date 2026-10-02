@@ -42,7 +42,6 @@ const row1Members: MemberCard[] = [
     division: "Executives",
     image: "/foto-bph.jpeg",
     video: "/bph.mov",
-    isPixel: true,
   },
   {
     id: "r1-4",
@@ -109,7 +108,6 @@ const row2Members: MemberCard[] = [
     division: "Executives",
     image: "/foto-bph.jpeg",
     video: "/bph.mov",
-    isPixel: true,
   },
 ];
 
@@ -119,19 +117,30 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 ---
 
 <section
-  class="relative z-20 w-full bg-black select-none flex flex-col justify-stretch p-0 m-0"
+  class="relative z-20 w-full min-h-screen min-h-[100dvh] bg-black select-none flex flex-col justify-stretch p-0 m-0"
   id="members-section"
   aria-label="Meet Our People"
 >
-  <!-- Floating Section Title -->
-  <div class="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-center whitespace-nowrap">
-    <h2 class="pixel-heading text-2xl sm:text-3xl md:text-5xl font-bold tracking-wider text-white">
-      Meet Our People!
-    </h2>
+  <!-- Sticky Section Title (initial position: top-8 md:top-12, sticks until half of Row 1's height) -->
+  <div
+    class="pointer-events-none z-30 w-full text-center relative pt-8 md:pt-12 h-[calc(30vh+5rem)] md:h-[calc(30dvh+6rem)] -mb-[calc(30vh+5rem)] md:-mb-[calc(30dvh+6rem)]"
+  >
+    <div
+      class="sticky top-8 md:top-12 inline-block text-center whitespace-nowrap"
+    >
+      <h2 class="pixel-heading relative inline-block text-2xl md:text-3xl font-bold tracking-wider text-white">
+        <span class="pixel-heading-duplicate absolute top-[0.05em] -left-[0.05em] select-none pointer-events-none text-white" aria-hidden="true">
+          Meet Our People!
+        </span>
+        <span class="pixel-heading-main relative text-white">
+          Meet Our People!
+        </span>
+      </h2>
+    </div>
   </div>
 
   <!-- Row 1: Scrolling Right (->) -->
-  <div class="marquee-row relative w-full h-[520px] sm:h-[600px] md:h-[680px] lg:h-[700px] flex-shrink-0 overflow-hidden flex items-stretch p-0 m-0">
+  <div class="marquee-row relative w-full h-[60vh] min-h-[380px] md:h-[60dvh] flex-shrink-0 overflow-hidden flex items-stretch p-0 m-0">
     <div class="marquee-track marquee-track-right flex h-full w-max p-0 m-0">
       {row1Track.map((member, i) => (
         <div
@@ -170,10 +179,8 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
           <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none"></div>
 
           <!-- Bottom Division Label (disappears when video is playing) -->
-          <div class="card-division-label absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none transition-all duration-300">
-            <span class={member.isPixel
-              ? "font-pixel text-white text-base sm:text-lg md:text-xl block drop-shadow-md"
-              : "text-white text-lg sm:text-xl md:text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
+          <div class="card-division-label absolute bottom-3 left-3 right-3 z-10 select-none pointer-events-none transition-all duration-300">
+            <span class="text-white text-lg sm:text-xl md:text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block">
               {member.division}
             </span>
           </div>
@@ -192,7 +199,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 
       {Object.values(divisionsData).map((division) => (
         <div
-          class="division-panel hidden w-full max-w-[1918px] mx-auto h-[367.36px] flex items-center px-6 sm:px-10 md:px-12 lg:px-16 box-border"
+          class="division-panel hidden w-full max-w-[1918px] mx-auto lg:h-[300px] flex items-center px-6 sm:px-10 md:px-12 lg:px-16 box-border"
           data-panel-id={division.id}
         >
           <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2 w-full h-full py-4 box-border">
@@ -200,9 +207,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
             <!-- Left Column: Division Title, Description & Badge -->
             <div class="w-full lg:w-[280px] xl:w-[320px] flex-shrink-0 flex flex-col justify-center h-full py-1">
               <div>
-                <h3 class={division.isPixel
-                  ? "font-pixel text-2xl sm:text-3xl lg:text-4xl text-black tracking-tight leading-tight mb-2"
-                  : "text-3xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight leading-[0.93] mb-2"}>
+                <h3 class="text-3xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight leading-[0.93] mb-2">
                   {division.nameLines.map((line) => (
                     <span class="block">{line}</span>
                   ))}
@@ -315,7 +320,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
   </div>
 
   <!-- Row 2: Scrolling Left (<-) -->
-  <div class="marquee-row relative w-full h-[520px] sm:h-[600px] md:h-[680px] lg:h-[700px] flex-shrink-0 overflow-hidden flex items-stretch p-0 m-0">
+  <div class="marquee-row relative w-full h-[60vh] min-h-[380px] md:h-[60dvh] flex-shrink-0 overflow-hidden flex items-stretch p-0 m-0">
     <div class="marquee-track marquee-track-left flex h-full w-max p-0 m-0">
       {row2Track.map((member, i) => (
         <div
@@ -354,10 +359,8 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
           <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none"></div>
 
           <!-- Bottom Division Label (disappears when video is playing) -->
-          <div class="card-division-label absolute bottom-6 left-6 right-6 z-10 select-none pointer-events-none transition-all duration-300">
-            <span class={member.isPixel
-              ? "font-pixel text-white text-base sm:text-lg md:text-xl block drop-shadow-md"
-              : "text-white text-lg sm:text-xl md:text-2xl font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block"}>
+          <div class="card-division-label absolute bottom-3 left-3 right-6 z-10 select-none pointer-events-none transition-all duration-300">
+            <span class="text-white text-lg sm:text-xl md:text-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] block">
               {member.division}
             </span>
           </div>
@@ -377,6 +380,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     const tracks = Array.from(section.querySelectorAll<HTMLElement>('.marquee-track'));
     const cards = Array.from(section.querySelectorAll<HTMLElement>('.member-card'));
     const panels = Array.from(section.querySelectorAll<HTMLElement>('.division-panel'));
+    const rows = Array.from(section.querySelectorAll<HTMLElement>('.marquee-row'));
 
     // Track state
     let activeCard: HTMLElement | null = null;
@@ -384,6 +388,10 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     let activeDivisionId: string | null = null;
 
     function deactivateCard() {
+      const wasTopRow = activeCard
+        ? (Boolean(activeCard.closest('.marquee-track-right')) || activeCard.dataset.memberId?.startsWith('r1'))
+        : false;
+
       if (activeCard) {
         activeCard.classList.remove('is-active');
         // Stop & hide video, restore photo
@@ -407,7 +415,42 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
         drawer.classList.remove('is-open');
       }
 
-      // Hide all panels after animation
+      // Calculate final target scroll position where the closed section's bottom aligns with viewport bottom
+      const sectionTop = section!.getBoundingClientRect().top + window.scrollY;
+      const closedSectionHeight = rows.reduce((acc, row) => acc + row.offsetHeight, 0);
+      const finalTargetY = Math.max(0, sectionTop + closedSectionHeight - window.innerHeight);
+
+      // Smooth frame-by-frame synchronization with drawer collapse (500ms)
+      const duration = 500;
+      const startTime = performance.now();
+      const startY = window.scrollY;
+
+      function syncCloseScroll(now: number) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+
+        if (wasTopRow) {
+          // If closing from top row, smoothly glide down to finalTargetY
+          const ease = 1 - Math.pow(1 - progress, 3);
+          const currentY = startY + (finalTargetY - startY) * ease;
+          window.scrollTo(0, currentY);
+        } else {
+          // If closing from bottom row, keep the section's bottom pinned directly to screen bottom continuously
+          const currentSectionBottom = section!.getBoundingClientRect().bottom + window.scrollY;
+          const currentTargetY = Math.max(0, currentSectionBottom - window.innerHeight);
+          window.scrollTo(0, currentTargetY);
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(syncCloseScroll);
+        } else {
+          window.scrollTo(0, finalTargetY);
+        }
+      }
+
+      requestAnimationFrame(syncCloseScroll);
+
+      // Hide all panels after animation completes (550ms, matching 500ms CSS transition)
       setTimeout(() => {
         if (!activeCard) {
           panels.forEach((p) => {
@@ -419,11 +462,15 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
           });
           activeDivisionId = null;
         }
-      }, 400);
+      }, 550);
 
-      // Resume marquee
-      section!.removeAttribute('data-paused');
-      tracks.forEach((t) => t.classList.remove('is-paused'));
+      // Resume marquee after close animation completes
+      setTimeout(() => {
+        if (!activeCard) {
+          section!.removeAttribute('data-paused');
+          tracks.forEach((t) => t.classList.remove('is-paused'));
+        }
+      }, 500);
     }
 
     function activateCard(card: HTMLElement) {
@@ -482,9 +529,11 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 
       // Switch division panel in drawer
       activeDivisionId = divisionId;
+      let activePanel: HTMLElement | null = null;
       panels.forEach((p) => {
         if (p.getAttribute('data-panel-id') === divisionId) {
           p.classList.remove('hidden');
+          activePanel = p;
           // Reset track scroll & blurred cards
           const track = p.querySelector<HTMLElement>('.members-draggable-track');
           if (track) track.scrollLeft = 0;
@@ -496,13 +545,26 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
         }
       });
 
-      // Expand drawer
+      // Expand drawer & move display directly to video's position
+      const isTopRow = Boolean(card.closest('.marquee-track-right')) || card.dataset.memberId?.startsWith('r1');
+      const isAlreadyOpen = drawer?.classList.contains('is-open');
+
       if (drawer) {
         drawer.classList.add('is-open');
-        // Scroll so drawer and active card are nicely framed
-        setTimeout(() => {
-          drawer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 120);
+      }
+
+      const activePanelEl = activePanel as HTMLElement | null;
+
+      if (isTopRow) {
+        // Video on top for top row: move top of section directly to top of viewport
+        const sectionTop = section!.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+      } else {
+        // Video on bottom for bottom row: move bottom of section directly to bottom of viewport
+        const sectionBottom = section!.getBoundingClientRect().bottom + window.scrollY;
+        const drawerAddition = isAlreadyOpen ? 0 : (activePanelEl ? activePanelEl.offsetHeight : 0);
+        const targetY = sectionBottom + drawerAddition - window.innerHeight;
+        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
       }
     }
 
@@ -677,13 +739,25 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 <style>
   .pixel-heading {
     font-family: 'Press Start 2P', 'Silkscreen', monospace;
-    text-shadow:
-      -2px -2px 0 #000,
-       2px -2px 0 #000,
-      -2px  2px 0 #000,
-       2px  2px 0 #000,
-       0 4px 14px rgba(0, 0, 0, 0.95);
     letter-spacing: 0.05em;
+  }
+
+  .pixel-heading-duplicate {
+    font-family: inherit;
+    letter-spacing: inherit;
+    color: #ffffff;
+    opacity: 1;
+    z-index: 1;
+    text-shadow: -2px 3px 8px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .pixel-heading-main {
+    font-family: inherit;
+    letter-spacing: inherit;
+    color: #ffffff;
+    opacity: 1;
+    z-index: 2;
+    text-shadow: -2px 3px 8px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .font-pixel {
