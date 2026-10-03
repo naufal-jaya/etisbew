@@ -10,5 +10,5 @@ export const sanityClient = createClient({
   projectId: isSanityConfigured ? projectId : 'placeholder',
   dataset,
   apiVersion,
-  useCdn: true,
+  useCdn: false,
 });

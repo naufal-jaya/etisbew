@@ -27,6 +27,26 @@ export const fallbackPartners: PartnerItem[] = [
 
 export const fallbackMilestones: MilestoneItem[] = [
   {
+    year: '2022',
+    description:
+      'Inisiasi awal perintisan IEEE Student Branch di IPB University melalui penggalangan minat mahasiswa teknik dan sains serta penyusunan visi awal komunitas.',
+    floatingImages: [
+      { url: '/history-bg-1.png', alt: 'IEEE Inisiasi Awal 2022' },
+      { url: '/history-bg-2.png', alt: 'Diskusi Mahasiswa IPB' },
+      { url: '/history-bg-3.png', alt: 'Perintisan Komunitas' },
+    ],
+  },
+  {
+    year: '2023',
+    description:
+      'Pembentukan Student Branch Formation Committee, perumusan AD/ART dan program kerja perdana, serta koordinasi intensif bersama IEEE Indonesia Section.',
+    floatingImages: [
+      { url: '/history-bg-3.png', alt: 'Pembentukan Formatur 2023' },
+      { url: '/history-bg-4.png', alt: 'Koordinasi IEEE Section' },
+      { url: '/history-bg-1.png', alt: 'Konsolidasi Tim' },
+    ],
+  },
+  {
     year: '2024',
     description:
       'Inisiasi pembentukan IEEE SB IPB dengan berbagai kolaborasi awal, workshop teknologi perdana, serta peletakan fondasi komunitas riset dan inovasi mahasiswa.',

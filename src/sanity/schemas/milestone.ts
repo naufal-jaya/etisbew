@@ -1,9 +1,14 @@
-import { defineType, defineField } from 'sanity';
+import { defineType, defineField, defineArrayMember } from 'sanity';
 
 export const milestoneSchema = defineType({
   name: 'milestone',
   title: 'Milestone',
   type: 'document',
+  initialValue: {
+    year: '',
+    description: '',
+    order: 0,
+  },
   fields: [
     defineField({
       name: 'year',
@@ -24,19 +29,21 @@ export const milestoneSchema = defineType({
       type: 'array',
       description: 'Floating background images for this milestone',
       of: [
-        {
+        defineArrayMember({
+          name: 'floatingImage',
+          title: 'Floating Image',
           type: 'image',
           options: {
             hotspot: true,
           },
           fields: [
-            {
+            defineField({
               name: 'alt',
               type: 'string',
               title: 'Alternative Text',
-            },
+            }),
           ],
-        },
+        }),
       ],
     }),
     defineField({

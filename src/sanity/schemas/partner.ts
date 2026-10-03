@@ -4,6 +4,10 @@ export const partnerSchema = defineType({
   name: 'partner',
   title: 'Partner',
   type: 'document',
+  initialValue: {
+    name: '',
+    order: 0,
+  },
   fields: [
     defineField({
       name: 'name',
