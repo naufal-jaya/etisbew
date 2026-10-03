@@ -85,8 +85,8 @@ const displayCells = Array.from({ length: minSlots }, (_, index) => {
   };
 });
 
-// Default backup floating images matching design placement
-const fallbackFloatingImgs = [
+// Static floating images for the background (fixed, not randomized)
+const staticFloatingImgs = [
   { url: '/history-bg-1.png', alt: 'IEEE group photo 1' },
   { url: '/history-bg-2.png', alt: 'IEEE event photo 2' },
   { url: '/history-bg-3.png', alt: 'IEEE group photo 3' },
@@ -101,25 +101,9 @@ const sortedMilestones = [...rawMilestones].sort(
 );
 
 const resolvedMilestones = sortedMilestones.map((m) => {
-  const images: { url: string; alt?: string }[] = [];
-  if (Array.isArray(m.floatingImages) && m.floatingImages.length > 0) {
-    m.floatingImages.forEach((img: any) => {
-      const url = urlForImage(img) || (typeof img === 'string' ? img : img?.url);
-      if (url) {
-        images.push({ url, alt: img.alt || `Memory of ${m.year}` });
-      }
-    });
-  }
-  // Fill up to 5 images using fallback if not enough images in CMS
-  const finalImages = [...images];
-  while (finalImages.length < 5) {
-    finalImages.push(fallbackFloatingImgs[finalImages.length % fallbackFloatingImgs.length]);
-  }
-
   return {
     year: String(m.year),
     description: m.description || '',
-    floatingImages: finalImages,
   };
 });
 
@@ -128,7 +112,6 @@ const defaultYear = '2026';
 const initialActiveIdx = resolvedMilestones.findIndex((m) => m.year === defaultYear);
 const activeIndex = initialActiveIdx !== -1 ? initialActiveIdx : resolvedMilestones.length - 1;
 const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0];
-const initialFloating = initialMilestone.floatingImages;
 
 ---
 
@@ -245,42 +228,32 @@ const initialFloating = initialMilestone.floatingImages;
       </h2>
     </div>
     
-    <!-- Floating Scattered Images (styled with scrapbook offset frame/shadow as shown in reference) -->
+    <!-- Floating Scattered Images (Static scrapbook layout) -->
     <div class="pointer-events-none select-none absolute inset-0 z-0 overflow-hidden">
       <!-- Floating 1: Left above 2025 -->
-      {initialFloating[0] && (
-        <div class="absolute left-[5%] md:left-[6%] top-[25%] md:top-[28%] w-28 h-18 sm:w-36 sm:h-22 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
-          <img id="floating-img-0" src={initialFloating[0].url} alt={initialFloating[0].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
-        </div>
-      )}
+      <div class="absolute left-[5%] md:left-[6%] top-[25%] md:top-[28%] w-28 h-18 sm:w-36 sm:h-22 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+        <img src={staticFloatingImgs[0].url} alt={staticFloatingImgs[0].alt} class="w-full h-full object-cover" />
+      </div>
 
       <!-- Floating 2: Top-left center (above title) -->
-      {initialFloating[1] && (
-        <div class="absolute left-[24%] md:left-[26%] top-[2%] md:top-[4%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
-          <img id="floating-img-1" src={initialFloating[1].url} alt={initialFloating[1].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
-        </div>
-      )}
+      <div class="absolute left-[24%] md:left-[26%] top-[2%] md:top-[4%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+        <img src={staticFloatingImgs[1].url} alt={staticFloatingImgs[1].alt} class="w-full h-full object-cover" />
+      </div>
 
       <!-- Floating 3: Right of Title (wide group photo) -->
-      {initialFloating[2] && (
-        <div class="absolute left-[64%] md:left-[67%] top-[4%] md:top-[6%] w-32 h-20 sm:w-40 sm:h-24 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
-          <img id="floating-img-2" src={initialFloating[2].url} alt={initialFloating[2].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
-        </div>
-      )}
+      <div class="absolute left-[64%] md:left-[67%] top-[4%] md:top-[6%] w-32 h-20 sm:w-40 sm:h-24 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+        <img src={staticFloatingImgs[2].url} alt={staticFloatingImgs[2].alt} class="w-full h-full object-cover" />
+      </div>
 
       <!-- Floating 4: Far Right Top/Mid -->
-      {initialFloating[3] && (
-        <div class="absolute right-[4%] md:right-[5%] top-[22%] md:top-[26%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
-          <img id="floating-img-3" src={initialFloating[3].url} alt={initialFloating[3].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
-        </div>
-      )}
+      <div class="absolute right-[4%] md:right-[5%] top-[22%] md:top-[26%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+        <img src={staticFloatingImgs[3].url} alt={staticFloatingImgs[3].alt} class="w-full h-full object-cover" />
+      </div>
 
       <!-- Floating 5: Bottom Right under description text -->
-      {initialFloating[4] && (
-        <div class="absolute left-[85%] md:left-[86%] bottom-[16px] md:bottom-[20px] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale transition-opacity duration-300">
-          <img id="floating-img-4" src={initialFloating[4].url} alt={initialFloating[4].alt || ''} class="w-full h-full object-cover transition-opacity duration-300" />
-        </div>
-      )}
+      <div class="absolute left-[85%] md:left-[86%] bottom-[16px] md:bottom-[20px] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-35 filter grayscale">
+        <img src={staticFloatingImgs[4].url} alt={staticFloatingImgs[4].alt} class="w-full h-full object-cover" />
+      </div>
     </div>
     
 
@@ -288,92 +261,97 @@ const initialFloating = initialMilestone.floatingImages;
     <!-- Supports direct click, mouse drag & touch swipe to slide through years -->
     <div
       id="history-timeline-track"
-      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab active:cursor-grabbing select-none"
-      title="Geser atau klik tahun untuk melihat milestone"
+      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab select-none overflow-hidden"
+      title="Geser atau klik tahun untuk navigasi milestone"
     >
-      
-      <!-- 1. Ruler Ticks: Leading ticks before first milestone + intermediate ticks between milestones -->
-      <!-- 2.5px thick ticks in #C8CAD4 -->
-      <div class="absolute inset-0 pointer-events-none">
-        <!-- Ticks before first milestone (at 0%, 4%) -->
-        <span class="absolute bottom-0 left-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-        <span class="absolute bottom-0 left-[4%] w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
+      <!-- Timeline Sliding Track Viewport with right fade-out mask -->
+      <div
+        id="timeline-viewport"
+        class="absolute inset-0 pointer-events-auto"
+      >
+        <!-- The sliding ruler and milestones container -->
+        <div
+          id="timeline-slider"
+          class="absolute top-0 bottom-0 left-0 flex items-end will-change-transform"
+          style="transform: translate3d(0px, 0, 0);"
+        >
+          <!-- 1. Ruler Ticks Container (Intermediate ticks between milestones only) -->
+          <div id="timeline-ticks" class="absolute inset-0 pointer-events-none">
+            <!-- Intermediate ticks between consecutive milestones (Ends at 2022, no leading ticks) -->
+            {resolvedMilestones.slice(0, -1).map((_, i) => (
+              <>
+                <span
+                  data-milestone-step={i}
+                  data-tick-sub="1"
+                  class="timeline-tick absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"
+                ></span>
+                <span
+                  data-milestone-step={i}
+                  data-tick-sub="2"
+                  class="timeline-tick absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"
+                ></span>
+                <span
+                  data-milestone-step={i}
+                  data-tick-sub="3"
+                  class="timeline-tick absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"
+                ></span>
+              </>
+            ))}
+          </div>
 
-        <!-- Ticks between milestones (each step 20%, 3 ticks at +5%, +10%, +15%) -->
-        {resolvedMilestones.slice(0, -1).map((_, i) => {
-          const base = 8 + i * 20;
-          return (
-            <>
-              <span style={`left: ${base + 5}%`} class="absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-              <span style={`left: ${base + 10}%`} class="absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-              <span style={`left: ${base + 15}%`} class="absolute bottom-0 w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 bg-[#C8CAD4]"></span>
-            </>
-          );
-        })}
-        <!-- Note: After the last milestone stem, absolutely NO ticks exist, matching reference image -->
+          <!-- 2. Dynamic Milestones: Render each year with stem, circular node, and year number -->
+          {resolvedMilestones.map((milestone, idx) => {
+            const isActive = idx === activeIndex;
+
+            return (
+              <button
+                type="button"
+                class="milestone-btn absolute bottom-0 flex flex-col items-center cursor-pointer group focus:outline-none select-none z-20 px-2"
+                data-index={idx}
+                data-year={milestone.year}
+                aria-label={`Pilih tahun ${milestone.year}`}
+              >
+                <!-- Year Number -->
+                <span
+                  class={`milestone-year-text font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] tracking-wider leading-none mb-1.5 sm:mb-2 select-none uppercase transition-all duration-200 cursor-pointer group-hover:text-gray-900 group-hover:!opacity-100 ${
+                    isActive ? 'text-[#1E2029]' : 'text-[#8F94A6]'
+                  }`}
+                >
+                  {milestone.year}
+                </span>
+
+                <!-- Circular Node -->
+                <div
+                  class={`milestone-node w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] bg-white z-10 flex items-center justify-center transition-all duration-200 ${
+                    isActive ? 'border-[#1E2029] ring-2 ring-gray-300' : 'border-[#C8CAD4] group-hover:border-gray-500'
+                  }`}
+                >
+                  <div
+                    class={`milestone-inner-dot w-2 h-2 rounded-full transition-all duration-200 ${
+                      isActive ? 'bg-[#1E2029]' : 'bg-transparent'
+                    }`}
+                  ></div>
+                </div>
+
+                <!-- Vertical Stem touching bottom-0 -->
+                <div
+                  class={`milestone-stem w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 -mt-[2px] transition-colors duration-200 ${
+                    isActive ? 'bg-[#1E2029]' : 'bg-[#C8CAD4]'
+                  }`}
+                ></div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <!-- 2. Dynamic Milestones: Render each year with stem, circular node, and year number -->
-      {resolvedMilestones.map((milestone, idx) => {
-        const leftPercent = 8 + idx * 20;
-        const isActive = idx === activeIndex;
-
-        return (
-          <button
-            type="button"
-            style={`left: ${leftPercent}%`}
-            class="milestone-btn absolute bottom-0 -translate-x-1/2 flex flex-col items-center cursor-pointer group focus:outline-none transition-transform duration-200 select-none z-20"
-            data-index={idx}
-            data-year={milestone.year}
-            aria-label={`Pilih tahun ${milestone.year}`}
-          >
-            <!-- Year Number -->
-            <span
-              class={`milestone-year-text font-tech text-5xl sm:text-6xl md:text-7xl lg:text-[76px] tracking-wider leading-none mb-1.5 sm:mb-2 select-none uppercase transition-colors duration-200 ${
-                isActive ? 'text-[#1E2029]' : 'text-[#8F94A6] group-hover:text-gray-700'
-              }`}
-            >
-              {milestone.year}
-            </span>
-
-            <!-- Circular Node -->
-            <div
-              class={`milestone-node w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] bg-white z-10 flex items-center justify-center transition-all duration-200 ${
-                isActive ? 'border-[#1E2029] ring-2 ring-gray-300' : 'border-[#C8CAD4] group-hover:border-gray-500'
-              }`}
-            >
-              <div
-                class={`milestone-inner-dot w-2 h-2 rounded-full transition-all duration-200 ${
-                  isActive ? 'bg-[#1E2029]' : 'bg-transparent'
-                }`}
-              ></div>
-            </div>
-
-            <!-- Vertical Stem touching bottom-0 -->
-            <div
-              class={`milestone-stem w-[2.5px] h-12 sm:h-14 md:h-16 lg:h-18 -mt-[2px] transition-colors duration-200 ${
-                isActive ? 'bg-[#1E2029]' : 'bg-[#C8CAD4]'
-              }`}
-            ></div>
-          </button>
-        );
-      })}
-
-      <!-- 3. Description Text (Aligned to the right of the milestones) -->
-      <div class="absolute left-[58%] sm:left-[60%] md:left-[62%] bottom-[32px] sm:bottom-[40px] md:bottom-[48px] lg:bottom-[54px] max-w-[280px] sm:max-w-xs md:max-w-sm lg:max-w-md select-none pr-4 z-20">
-        <div class="flex items-center gap-2 mb-1.5 text-[11px] sm:text-xs font-mono tracking-wider text-gray-400 uppercase select-none">
-          <span>// Milestone</span>
-          <span id="active-year-badge" class="font-bold text-gray-900 px-1.5 py-0.5 bg-gray-100 rounded text-[10px] sm:text-[11px]">
-            {initialMilestone.year}
-          </span>
-          <span class="text-gray-400 hidden sm:inline">• Scroll Wheel / Klik</span>
-        </div>
+      <!-- 3. Description Text (Aligned to the right side of the section) -->
+      <div class="absolute right-4 sm:right-8 md:right-12 lg:right-16 xl:right-20 bottom-[32px] sm:bottom-[40px] md:bottom-[48px] lg:bottom-[54px] max-w-[260px] sm:max-w-xs md:max-w-sm select-none z-30 pointer-events-auto">
         <p
           id="milestone-desc-text"
           class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal tracking-[0.015em] transition-opacity duration-200"
         >
-          {initialMilestone.description ||
-            'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini'}
+          {initialMilestone.description}
         </p>
       </div>
 
@@ -382,7 +360,7 @@ const initialFloating = initialMilestone.floatingImages;
   </div>
 </section>
 
-<!-- Client Script: Interactive Milestone Scroll Wheel / Click / Drag Handler -->
+<!-- Client Script: Interactive Milestone Scroll Wheel / Click / Drag Centering Handler -->
 <script is:inline define:vars={{ milestonesData: resolvedMilestones, initialIdx: activeIndex }}>
   (function () {
     const milestones = milestonesData || [];
@@ -390,36 +368,82 @@ const initialFloating = initialMilestone.floatingImages;
 
     const growthSection = document.getElementById('history-growth-section');
     const track = document.getElementById('history-timeline-track');
+    const slider = document.getElementById('timeline-slider');
     const descText = document.getElementById('milestone-desc-text');
-    const yearBadge = document.getElementById('active-year-badge');
-    const buttons = document.querySelectorAll('.milestone-btn');
+    const buttons = Array.from(document.querySelectorAll('.milestone-btn'));
 
-    // Floating images elements
-    const floatingImgs = [
-      document.getElementById('floating-img-0'),
-      document.getElementById('floating-img-1'),
-      document.getElementById('floating-img-2'),
-      document.getElementById('floating-img-3'),
-      document.getElementById('floating-img-4'),
-    ];
+    if (!track || !slider || milestones.length === 0) return;
 
-    function updateActiveMilestone(index) {
-      if (index < 0 || index >= milestones.length) return;
-      currentIndex = index;
-      const target = milestones[index];
+    let focalX = 0;
+    let stepX = 240;
+    let currentSliderX = 0;
+    let isDragging = false;
+    let hasDragged = false;
+    let startPointerX = 0;
+    let startSliderX = 0;
+    let lastPointerX = 0;
 
-      // 1. Update Buttons / Nodes UI
+    function calculateDimensions() {
+      const trackWidth = track.clientWidth || window.innerWidth;
+      if (trackWidth >= 1024) {
+        focalX = Math.round(trackWidth * 0.50);
+        stepX = Math.round(Math.min(270, Math.max(220, trackWidth * 0.18)));
+      } else if (trackWidth >= 640) {
+        focalX = Math.round(trackWidth * 0.48);
+        stepX = Math.round(Math.min(230, Math.max(180, trackWidth * 0.22)));
+      } else {
+        focalX = Math.round(trackWidth * 0.40);
+        stepX = Math.round(Math.min(190, Math.max(140, trackWidth * 0.30)));
+      }
+
+      // Position milestone buttons on slider
+      buttons.forEach((btn, idx) => {
+        const x = idx * stepX;
+        btn.style.left = `${x}px`;
+      });
+
+      // Position intermediate ticks between milestones (Ends at 2022, no leading ticks)
+      const intermediateTicks = slider.querySelectorAll('[data-milestone-step]');
+      intermediateTicks.forEach((tick) => {
+        const stepIdx = parseInt(tick.getAttribute('data-milestone-step') || '0', 10);
+        const subIdx = parseInt(tick.getAttribute('data-tick-sub') || '1', 10);
+        const tickX = stepIdx * stepX + subIdx * 0.25 * stepX;
+        tick.style.left = `${tickX}px`;
+      });
+    }
+
+    function setSliderPosition(x, animate = true) {
+      currentSliderX = x;
+      if (animate) {
+        slider.style.transition = 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1)';
+      } else {
+        slider.style.transition = 'none';
+      }
+      slider.style.transform = `translate3d(${x}px, 0, 0)`;
+    }
+
+    function updateVisuals(index) {
       buttons.forEach((btn, idx) => {
         const yearText = btn.querySelector('.milestone-year-text');
         const node = btn.querySelector('.milestone-node');
         const innerDot = btn.querySelector('.milestone-inner-dot');
         const stem = btn.querySelector('.milestone-stem');
 
-        if (idx === index) {
+        const diff = idx - index;
+
+        // The line (stem and node) under unselected years NEVER fades out!
+        // Button container is ALWAYS full opacity 1 at baseline
+        btn.style.opacity = '1';
+        btn.style.transform = 'translateX(-50%)';
+
+        if (diff === 0) {
+          // Selected Active Year
           btn.setAttribute('aria-current', 'true');
+          btn.style.pointerEvents = 'auto';
           if (yearText) {
             yearText.classList.remove('text-[#8F94A6]');
             yearText.classList.add('text-[#1E2029]');
+            yearText.style.opacity = '1';
           }
           if (node) {
             node.classList.remove('border-[#C8CAD4]');
@@ -434,11 +458,8 @@ const initialFloating = initialMilestone.floatingImages;
             stem.classList.add('bg-[#1E2029]');
           }
         } else {
+          // Unselected Years: keep stem and node solid #C8CAD4 with full opacity 1
           btn.removeAttribute('aria-current');
-          if (yearText) {
-            yearText.classList.remove('text-[#1E2029]');
-            yearText.classList.add('text-[#8F94A6]');
-          }
           if (node) {
             node.classList.remove('border-[#1E2029]', 'ring-2', 'ring-gray-300');
             node.classList.add('border-[#C8CAD4]');
@@ -451,149 +472,232 @@ const initialFloating = initialMilestone.floatingImages;
             stem.classList.remove('bg-[#1E2029]');
             stem.classList.add('bg-[#C8CAD4]');
           }
+
+          if (diff < 0) {
+            // Older years (to the left): visible and clickable
+            btn.style.pointerEvents = 'auto';
+            if (yearText) {
+              yearText.classList.remove('text-[#1E2029]');
+              yearText.classList.add('text-[#8F94A6]');
+              if (diff === -1) {
+                yearText.style.opacity = '0.70';
+              } else if (diff === -2) {
+                yearText.style.opacity = '0.50';
+              } else if (diff === -3) {
+                yearText.style.opacity = '0.35';
+              } else {
+                yearText.style.opacity = '0.22';
+              }
+            }
+          } else {
+            // More recent years (to the right of selected):
+            // Year text is hidden so it appears as empty gradient space
+            if (yearText) {
+              yearText.style.opacity = '0';
+            }
+            btn.style.pointerEvents = 'auto';
+          }
         }
       });
+    }
 
-      // 2. Update Description with Fade Transition
+    function goToMilestone(index, animate = true) {
+      if (index < 0 || index >= milestones.length) return;
+      currentIndex = index;
+      const target = milestones[index];
+
+      // 1. Center the selected year directly at the center of the screen
+      const targetX = focalX - currentIndex * stepX;
+      setSliderPosition(targetX, animate);
+
+      // 2. Update button styles, opacities, and states
+      updateVisuals(index);
+
+      // 3. Update description with fade
       if (descText) {
         descText.style.opacity = '0';
         setTimeout(() => {
           descText.textContent = target.description || '';
-          if (yearBadge) {
-            yearBadge.textContent = target.year;
-          }
           descText.style.opacity = '1';
-        }, 150);
+        }, 140);
       }
 
-      // 3. Update Floating Scrapbook Background Images
-      if (Array.isArray(target.floatingImages)) {
-        target.floatingImages.forEach((imgObj, i) => {
-          const imgEl = floatingImgs[i];
-          if (imgEl && imgObj && imgObj.url) {
-            imgEl.style.opacity = '0';
-            setTimeout(() => {
-              imgEl.src = imgObj.url;
-              imgEl.alt = imgObj.alt || `Memory of ${target.year}`;
-              imgEl.style.opacity = '1';
-            }, 180);
-          }
-        });
-      }
+      // Background images are completely static (no randomization / swapping)
     }
 
-    // Direct Click on Year
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
-        updateActiveMilestone(idx);
-      });
+    // Initialize layout and state
+    calculateDimensions();
+    goToMilestone(currentIndex, false);
+
+    // Window resize handler
+    window.addEventListener('resize', () => {
+      calculateDimensions();
+      setSliderPosition(focalX - currentIndex * stepX, false);
+      updateVisuals(currentIndex);
     });
 
-    // ========================================================
-    // Scroll Wheel Engine to cycle between years
-    // ========================================================
-    let isWheelLocked = false;
-    let wheelCooldownTimer = null;
-    let accumulatedDelta = 0;
+    // ==========================================
+    // 1. Unified Click Handler on Track
+    // ==========================================
+    track.addEventListener('click', (e) => {
+      // Ignore click if a drag just occurred
+      if (hasDragged) return;
 
-    function handleWheel(e) {
-      // Prefer vertical delta, fall back to horizontal delta
-      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      // Don't navigate if clicking description box
+      if (e.target && e.target.closest('#milestone-desc-text')) return;
 
-      if (Math.abs(delta) < 4) return;
+      const trackRect = track.getBoundingClientRect();
+      const clickX = e.clientX - trackRect.left;
+      const activeScreenX = currentSliderX + currentIndex * stepX;
 
-      const isScrollingDown = delta > 0;
-      const isScrollingUp = delta < 0;
-
-      const canAdvance = isScrollingDown && currentIndex < milestones.length - 1;
-      const canRetreat = isScrollingUp && currentIndex > 0;
-
-      // Prevent page scroll only if we can still change years
-      if (canAdvance || canRetreat) {
-        e.preventDefault();
-      } else {
-        // At edges (e.g. at 2026 and scrolling down, or at 2024 and scrolling up), let natural page scroll continue
+      // 1. Check if user clicked directly on or inside a milestone button
+      const clickedBtn = e.target.closest('.milestone-btn');
+      if (clickedBtn) {
+        const idx = parseInt(clickedBtn.getAttribute('data-index') || '0', 10);
+        if (idx > currentIndex) {
+          // If clicked on a year to the right, advance to next year
+          if (currentIndex < milestones.length - 1) {
+            goToMilestone(currentIndex + 1, true);
+          }
+          return;
+        } else if (idx < currentIndex) {
+          goToMilestone(idx, true);
+          return;
+        }
         return;
       }
 
-      if (isWheelLocked) return;
+      // 2. Click on the right side of the selected year (empty gradient space)
+      // "clicking on the rightside of selected year (which is empty gradient space) will select the next year. unless its the latest year"
+      if (clickX > activeScreenX + 35) {
+        if (currentIndex < milestones.length - 1) {
+          goToMilestone(currentIndex + 1, true);
+        }
+        return;
+      }
 
-      accumulatedDelta += delta;
+      // 3. Click on the timeline ticks / space to the left of the selected year
+      if (clickX < activeScreenX - 35) {
+        const sliderClickX = clickX - currentSliderX;
+        const targetIdx = Math.round(sliderClickX / stepX);
+        if (targetIdx >= 0 && targetIdx < currentIndex) {
+          goToMilestone(targetIdx, true);
+        }
+        return;
+      }
+    });
 
-      // Threshold to trigger year change (prevents twitchy jumps on trackpads or high-res mice)
-      if (Math.abs(accumulatedDelta) >= 30) {
-        isWheelLocked = true;
+    // Also attach direct click listeners to buttons to guarantee instantaneous response
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (hasDragged) return;
+        const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
+        if (idx > currentIndex) {
+          if (currentIndex < milestones.length - 1) {
+            goToMilestone(currentIndex + 1, true);
+          }
+        } else if (idx < currentIndex) {
+          goToMilestone(idx, true);
+        }
+      });
+    });
 
-        if (accumulatedDelta > 0 && currentIndex < milestones.length - 1) {
-          updateActiveMilestone(currentIndex + 1);
-        } else if (accumulatedDelta < 0 && currentIndex > 0) {
-          updateActiveMilestone(currentIndex - 1);
+    // ==========================================
+    // 2. Draggable Navigation (Mouse & Touch)
+    // ==========================================
+    track.addEventListener('pointerdown', (e) => {
+      // Don't drag if clicking description
+      if (e.target && e.target.closest('#milestone-desc-text')) return;
+
+      isDragging = true;
+      hasDragged = false;
+      startPointerX = e.clientX;
+      lastPointerX = e.clientX;
+      startSliderX = currentSliderX;
+      slider.style.transition = 'none';
+      // Notice: Do NOT call setPointerCapture here!
+      // Calling setPointerCapture on pointerdown suppresses click events on child buttons.
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+
+      lastPointerX = e.clientX;
+      const deltaX = e.clientX - startPointerX;
+
+      // Only engage drag mode and pointer capture after moving past threshold (6px)
+      if (!hasDragged && Math.abs(deltaX) > 6) {
+        hasDragged = true;
+        track.classList.add('cursor-grabbing');
+        try {
+          if (e.pointerId) track.setPointerCapture(e.pointerId);
+        } catch (_) {}
+      }
+
+      if (hasDragged) {
+        const minX = focalX - (milestones.length - 1) * stepX;
+        const maxX = focalX;
+        let newX = startSliderX + deltaX;
+
+        // Apply rubber banding at edges
+        if (newX > maxX) {
+          newX = maxX + (newX - maxX) * 0.25;
+        } else if (newX < minX) {
+          newX = minX + (newX - minX) * 0.25;
         }
 
-        accumulatedDelta = 0;
+        setSliderPosition(newX, false);
+      }
+    });
 
-        // Reset lock after 400ms cooldown
-        clearTimeout(wheelCooldownTimer);
-        wheelCooldownTimer = setTimeout(() => {
-          isWheelLocked = false;
-          accumulatedDelta = 0;
-        }, 400);
+    function finishDrag(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      track.classList.remove('cursor-grabbing');
+      try {
+        if (e && e.pointerId && track.hasPointerCapture && track.hasPointerCapture(e.pointerId)) {
+          track.releasePointerCapture(e.pointerId);
+        }
+      } catch (_) {}
+
+      if (hasDragged) {
+        const currentX = (e && typeof e.clientX === 'number') ? e.clientX : lastPointerX;
+        const deltaX = currentX - startPointerX;
+        let snappedIdx = Math.round((focalX - currentSliderX) / stepX);
+
+        if (deltaX < -25 && snappedIdx <= currentIndex) {
+          snappedIdx = Math.min(milestones.length - 1, currentIndex + 1);
+        } else if (deltaX > 25 && snappedIdx >= currentIndex) {
+          snappedIdx = Math.max(0, currentIndex - 1);
+        }
+
+        snappedIdx = Math.max(0, Math.min(milestones.length - 1, snappedIdx));
+        goToMilestone(snappedIdx, true);
+
+        // Keep hasDragged true briefly to suppress immediate click trigger
+        setTimeout(() => {
+          hasDragged = false;
+        }, 80);
       }
     }
 
-    if (growthSection) {
-      growthSection.addEventListener('wheel', handleWheel, { passive: false });
-    }
-    if (track) {
-      track.addEventListener('wheel', handleWheel, { passive: false });
-    }
+    window.addEventListener('pointerup', finishDrag);
+    window.addEventListener('pointercancel', finishDrag);
 
-    // Touch & Pointer Drag / Swipe Engine
-    if (track) {
-      let isPointerDown = false;
-      let startX = 0;
-      let startY = 0;
-
-      track.addEventListener('pointerdown', (e) => {
-        isPointerDown = true;
-        startX = e.clientX;
-        startY = e.clientY;
-      });
-
-      window.addEventListener('pointerup', (e) => {
-        if (!isPointerDown) return;
-        isPointerDown = false;
-        const deltaX = e.clientX - startX;
-        const deltaY = e.clientY - startY;
-
-        if (Math.abs(deltaX) > 35 && Math.abs(deltaX) > Math.abs(deltaY)) {
-          if (deltaX < 0) {
-            if (currentIndex < milestones.length - 1) {
-              updateActiveMilestone(currentIndex + 1);
-            }
-          } else {
-            if (currentIndex > 0) {
-              updateActiveMilestone(currentIndex - 1);
-            }
-          }
+    // ==========================================
+    // 3. Keyboard Navigation
+    // ==========================================
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        if (currentIndex < milestones.length - 1) {
+          goToMilestone(currentIndex + 1, true);
         }
-      });
-
-      // Keyboard arrow navigation
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          if (currentIndex < milestones.length - 1) {
-            updateActiveMilestone(currentIndex + 1);
-          }
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          if (currentIndex > 0) {
-            updateActiveMilestone(currentIndex - 1);
-          }
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        if (currentIndex > 0) {
+          goToMilestone(currentIndex - 1, true);
         }
-      });
-    }
+      }
+    });
   })();
 </script>
 
@@ -930,5 +1034,49 @@ const initialFloating = initialMilestone.floatingImages;
     backdrop-filter: blur(2.5px);
     -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
     mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
+  }
+
+  /* History timeline sliding viewport with smooth edge masks */
+  #timeline-viewport {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 40px,
+      black var(--timeline-fade-start, 54%),
+      transparent var(--timeline-fade-end, 66%)
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 40px,
+      black var(--timeline-fade-start, 54%),
+      transparent var(--timeline-fade-end, 66%)
+    );
+  }
+
+  @media (max-width: 639px) {
+    #timeline-viewport {
+      --timeline-fade-start: 44%;
+      --timeline-fade-end: 56%;
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) {
+    #timeline-viewport {
+      --timeline-fade-start: 52%;
+      --timeline-fade-end: 64%;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    #timeline-viewport {
+      --timeline-fade-start: 54%;
+      --timeline-fade-end: 66%;
+    }
+  }
+
+  .milestone-btn {
+    transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+    touch-action: pan-y;
   }
 </style>
