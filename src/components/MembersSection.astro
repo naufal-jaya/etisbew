@@ -119,6 +119,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 <section
   class="relative z-20 w-full min-h-screen min-h-[100dvh] bg-black select-none flex flex-col justify-stretch p-0 m-0"
   id="members-section"
+  data-lead-section="members"
   aria-label="Meet Our People"
 >
   <!-- Sticky Section Title (initial position: top-8 md:top-12, sticks until half of Row 1's height) -->
@@ -249,6 +250,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
               <!-- Draggable Cards Track -->
               <div
                 class="members-draggable-track flex items-center gap-3.5 sm:gap-4 overflow-x-auto select-none cursor-grab active:cursor-grabbing py-1 pl-16 pr-1 no-scrollbar h-[270px]"
+                data-lenis-prevent
               >
                 <!-- Group Photo Card (Exact 415x257px, sharp corners: rounded-none, no text, no hover effect) -->
                 <div class="group-photo-card relative flex-shrink-0 w-[415px] h-[257px] rounded-none overflow-hidden bg-neutral-900 border-0 shadow-sm">
@@ -558,13 +560,21 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
       if (isTopRow) {
         // Video on top for top row: move top of section directly to top of viewport
         const sectionTop = section!.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+        if ((window as any).lenis) {
+          (window as any).lenis.scrollTo(sectionTop, { duration: 0.65 });
+        } else {
+          window.scrollTo({ top: sectionTop, behavior: 'smooth' });
+        }
       } else {
         // Video on bottom for bottom row: move bottom of section directly to bottom of viewport
         const sectionBottom = section!.getBoundingClientRect().bottom + window.scrollY;
         const drawerAddition = isAlreadyOpen ? 0 : (activePanelEl ? activePanelEl.offsetHeight : 0);
         const targetY = sectionBottom + drawerAddition - window.innerHeight;
-        window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+        if ((window as any).lenis) {
+          (window as any).lenis.scrollTo(Math.max(0, targetY), { duration: 0.65 });
+        } else {
+          window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+        }
       }
     }
 

@@ -1,0 +1,200 @@
+---
+import 'lenis/dist/lenis.css';
+---
+
+<script>
+  import Lenis from 'lenis';
+
+  // Global reference
+  declare global {
+    interface Window {
+      lenis?: Lenis;
+    }
+  }
+
+  // 1. Initialize Lenis for fluid, responsive inertial scrolling
+  const lenis = new Lenis({
+    duration: 0.95,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 1.05,
+    touchMultiplier: 1.25,
+    infinite: false,
+    autoRaf: false,
+    prevent: (node) => {
+      // Allow native/custom horizontal dragging or scrolling inside tracks without Lenis interference
+      return Boolean(
+        node.closest('[data-lenis-prevent]') ||
+        node.closest('.members-draggable-track')
+      );
+    },
+  });
+
+  window.lenis = lenis;
+
+  // Run Lenis in RAF loop
+  function raf(time: number) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  // 2. Low-Resistance Section Lead Engine
+  // Keeps the smooth snapping/docking mechanism intact, but eliminates sticky resistance
+  // so scrolling away from any snapped section requires zero struggle.
+  let isLeading = false;
+  let scrollDirection = 1; // 1 = down, -1 = up
+  let settleTimer: ReturnType<typeof setTimeout> | null = null;
+  let isUserInteracting = false;
+  let interactionTimer: ReturnType<typeof setTimeout> | null = null;
+
+  // Immediately cancel any active auto-glide and reset targetScroll to actualScroll
+  // so new user inputs never fight against an ongoing glide target.
+  function cancelLeading() {
+    if (isLeading) {
+      isLeading = false;
+      lenis.scrollTo(lenis.actualScroll, { immediate: true });
+    }
+    if (settleTimer) {
+      clearTimeout(settleTimer);
+      settleTimer = null;
+    }
+  }
+
+  function markUserInteraction() {
+    cancelLeading();
+    isUserInteracting = true;
+    if (interactionTimer) {
+      clearTimeout(interactionTimer);
+    }
+    interactionTimer = setTimeout(() => {
+      isUserInteracting = false;
+    }, 140);
+  }
+
+  // Intercept user inputs to guarantee zero input latency and zero resistance
+  window.addEventListener('wheel', markUserInteraction, { passive: true });
+  window.addEventListener('touchstart', markUserInteraction, { passive: true });
+  window.addEventListener('touchmove', markUserInteraction, { passive: true });
+  window.addEventListener('pointerdown', markUserInteraction, { passive: true });
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].includes(e.key)) {
+      markUserInteraction();
+    }
+  }, { passive: true });
+
+  // Compute all target section positions in absolute document scroll coordinates
+  function getLeadTargets(): number[] {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-lead-section]'));
+    const viewportHeight = window.innerHeight;
+    const targets: number[] = [0]; // Hero is always top: 0
+
+    sections.forEach((section) => {
+      const type = section.dataset.leadSection;
+      if (type === 'hero') return;
+
+      const rect = section.getBoundingClientRect();
+      const topY = Math.round(rect.top + window.scrollY);
+      targets.push(topY);
+
+      // If a section is taller than the screen, allow docking at its bottom
+      const height = section.offsetHeight;
+      if (height > viewportHeight + 150) {
+        const bottomY = Math.round(topY + height - viewportHeight);
+        targets.push(bottomY);
+      }
+    });
+
+    // Sort ascending & deduplicate points within 20px
+    const sorted = Array.from(new Set(targets)).sort((a, b) => a - b);
+    const filtered: number[] = [];
+    for (const pos of sorted) {
+      if (filtered.length === 0 || pos - filtered[filtered.length - 1] > 20) {
+        filtered.push(pos);
+      }
+    }
+    return filtered;
+  }
+
+  // Evaluate scroll position when user finishes scrolling and gently lead to the target section
+  function evaluateAndLead() {
+    if (isLeading || isUserInteracting) return;
+
+    // Do not lead while Lenis is still decelerating user scroll
+    if (Math.abs(lenis.velocity) > 0.05) {
+      settleTimer = setTimeout(evaluateAndLead, 80);
+      return;
+    }
+
+    // Do not interrupt if the members detail drawer is open and the user is inspecting it
+    const drawerOpen = document.querySelector('#members-drawer.is-open');
+    const membersSec = document.getElementById('members-section');
+    if (drawerOpen && membersSec) {
+      const rect = membersSec.getBoundingClientRect();
+      if (rect.top <= 120 && rect.bottom >= window.innerHeight - 120) {
+        return;
+      }
+    }
+
+    const targets = getLeadTargets();
+    if (targets.length < 2) return;
+
+    const currentY = Math.round(window.scrollY);
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+    // If within 8px of top or bottom, we are cleanly resting
+    if (currentY <= targets[0] + 8 || currentY >= maxScroll - 8) return;
+
+    // Snap to the section relative to the top of the user's screen.
+    // The top of the user's screen is at currentY.
+    // A subtle directional lookahead (up to ~60px) helps assist intentional scroll movements,
+    // while ensuring that being slightly above or below a section boundary (e.g. going a little
+    // too high from Partners) always snaps directly back to that relative section.
+    const lookahead = Math.min(60, Math.max(20, Math.abs(lenis.velocity) * 80)) * scrollDirection;
+    const screenTopFocus = currentY + lookahead;
+
+    let destination = targets[0];
+    let minDistance = Math.abs(screenTopFocus - targets[0]);
+
+    for (let i = 1; i < targets.length; i++) {
+      const dist = Math.abs(screenTopFocus - targets[i]);
+      if (dist < minDistance) {
+        minDistance = dist;
+        destination = targets[i];
+      }
+    }
+
+    if (Math.abs(currentY - destination) <= 8) return;
+
+    // Glide smoothly into the destination section
+    isLeading = true;
+    lenis.scrollTo(destination, {
+      duration: 0.8,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3), // Responsive cubic ease-out
+      lock: false, // Never lock the scroll, user can resume freely at any moment
+      onComplete: () => {
+        isLeading = false;
+      },
+    });
+  }
+
+  // Monitor scroll updates
+  lenis.on('scroll', (e: { scroll: number; velocity: number; direction: number }) => {
+    if (Math.abs(e.velocity) > 0.03) {
+      scrollDirection = e.direction >= 0 ? 1 : -1;
+    }
+
+    if (isLeading) return;
+
+    if (settleTimer) {
+      clearTimeout(settleTimer);
+    }
+
+    // Wait 300ms after user finishes their scroll gesture before softly leading
+    settleTimer = setTimeout(() => {
+      evaluateAndLead();
+    }, 300);
+  });
+</script>

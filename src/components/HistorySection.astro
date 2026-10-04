@@ -115,7 +115,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
 
 ---
 
-<section class="relative z-20 w-full bg-white text-gray-900 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-2 sm:pt-3 md:pt-4 pb-0 overflow-hidden border-t-[2.5px] border-[#C8CAD4]">
+<section id="section-history" data-lead-section="history" class="relative z-20 w-full bg-white text-gray-900 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-2 sm:pt-3 md:pt-4 pb-0 overflow-hidden border-t-[2.5px] border-[#C8CAD4]">
   
   <!-- Left & Right blur/fade overlays (Spans full height of HistorySection to the very bottom) -->
   <div class="history-fade-left"></div>
@@ -261,7 +261,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     <!-- Supports direct click, mouse drag & touch swipe to slide through years -->
     <div
       id="history-timeline-track"
-      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab select-none overflow-hidden"
+      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab select-none overflow-hidden touch-pan-y"
       title="Geser atau klik tahun untuk navigasi milestone"
     >
       <!-- Timeline Sliding Track Viewport with right fade-out mask -->
