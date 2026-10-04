@@ -14,6 +14,7 @@ export interface DivisionDetail {
   description: string;
   groupPhoto: string;
   groupCaption: string;
+  coverPhotos?: string[];
   isPixel?: boolean;
   members: DivisionMember[];
 }

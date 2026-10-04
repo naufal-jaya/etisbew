@@ -10,7 +10,13 @@
 // - Member photo: 185x257px, click to blur photo and reveal LinkedIn logo with "Connect in LinkedIn"
 // - Draggable: mouse drag & touch swipe left/right across all members
 
-import { divisionsData } from "../data/divisions";
+import {
+  divisionsData,
+  type DivisionDetail,
+  type DivisionMember,
+} from "../data/divisions";
+import { sanityClient, isSanityConfigured } from "../sanity/client";
+import { urlForImage } from "../sanity/image";
 
 interface MemberCard {
   id: string;
@@ -21,7 +27,7 @@ interface MemberCard {
   isPixel?: boolean;
 }
 
-const row1Members: MemberCard[] = [
+const initialRow1Members: MemberCard[] = [
   {
     id: "r1-1",
     divisionId: "cnm",
@@ -66,7 +72,7 @@ const row1Members: MemberCard[] = [
   },
 ];
 
-const row2Members: MemberCard[] = [
+const initialRow2Members: MemberCard[] = [
   {
     id: "r2-1",
     divisionId: "infor",
@@ -111,9 +117,162 @@ const row2Members: MemberCard[] = [
   },
 ];
 
-// Quadruple each row for seamless infinite loop coverage on any screen width
-const row1Track = [...row1Members, ...row1Members, ...row1Members, ...row1Members];
-const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Members];
+// Helpers to match and normalize Sanity CMS division data
+function getCanonicalDivisionId(rawId?: string, rawName?: string): string | null {
+  const id = (rawId || "").trim().toLowerCase();
+  const name = (rawName || "").trim().toLowerCase();
+
+  if (id === "hr" || name.includes("human")) return "hr";
+  if (id === "cnm" || name.includes("creative") || name.includes("marketing")) return "cnm";
+  if (id === "edu" || name.includes("education")) return "edu";
+  if (id === "ext" || id === "external" || name.includes("external")) return "external";
+  if (id === "inf" || id === "infor" || name.includes("tech") || name.includes("information") || name.includes("infor")) return "infor";
+  if (id === "bph" || id === "exe" || id === "executives" || name.includes("executive") || name.includes("bph")) return "executives";
+
+  if (id && divisionsData[id]) return id;
+
+  return null;
+}
+
+function formatNameLines(name: string): [string, string] | [string] {
+  const words = name.trim().split(/\s+/);
+  if (words.length <= 1) return [name];
+  if (words.length === 2) return [words[0], words[1]];
+  if (words.length === 3) return [`${words[0]} ${words[1]}`, words[2]];
+  const mid = Math.ceil(words.length / 2);
+  return [words.slice(0, mid).join(" "), words.slice(mid).join(" ")];
+}
+
+function formatLinkedInUrl(linkedin?: string): string {
+  if (!linkedin) return "";
+  const trimmed = linkedin.trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+  const clean = trimmed.replace(/^[@/]+/, "").replace(/^linkedin\.com\/in\//, "");
+  return `https://www.linkedin.com/in/${clean}`;
+}
+
+const DIVISIONS_QUERY = `*[_type == "division"] {
+  id,
+  name,
+  description,
+  groupPhoto,
+  coverPhotos[],
+  members[] {
+    name,
+    role,
+    photo,
+    linkedin
+  }
+}`;
+
+const resolvedDivisions: Record<string, DivisionDetail> = { ...divisionsData };
+
+if (isSanityConfigured) {
+  try {
+    const sanityDivisions = await sanityClient.fetch(DIVISIONS_QUERY);
+    if (Array.isArray(sanityDivisions) && sanityDivisions.length > 0) {
+      for (const div of sanityDivisions) {
+        const canonicalId = getCanonicalDivisionId(div.id, div.name);
+        if (canonicalId && resolvedDivisions[canonicalId]) {
+          const fallback = divisionsData[canonicalId];
+
+          // Use Sanity members if non-empty, otherwise use current replacement
+          let members: DivisionMember[] = fallback.members;
+          if (Array.isArray(div.members) && div.members.length > 0) {
+            const parsedMembers = div.members
+              .filter((m: any) => m && (m.name || m.role || m.photo))
+              .map((m: any) => ({
+                name: m.name?.trim() || "Member",
+                role: m.role?.trim() || "",
+                image: urlForImage(m.photo) || "/dummy-avatar.svg",
+                linkedin: formatLinkedInUrl(m.linkedin),
+              }));
+
+            if (parsedMembers.length > 0) {
+              members = parsedMembers;
+            }
+          }
+
+          const hasName = Boolean(div.name && div.name.trim());
+          const name = hasName ? div.name.trim() : fallback.name;
+          const nameLines = hasName ? formatNameLines(name) : fallback.nameLines;
+          const hasDesc = Boolean(div.description && div.description.trim());
+          const description = hasDesc ? div.description.trim() : fallback.description;
+          const groupPhotoUrl = urlForImage(div.groupPhoto);
+          const groupPhoto = groupPhotoUrl || fallback.groupPhoto;
+
+          // Resolve coverPhotos array for alternating marquee cards
+          const coverPhotos: string[] = [];
+          if (Array.isArray(div.coverPhotos) && div.coverPhotos.length > 0) {
+            for (const img of div.coverPhotos) {
+              const url = urlForImage(img);
+              if (url) coverPhotos.push(url);
+            }
+          }
+
+          resolvedDivisions[canonicalId] = {
+            ...fallback,
+            name,
+            nameLines,
+            shortName: name,
+            description,
+            groupPhoto,
+            groupCaption: `${name} Team 2024/2025`,
+            coverPhotos: coverPhotos.length > 0 ? coverPhotos : undefined,
+            members,
+          };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Could not fetch divisions from Sanity CMS, using fallback data:", err);
+  }
+}
+
+const NUM_CYCLES = 4;
+
+// Dynamically bind division photo and name to marquee cards, using coverPhotos alternately across cycles
+const row1Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
+  initialRow1Members.map((card) => {
+    const div = resolvedDivisions[card.divisionId];
+    // If multiple coverPhotos exist, pick alternately based on cycle
+    // Fallback: coverPhotos -> groupPhoto -> local card.image
+    const photos = div?.coverPhotos && div.coverPhotos.length > 0
+      ? div.coverPhotos
+      : (div?.groupPhoto ? [div.groupPhoto] : [card.image]);
+
+    const image = photos[cycleIdx % photos.length];
+
+    return {
+      ...card,
+      id: `${card.id}-c${cycleIdx}`,
+      division: div?.shortName || div?.name || card.division,
+      image,
+    };
+  })
+);
+
+const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
+  initialRow2Members.map((card) => {
+    const div = resolvedDivisions[card.divisionId];
+    const photos = div?.coverPhotos && div.coverPhotos.length > 0
+      ? div.coverPhotos
+      : (div?.groupPhoto ? [div.groupPhoto] : [card.image]);
+
+    // Offset by 1 so Row 2 displays an alternate photo from Row 1
+    const image = photos[(cycleIdx + 1) % photos.length];
+
+    return {
+      ...card,
+      id: `${card.id}-c${cycleIdx}`,
+      division: div?.shortName || div?.name || card.division,
+      image,
+    };
+  })
+);
 ---
 
 <section
@@ -198,7 +357,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
     <div class="division-drawer-inner relative w-full overflow-hidden">
 
 
-      {Object.values(divisionsData).map((division) => (
+      {Object.values(resolvedDivisions).map((division) => (
         <div
           class="division-panel hidden w-full max-w-[1918px] mx-auto lg:h-[300px] flex items-center px-6 sm:px-10 md:px-12 lg:px-16 box-border"
           data-panel-id={division.id}
@@ -225,7 +384,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
             <div class="carousel-container relative flex-1 min-w-0 w-full overflow-hidden group flex items-center h-full">
               
               <!-- Left White Fading Overlay – sits right at the carousel edge, next to the text column -->
-              <div class="carousel-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-10 md:w-12 z-20 bg-gradient-to-r from-white via-white/60 to-transparent"></div>
+<div class="carousel-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-10 md:w-16 z-20 bg-[linear-gradient(to_right,#fff_0%,rgba(255,255,255,0.66)_45%,transparent_100%)]"></div>
 
               <!-- Desktop Navigation Arrows -->
               <button
@@ -295,20 +454,26 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
                       </p>
 
                       <!-- LinkedIn Link: visible when blurred (replaces role, matching mockup!) -->
-                      <a
-                        href={member.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="member-linkedin-link flex items-center gap-1.5 mt-1 text-white text-[11.5px] font-medium leading-tight hover:opacity-80 transition-opacity pointer-events-auto"
-                        title={`Connect with ${member.name} in LinkedIn`}
-                      >
-                        <img
-                          src="/members/linkedin-white.svg"
-                          alt="LinkedIn"
-                          class="w-3.5 h-3.5 flex-shrink-0 object-contain"
-                        />
-                        <span class="tracking-tight text-white font-normal text-[11.5px] drop-shadow-sm">Connect in LinkedIn</span>
-                      </a>
+                      {member.linkedin ? (
+                        <a
+                          href={member.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="member-linkedin-link flex items-center gap-1.5 mt-1 text-white text-[11.5px] font-medium leading-tight hover:opacity-80 transition-opacity pointer-events-auto"
+                          title={`Connect with ${member.name} in LinkedIn`}
+                        >
+                          <img
+                            src="/members/linkedin-white.svg"
+                            alt="LinkedIn"
+                            class="w-3.5 h-3.5 flex-shrink-0 object-contain"
+                          />
+                          <span class="tracking-tight text-white font-normal text-[11.5px] drop-shadow-sm">Connect in LinkedIn</span>
+                        </a>
+                      ) : (
+                        <div class="member-linkedin-link flex items-center gap-1.5 mt-1 text-neutral-300 text-[11.5px] font-medium leading-tight pointer-events-none">
+                          <span class="tracking-tight text-neutral-300 font-normal text-[11.5px] drop-shadow-sm">{member.role || "IEEE SB IPB"}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -624,7 +789,7 @@ const row2Track = [...row2Members, ...row2Members, ...row2Members, ...row2Member
 
         // If clicking on the LinkedIn link when already blurred, allow navigation
         const target = e.target as HTMLElement;
-        if (target.closest('.member-linkedin-link') && card.classList.contains('is-blurred')) {
+        if (target.closest('a.member-linkedin-link') && card.classList.contains('is-blurred')) {
           return;
         }
 
