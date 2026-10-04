@@ -4,6 +4,8 @@ import Hero from "../components/Hero.astro";
 import AboutOverlay from "../components/AboutOverlay.astro";
 import MembersSection from "../components/MembersSection.astro";
 import HistorySection from "../components/HistorySection.astro";
+import PostsSection from "../components/PostsSection.astro";
+import Footer from "../components/Footer.astro";
 import SmoothScroll from "../components/SmoothScroll.astro";
 ---
 
@@ -50,14 +52,11 @@ import SmoothScroll from "../components/SmoothScroll.astro";
       <!-- Members Showcase Section -->
       <MembersSection />
 
-      <!-- Spacer to test sticky scroll effect -->
-      <div
-        id="section-spacer"
-        data-lead-section="spacer"
-        class="h-screen w-full bg-black flex items-center justify-center text-neutral-600 text-sm select-none"
-      >
-        <span>Scroll space for sticky testing</span>
-      </div>
+      <!-- Posts Section (empty white section following screen height) -->
+      <PostsSection />
+
+      <!-- Footer from dev branch -->
+      <Footer />
     </main>
   </body>
 </html>

@@ -1,0 +1,338 @@
+---
+// Posts Section
+// - Top row: 3 featured posts with smooth horizontal expansion/shrinking,
+//   alternating highlights, running duration bar, and title/author display on highlighted post.
+// - Bottom row: 4 recent posts in 440/248 ratio with title & 'Post_type by Author'.
+// - Strict identical horizontal and vertical gaps between cards.
+// - Fade to black bottom gradient on each card.
+// - Button leading to /posts with read_more.png and 'Read other articles' text.
+
+interface PostItem {
+  id: string;
+  title: string;
+  type: string;
+  author: string;
+  image: string;
+  slug: string;
+}
+
+const featuredPosts: PostItem[] = [
+  {
+    id: "f-1",
+    title: "Precision Agriculture: Using Autonomous Drones for High-Yield Crop Monitoring",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/drone-tech/1024/600",
+    slug: "precision-agriculture-drones",
+  },
+  {
+    id: "f-2",
+    title: "How the Activated Sludge Process Powers Modern Urban Wastewater Treatment",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/sludge-water/1024/600",
+    slug: "activated-sludge-wastewater",
+  },
+  {
+    id: "f-3",
+    title: "Biomimetic Sensors: Harnessing Botanical Mechanisms for Next-Gen Robotics",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/bio-botany/1024/600",
+    slug: "biomimetic-sensors-robotics",
+  },
+];
+
+const recentPosts: PostItem[] = [
+  {
+    id: "r-1",
+    title: "How the Activated Sludge Process Powers Modern Urban...",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/urban-infra/600/340",
+    slug: "urban-wastewater-infra",
+  },
+  {
+    id: "r-2",
+    title: "How the Activated Sludge Process Powers Modern Urban...",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/smart-terrace/600/340",
+    slug: "iot-smart-farming-terrace",
+  },
+  {
+    id: "r-3",
+    title: "How the Activated Sludge Process Powers Modern Urban...",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/solar-sunset/600/340",
+    slug: "renewable-energy-monitoring",
+  },
+  {
+    id: "r-4",
+    title: "How the Activated Sludge Process Powers Modern Urban...",
+    type: "Tech Insight",
+    author: "Naufal Farkova",
+    image: "https://picsum.photos/seed/effluent-lab/600/340",
+    slug: "biological-effluent-analysis",
+  },
+];
+---
+
+<section
+  id="posts"
+  data-lead-section="posts"
+  class="relative z-20 w-full min-h-screen min-h-[100dvh] bg-white text-black flex flex-col justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-8 md:py-12 select-none"
+  aria-label="Posts"
+>
+  <div class="posts-wrapper w-full max-w-6xl mx-auto flex flex-col justify-center">
+    <!-- Section Heading -->
+    <h2 class="text-sm sm:text-xl italic text-neutral-900 tracking-tight mb-3 md:mb-4">
+      Read amazing articles!
+    </h2>
+
+    <!-- Top Row: 3 Featured Posts (Alternating Highlight) -->
+    <div
+      id="featured-row"
+      class="featured-row flex w-full overflow-hidden"
+      data-active-index="1"
+    >
+      {featuredPosts.map((post, idx) => (
+        <div
+          class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === 1 ? 'is-active' : ''}`}
+          data-card-index={idx}
+          role="button"
+          tabindex="0"
+          aria-label={post.title}
+        >
+          <!-- Background Image -->
+          <img
+            src={post.image}
+            alt={post.title}
+            class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+          />
+
+          <!-- Subtle Fade to Black Overlay at Bottom -->
+          <div class="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none"></div>
+
+          <!-- Post Info (Title, Post Type, Author) - visible only when highlighted -->
+          <div class="featured-info absolute inset-x-0 bottom-0 p-4 sm:p-5 md:p-7 text-white z-10 pointer-events-none">
+            <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white leading-tight mb-1.5 md:mb-2 line-clamp-2 max-w-2xl drop-shadow-md">
+              {post.title}
+            </h3>
+            <p class="text-xs sm:text-sm text-neutral-300 font-normal drop-shadow-sm">
+              {post.type} by {post.author}
+            </p>
+          </div>
+
+          <!-- Running Progress Bar at Bottom (shows duration of highlight) -->
+          <div class="featured-progress-track absolute inset-x-0 bottom-0 h-1 bg-black/40 z-20 overflow-hidden">
+            <div class="featured-progress-bar h-full bg-white/90 w-0"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <!-- Second Row: 4 Recent Posts (Grid) -->
+    <div class="recent-posts-grid grid grid-cols-2 md:grid-cols-4 w-full">
+      {recentPosts.map((post) => (
+        <a
+          href="/posts"
+          class="recent-card group relative aspect-[440/248] overflow-hidden bg-neutral-900 block"
+          aria-label={post.title}
+        >
+          <!-- Background Image -->
+          <img
+            src={post.image}
+            alt={post.title}
+            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+
+          <!-- Subtle Fade to Black Overlay at Bottom -->
+          <div class="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none"></div>
+
+          <!-- Info -->
+          <div class="absolute inset-x-0 bottom-0 p-2.5 sm:p-3.5 text-white z-10">
+            <h4 class="text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 drop-shadow-sm transition-colors">
+              {post.title}
+            </h4>
+            <p class="text-[10px] sm:text-xs font-normal mt-1 drop-shadow-sm">
+              {post.type} by {post.author}
+            </p>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Bottom Button Container: Image + "Read other articles" text directing to /posts -->
+    <div class="flex justify-end pt-3 sm:pt-4">
+      <a
+        href="/posts"
+        class="group flex flex-col items-center gap-1 cursor-pointer select-none transition-transform duration-200 hover:-translate-y-1"
+        aria-label="Read other articles"
+      >
+        <img
+          src="/read_more.png"
+          alt="Read other articles"
+          class="h-10 sm:h-12 md:h-14 w-auto object-contain transition-opacity group-hover:opacity-90"
+          loading="lazy"
+        />
+        <span class="text-xs sm:text-sm font-medium group-hover:text-blue-600 transition-colors">
+          Read other articles
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Single identical gap definition for row 1 horizontal gaps, row 2 gaps, and row gap */
+  :root {
+    --posts-card-gap: 16px;
+  }
+  @media (max-width: 640px) {
+    :root {
+      --posts-card-gap: 12px;
+    }
+  }
+
+  /* Top Row Flex Layout */
+  .featured-row {
+    gap: var(--posts-card-gap);
+    margin-bottom: var(--posts-card-gap);
+    /* Aspect ratio for the row matching 1835 / 590 (404 + 1027 + 404 = 1835) */
+    aspect-ratio: 1835 / 590;
+    min-height: 220px;
+    max-height: 480px;
+  }
+
+  /* Featured Card Ratios & Horizontal Expansion Animation */
+  .featured-card {
+    flex: 404 1 0%;
+    min-width: 0;
+    height: 100%;
+    transition: flex 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .featured-card.is-active {
+    flex: 1027 1 0%;
+  }
+
+  /* Title, Post Type & Author: only visible when card is highlighted */
+  .featured-card .featured-info {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .featured-card.is-active .featured-info {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.18s;
+  }
+
+  /* Running Duration Bar */
+  .featured-card .featured-progress-bar {
+    width: 0%;
+    transition: none;
+  }
+
+  /* Second Row Grid: identical gap */
+  .recent-posts-grid {
+    gap: var(--posts-card-gap);
+  }
+</style>
+
+<script>
+  function setupFeaturedCarousel() {
+    const row = document.getElementById('featured-row');
+    if (!row) return;
+
+    const cards = Array.from(row.querySelectorAll<HTMLElement>('.featured-card'));
+    if (cards.length < 2) return;
+
+    const DURATION_MS = 7000;
+    let currentIndex = 1; // Start with the middle card as in mockup
+    let timerStartTime = 0;
+    let animFrameId: number | null = null;
+    let isPaused = false;
+    let elapsedBeforePause = 0;
+
+    function setActive(index: number) {
+      currentIndex = (index + cards.length) % cards.length;
+      row.dataset.activeIndex = String(currentIndex);
+
+      cards.forEach((card, idx) => {
+        const bar = card.querySelector<HTMLElement>('.featured-progress-bar');
+        if (idx === currentIndex) {
+          card.classList.add('is-active');
+          if (bar) bar.style.width = '0%';
+        } else {
+          card.classList.remove('is-active');
+          if (bar) bar.style.width = '0%';
+        }
+      });
+
+      startProgress(0);
+    }
+
+    function startProgress(startElapsed: number) {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+      timerStartTime = performance.now() - startElapsed;
+
+      function step(now: number) {
+        if (isPaused) return;
+
+        const elapsed = now - timerStartTime;
+        const progress = Math.min(1, elapsed / DURATION_MS);
+
+        const activeCard = cards[currentIndex];
+        const bar = activeCard?.querySelector<HTMLElement>('.featured-progress-bar');
+        if (bar) {
+          bar.style.width = `${(progress * 100).toFixed(1)}%`;
+        }
+
+        if (progress >= 1) {
+          setActive(currentIndex + 1);
+        } else {
+          animFrameId = requestAnimationFrame(step);
+        }
+      }
+
+      animFrameId = requestAnimationFrame(step);
+    }
+
+    // Manual click on any card to highlight it
+    cards.forEach((card, idx) => {
+      card.addEventListener('click', () => {
+        if (currentIndex !== idx) {
+          elapsedBeforePause = 0;
+          setActive(idx);
+        }
+      });
+    });
+
+    // Pause on hover so the user can read comfortably
+    row.addEventListener('mouseenter', () => {
+      isPaused = true;
+      elapsedBeforePause = performance.now() - timerStartTime;
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+    });
+
+    row.addEventListener('mouseleave', () => {
+      if (isPaused) {
+        isPaused = false;
+        startProgress(elapsedBeforePause);
+      }
+    });
+
+    // Initialize
+    setActive(currentIndex);
+  }
+
+  // Run on page load
+  setupFeaturedCarousel();
+  document.addEventListener('astro:page-load', setupFeaturedCarousel);
+</script>

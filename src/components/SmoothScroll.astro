@@ -107,6 +107,12 @@ import 'lenis/dist/lenis.css';
       }
     });
 
+    // Also include document bottom (maxScroll) so scrolling down to footer docks smoothly
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - viewportHeight);
+    if (maxScroll > 0) {
+      targets.push(maxScroll);
+    }
+
     // Sort ascending & deduplicate points within 20px
     const sorted = Array.from(new Set(targets)).sort((a, b) => a - b);
     const filtered: number[] = [];
