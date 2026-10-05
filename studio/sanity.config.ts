@@ -8,7 +8,7 @@ export default defineConfig({
   title: 'IEEE SB IPB Studio',
 
   projectId: 'b92mxp3b',
-  dataset: 'production',
+  dataset: 'v2',
 
   plugins: [structureTool(), visionTool()],
 

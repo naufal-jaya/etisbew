@@ -19,7 +19,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 const projectId = process.env.PUBLIC_SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-const dataset = process.env.PUBLIC_SANITY_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET || 'production';
+const dataset = process.env.PUBLIC_SANITY_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET || 'v2';
 const token = process.env.SANITY_API_WRITE_TOKEN || process.env.SANITY_AUTH_TOKEN;
 
 if (!projectId || !token) {
