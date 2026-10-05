@@ -1,30 +1,272 @@
 ---
+// About & Vision-Mission Section with immersive shrinking slide transition
 ---
-<section id="section-about" data-lead-section="about" class="min-h-screen w-full relative z-10 backdrop-blur-[24px] bg-black/60 flex flex-col items-center justify-center px-6 py-24">
-  <div class="relative w-full max-w-7xl mx-auto flex flex-col lg:flex-row justify-center items-center">
-    
-    <!-- Center block -->
-    <div class="flex flex-col items-center max-w-2xl text-center">
-      <!-- Logos -->
-      <div class="flex items-center gap-6 md:gap-10 mb-6">
-        <img src="/ieee.png" alt="IEEE Logo" class="h-10 md:h-14 object-contain drop-shadow-md" />
-        <img src="/ieee-ipb.svg" alt="IEEE IPB Logo" class="h-12 md:h-16 object-contain drop-shadow-md" />
+
+<div class="relative w-full z-10">
+  <!-- Fading blur lip overflowing onto Hero -->
+  <div
+    class="about-blur-lip pointer-events-none select-none"
+    aria-hidden="true"
+  ></div>
+
+  <section
+    id="section-about"
+    data-lead-section="about"
+    class="relative z-10 w-full min-h-screen min-h-[100dvh] backdrop-blur-[24px] bg-black/60 text-white flex flex-col justify-center select-none overflow-hidden"
+    aria-label="About IEEE SB IPB"
+  >
+  <!-- Centered Stage Grid (stacks panels in the exact same spot without any inner clipping) -->
+  <div class="about-stage w-full relative">
+    <!-- Panel 1: About Us -->
+    <div
+      id="panel-about"
+      class="about-panel w-full relative flex flex-col items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-8 md:py-12"
+    >
+      <!-- Center block -->
+      <div class="flex flex-col items-center max-w-2xl w-full text-center mx-auto">
+        <!-- Logos -->
+        <div class="flex items-center gap-6 md:gap-10 mb-6">
+          <img
+            src="/ieee.png"
+            alt="IEEE Logo"
+            class="h-10 md:h-14 object-contain drop-shadow-md select-none pointer-events-none"
+            loading="eager"
+          />
+          <img
+            src="/ieee-ipb.svg"
+            alt="IEEE IPB Logo"
+            class="h-12 md:h-16 object-contain drop-shadow-md select-none pointer-events-none"
+            loading="eager"
+          />
+        </div>
+
+        <!-- Text -->
+        <p class="text-gray-200 text-sm md:text-base leading-relaxed">
+          IEEE SB IPB is lorem ipsum sir dolor amet blo blo blo blo lorem
+          ipsum<br class="hidden md:block" />
+          sir dolor amet blo blo blo blo lorem ipsum sir dolor amet blo blo blo<br
+            class="hidden md:block"
+          />
+          blo lorem ipsum sir dolor amet blo blo blo blo lorem ipsum sir dolor<br
+            class="hidden md:block"
+          />
+          amet blo blo blo blo lorem ipsum sir dolor amet blo blo blo blo
+        </p>
       </div>
-      
-      <!-- Text -->
-      <p class="text-gray-200 text-sm md:text-base leading-relaxed">
-        IEEE SB IPB is lorem ipsum sir dolor amet blo blo blo blo lorem ipsum<br class="hidden md:block" />
-        sir dolor amet blo blo blo blo lorem ipsum sir dolor amet blo blo blo<br class="hidden md:block" />
-        blo lorem ipsum sir dolor amet blo blo blo blo lorem ipsum sir dolor<br class="hidden md:block" />
-        amet blo blo blo blo lorem ipsum sir dolor amet blo blo blo blo
-      </p>
+
+      <!-- Right button: Vision & Mission (In the middle of the right margin) -->
+      <div
+        class="absolute top-1/2 -translate-y-1/2 z-20"
+        style="right: clamp(16px, calc((100vw - 1152px) / 4), 100px);"
+      >
+        <button
+          type="button"
+          id="to-vision-btn"
+          class="text-neutral-400 hover:text-white transition-colors text-sm flex items-center font-medium cursor-pointer whitespace-nowrap"
+          aria-label="Vision & Mission"
+        >
+          Vision & Mission <span class="ml-1 text-lg leading-none"
+            >&rsaquo;</span
+          >
+        </button>
+      </div>
     </div>
 
-    <!-- Right link -->
-    <div class="lg:absolute right-4 top-1/2 lg:-translate-y-1/2 mt-12 lg:mt-0">
-      <a href="/about" class="text-white hover:text-gray-300 transition-colors text-sm flex items-center font-medium">
-        Vision & Mission <span class="ml-1 text-lg leading-none">&rsaquo;</span>
-      </a>
+    <!-- Panel 2: Vision & Mission -->
+    <div
+      id="panel-vision"
+      class="vision-panel w-full relative flex flex-col items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16 py-8 md:py-12"
+    >
+      <!-- Left button: Back (In the middle of the left margin) -->
+      <div
+        class="absolute top-1/2 -translate-y-1/2 z-20"
+        style="left: clamp(16px, calc((100vw - 1152px) / 4), 100px);"
+      >
+        <button
+          type="button"
+          id="to-about-btn"
+          class="text-neutral-400 hover:text-white transition-colors text-sm flex items-center font-medium cursor-pointer whitespace-nowrap"
+          aria-label="Back"
+        >
+          <span class="mr-1 text-lg leading-none">&lsaquo;</span> Back
+        </button>
+      </div>
+
+      <!-- Center block: Vision & Mission (Justified Center) -->
+      <div class="flex flex-col items-center max-w-2xl w-full text-center mx-auto">
+        <!-- Vision -->
+        <div class="mb-6 w-full">
+          <h3
+            class="text-base md:text-3xl font-bold text-white tracking-wide mb-2 text-center"
+          >
+            Vision
+          </h3>
+          <p
+            class="text-gray-200 text-sm md:text-base leading-relaxed text-justify [text-align-last:center]"
+          >
+            To be a premier student-driven technology community that empowers
+            students to innovate, collaborate, and excel in engineering and
+            technological advancement for the benefit of humanity.
+          </p>
+        </div>
+
+        <!-- Mission -->
+        <div class="w-full">
+          <h3
+            class="text-base md:text-3xl font-bold text-white tracking-wide mb-2 text-center"
+          >
+            Mission
+          </h3>
+          <div
+            class="space-y-2 text-gray-200 text-sm md:text-base leading-relaxed text-justify [text-align-last:center]"
+          >
+            <p>
+              Fostering technological innovation and academic excellence
+              through hands-on workshops, competitions, and collaborative
+              research projects.
+            </p>
+            <p>
+              Expanding professional networks and cross-disciplinary
+              collaborations with global academic, industry, and IEEE
+              communities.
+            </p>
+            <p>
+              Cultivating inclusive leadership, practical engineering
+              problem-solving, and sustainable solutions addressing real-world
+              challenges.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+</div>
+
+<script>
+  function initAboutSlider() {
+    const section = document.getElementById("section-about");
+    const toVisionBtn = document.getElementById("to-vision-btn");
+    const toAboutBtn = document.getElementById("to-about-btn");
+
+    if (!section || !toVisionBtn || !toAboutBtn) return;
+
+    function showVision() {
+      section?.classList.add("is-vision");
+    }
+
+    function showAbout() {
+      section?.classList.remove("is-vision");
+    }
+
+    toVisionBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showVision();
+    });
+
+    toAboutBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showAbout();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && section?.classList.contains("is-vision")) {
+        showAbout();
+      }
+    });
+  }
+
+  initAboutSlider();
+  document.addEventListener("astro:page-load", initAboutSlider);
+</script>
+
+<style>
+  /* Progressive fading blur lip overflowing onto Hero */
+  .about-blur-lip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: clamp(60px, 9vh, 88px);
+    transform: translateY(calc(-100% + 1px));
+    pointer-events: none;
+    user-select: none;
+    z-index: 10;
+    will-change: transform;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.48) 25%,
+      rgba(0, 0, 0, 0.28) 55%,
+      rgba(0, 0, 0, 0.08) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.85) 25%,
+      rgba(0, 0, 0, 0.5) 55%,
+      rgba(0, 0, 0, 0.15) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 0%,
+      rgba(0, 0, 0, 0.85) 25%,
+      rgba(0, 0, 0, 0.5) 55%,
+      rgba(0, 0, 0, 0.15) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  /* Grid staging: both panels share the exact same area with no inner clipping */
+  .about-stage {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    justify-items: center;
+    width: 100%;
+  }
+
+  .about-panel,
+  .vision-panel {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    width: 100%;
+    will-change: transform, opacity;
+    transition:
+      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Default state: About is centered, Vision is offscreen to the right shrunk down */
+  #section-about:not(.is-vision) .about-panel {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #section-about:not(.is-vision) .vision-panel {
+    transform: translateX(100vw) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Vision state: About shrinks and slides offscreen to the left, Vision expands and slides in */
+  #section-about.is-vision .about-panel {
+    transform: translateX(-100vw) scale(0.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #section-about.is-vision .vision-panel {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>

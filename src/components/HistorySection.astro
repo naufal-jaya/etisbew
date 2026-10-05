@@ -127,7 +127,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
   <!-- ========================================== -->
   <div class="w-full flex flex-col items-center">
     <!-- Section Title (centered) -->
-    <div class="w-full text-center px-4 pt-6 sm:pt-8 md:pt-10 mb-1.5 sm:mb-2 md:mb-3">
+    <div class="w-full text-center px-4 pt-2 sm:pt-4 mb-1.5 sm:mb-2 md:mb-3">
       <h2 class="text-center text-3xl md:text-4xl font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
         Partners Throughout The Years
       </h2>
@@ -345,8 +345,12 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
         </div>
       </div>
 
-      <!-- 3. Description Text (Aligned to the right side of the section) -->
-      <div class="absolute right-4 sm:right-8 md:right-12 lg:right-16 xl:right-20 bottom-[32px] sm:bottom-[40px] md:bottom-[48px] lg:bottom-[54px] max-w-[260px] sm:max-w-xs md:max-w-sm select-none z-30 pointer-events-auto">
+      <!-- 3. Description Text (Always sticks at the end of the timeline white fade) -->
+      <div
+        id="milestone-desc-container"
+        class="absolute bottom-[32px] sm:bottom-[40px] md:bottom-[48px] lg:bottom-[54px] max-w-[280px] sm:max-w-sm md:max-w-md lg:max-w-sm select-none z-30 pointer-events-auto pr-3 sm:pr-4"
+        style="left: calc(var(--timeline-fade-end, 66%) + 8px);"
+      >
         <p
           id="milestone-desc-text"
           class="text-xs sm:text-sm md:text-[14px] text-gray-900 leading-[1.6] font-sans font-normal tracking-[0.015em] transition-opacity duration-200"
@@ -997,82 +1001,83 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     -webkit-backface-visibility: hidden;
   }
 
-  /* Side blur & fade overlays for the partners grid */
+  /* Side fade to white overlays for the partners grid (spans the full margin width) */
   .history-fade-left,
   .history-fade-right {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 14%;
-    min-width: 90px;
-    max-width: 220px;
+    width: clamp(48px, calc((100vw - 1152px) / 2), 200px);
     z-index: 30;
     pointer-events: none;
+  }
+
+  @media (max-width: 1024px) {
+    .history-fade-left,
+    .history-fade-right {
+      width: clamp(32px, 8vw, 64px);
+    }
   }
 
   .history-fade-left {
     left: 0;
     background: linear-gradient(
       to right,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0.85) 40%,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.96) 30%,
+      rgba(255, 255, 255, 0.7) 65%,
+      rgba(255, 255, 255, 0.25) 85%,
       rgba(255, 255, 255, 0) 100%
     );
-    backdrop-filter: blur(2.5px);
-    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
   }
 
   .history-fade-right {
     right: 0;
     background: linear-gradient(
       to left,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0.85) 40%,
+      #ffffff 0%,
+      rgba(255, 255, 255, 0.96) 30%,
+      rgba(255, 255, 255, 0.7) 65%,
+      rgba(255, 255, 255, 0.25) 85%,
       rgba(255, 255, 255, 0) 100%
     );
-    backdrop-filter: blur(2.5px);
-    -webkit-mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
-    mask-image: linear-gradient(to left, rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 0) 100%);
   }
 
   /* History timeline sliding viewport with smooth edge masks */
-  #timeline-viewport {
-    mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 40px,
-      black var(--timeline-fade-start, 54%),
-      transparent var(--timeline-fade-end, 66%)
-    );
-    -webkit-mask-image: linear-gradient(
-      to right,
-      transparent 0%,
-      black 40px,
-      black var(--timeline-fade-start, 54%),
-      transparent var(--timeline-fade-end, 66%)
-    );
+  #history-timeline-track {
+    --timeline-fade-start: 44%;
+    --timeline-fade-end: 56%;
   }
 
-  @media (max-width: 639px) {
-    #timeline-viewport {
-      --timeline-fade-start: 44%;
-      --timeline-fade-end: 56%;
-    }
-  }
-
-  @media (min-width: 640px) and (max-width: 1023px) {
-    #timeline-viewport {
+  @media (min-width: 640px) {
+    #history-timeline-track {
       --timeline-fade-start: 52%;
       --timeline-fade-end: 64%;
     }
   }
 
   @media (min-width: 1024px) {
-    #timeline-viewport {
+    #history-timeline-track {
       --timeline-fade-start: 54%;
       --timeline-fade-end: 66%;
     }
+  }
+
+  #timeline-viewport {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 40px,
+      black var(--timeline-fade-start),
+      transparent var(--timeline-fade-end)
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 40px,
+      black var(--timeline-fade-start),
+      transparent var(--timeline-fade-end)
+    );
   }
 
   .milestone-btn {
