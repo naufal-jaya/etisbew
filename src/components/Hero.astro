@@ -36,25 +36,25 @@ import { featuredPosts } from "../data/posts";
 
   <!-- Content Container -->
   <div
-    class="relative z-10 w-full h-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col justify-center pb-16 pt-24"
+    class="relative z-10 w-full h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col justify-between sm:justify-center pb-8 sm:pb-16 pt-20 sm:pt-24"
   >
     <!-- Left side (Logo) -->
-    <div class="flex-1 flex flex-col justify-center max-w-md">
+    <div class="my-auto sm:my-0 flex-1 flex flex-col justify-center max-w-md">
       <img
         src="/ieee-ipb.svg"
         alt="IPB University IEEE Student Branch"
-        class="w-[400px] h-auto drop-shadow-lg"
+        class="w-[260px] sm:w-[340px] lg:w-[400px] h-auto drop-shadow-lg"
       />
     </div>
 
     <!-- Bottom right side (Latest Article) -->
-    <div class="absolute bottom-12 right-6 lg:right-12 flex flex-col items-end">
-      <span class="text-white text-sm font-light mb-1">Latest article</span>
+    <div class="relative sm:absolute sm:bottom-12 sm:right-6 lg:right-12 flex flex-col items-start sm:items-end w-full sm:w-auto mt-auto sm:mt-0">
+      <span class="text-white text-xs sm:text-sm font-light mb-1">Latest article</span>
       <!-- Card -->
       <a
         id="hero-article-card"
         href={`/posts#${featuredPosts[0].slug}`}
-        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-[296px] max-w-full h-[80px] relative group cursor-pointer block select-none"
+        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-full sm:w-[296px] max-w-full h-[72px] sm:h-[80px] relative group cursor-pointer block select-none"
         aria-label="Latest featured article"
       >
         <!-- Sliding Images Track -->
@@ -110,7 +110,7 @@ import { featuredPosts } from "../data/posts";
 
         <!-- Three Transparent Dots at Right Bottom (aligned with author's text) -->
         <div
-          class="absolute right-3 bottom-[11.5px] z-30 flex items-center gap-1.5"
+          class="absolute right-3 bottom-[9px] sm:bottom-[11.5px] z-30 flex items-center gap-1.5"
           id="hero-carousel-dots"
           aria-label="Carousel navigation dots"
         >

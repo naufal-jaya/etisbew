@@ -50,10 +50,15 @@ if (isSanityConfigured) {
   milestones = fallbackMilestones;
 }
 
-// Grid layout parameters (10 columns to match reference design)
-const totalCols = 10;
-const totalRows = 2;
-const minSlots = totalRows * totalCols; // 20 partner slots (2 full rows of 10)
+// Desktop Grid layout parameters (10 columns x 2 rows = 20 slots)
+const desktopCols = 10;
+const desktopRows = 2;
+const desktopSlots = desktopRows * desktopCols;
+
+// Mobile Grid layout parameters (5 columns x 3 rows = 15 slots)
+const mobileCols = 5;
+const mobileRows = 3;
+const mobileSlots = mobileRows * mobileCols;
 
 const sourcePartners = partners.length > 0 ? partners : fallbackPartners;
 
@@ -70,10 +75,25 @@ sourcePartners.forEach((p) => {
 });
 const uniquePartnersList = Array.from(uniquePartnersMap.values());
 
-// Generate the 20 display cells, grouped by diagonal sets (diagSet = row + col, 0..10)
-const displayCells = Array.from({ length: minSlots }, (_, index) => {
-  const row = Math.floor(index / totalCols);
-  const col = index % totalCols;
+// Generate Desktop 20 display cells (10x2)
+const desktopDisplayCells = Array.from({ length: desktopSlots }, (_, index) => {
+  const row = Math.floor(index / desktopCols);
+  const col = index % desktopCols;
+  const diagSet = row + col;
+  const initialPartner = uniquePartnersList[diagSet % uniquePartnersList.length] || { name: '', logo: '' };
+  return {
+    index,
+    row,
+    col,
+    diagSet,
+    initialPartner,
+  };
+});
+
+// Generate Mobile 15 display cells (5x3)
+const mobileDisplayCells = Array.from({ length: mobileSlots }, (_, index) => {
+  const row = Math.floor(index / mobileCols);
+  const col = index % mobileCols;
   const diagSet = row + col;
   const initialPartner = uniquePartnersList[diagSet % uniquePartnersList.length] || { name: '', logo: '' };
   return {
@@ -115,65 +135,126 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
 
 ---
 
-<section id="section-history" data-lead-section="history" class="relative z-20 w-full bg-white text-gray-900 min-h-screen lg:h-screen lg:max-h-screen flex flex-col justify-between pt-2 sm:pt-3 md:pt-4 pb-0 overflow-hidden border-t-[2.5px] border-[#C8CAD4]">
+<section id="section-history" data-lead-section="history" class="relative z-20 w-full bg-white text-gray-900 h-screen min-h-[640px] md:h-screen md:min-h-screen md:max-h-screen flex flex-col justify-between pt-0 pb-0 overflow-hidden border-t-[2.5px] border-[#C8CAD4]">
   
   <!-- Left & Right blur/fade overlays (Spans full height of HistorySection to the very bottom) -->
   <div class="history-fade-left"></div>
   <div class="history-fade-right"></div>
 
   <!-- ========================================== -->
-  <!-- SECTION A: Partners Throughout The Years  -->
-  <!-- Full Width Edge-to-Edge (Mentok Kanan-Kiri)-->
+  <!-- TOP HALF (Mobile) / SECTION A (Desktop)    -->
   <!-- ========================================== -->
-  <div class="w-full flex flex-col items-center">
-    <!-- Section Title (centered) -->
-    <div class="w-full text-center px-4 pt-2 sm:pt-4 mb-1.5 sm:mb-2 md:mb-3">
-      <h2 class="text-center text-3xl md:text-4xl font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
+  <div id="history-partners-section" class="relative w-full h-1/2 md:h-auto flex flex-col justify-between md:justify-start items-center overflow-hidden select-none">
+    <!-- Section Title (centered with matched top/bottom margins) -->
+    <div class="w-full text-center px-4 my-3 sm:my-4 md:my-5 flex-shrink-0">
+      <h2 class="text-center text-xl sm:text-2xl md:text-3xl lg:text-4xl font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
         Partners Throughout The Years
       </h2>
     </div>
 
-    <!-- Connected Grid: Edge-to-edge square containers with 2.5px borders in #C8CAD4 -->
-    <div class="relative w-full overflow-x-clip overflow-y-visible py-2">
-      <!-- Grid Container: 10 columns spanning 100% width with 2.5px borders in #C8CAD4 -->
+    <!-- MOBILE GRID: 5 columns x 3 rows (5x3, visible on screens < md) -->
+    <div class="relative w-full flex-1 flex items-center justify-center overflow-hidden py-1 md:hidden">
       <div
-        id="partners-grid-root"
-        class="relative w-full grid grid-cols-10 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none"
+        class="partners-grid-root relative w-full grid grid-cols-5 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none"
       >
-        {displayCells.map((cell) => {
+        {mobileDisplayCells.map((cell) => {
           const { index, row, col, diagSet, initialPartner } = cell;
           const isFirstCol = col === 0;
-          const isLastCol = col === totalCols - 1;
-          const isLastRow = row === totalRows - 1;
+          const isLastCol = col === mobileCols - 1;
+          const isLastRow = row === mobileRows - 1;
 
           return (
             <div
-              class={`group relative flex items-center justify-center p-1 sm:p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
+              class={`group relative flex items-center justify-center p-1 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
               data-partner-cell
               data-cell-index={index}
               data-diag-set={diagSet}
             >
-              <!-- Circular Node: Top-Left vertex (thicker 2.5px border in #C8CAD4) -->
-              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              <!-- Circular Node: Top-Left vertex -->
+              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
 
-              <!-- Circular Node: Top-Right vertex (for rightmost column) -->
+              <!-- Circular Node: Top-Right vertex -->
               {isLastCol && (
-                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
               )}
 
-              <!-- Circular Node: Bottom-Left vertex (for bottom row) -->
+              <!-- Circular Node: Bottom-Left vertex -->
               {isLastRow && (
-                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
               )}
 
-              <!-- Circular Node: Bottom-Right vertex (for bottom-right corner) -->
+              <!-- Circular Node: Bottom-Right vertex -->
               {isLastRow && isLastCol && (
-                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
               )}
 
-              <!-- Logo Content (Double-buffered layers for seamless shrink & fade-in) -->
+              <!-- Logo Content -->
               <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
-                <!-- Interactive Logo Target: sized precisely to logo, not the rectangle container -->
+                <div
+                  class="partner-logo-target relative flex items-center justify-center w-[72%] h-[72%] cursor-pointer group/logo"
+                  data-partner-target
+                >
+                  <img
+                    data-layer="a"
+                    src={initialPartner.logo}
+                    alt={initialPartner.name}
+                    loading="eager"
+                    class="partner-logo-layer absolute max-h-full max-w-full object-contain pointer-events-none transition-transform duration-200 group-hover/logo:scale-105"
+                  />
+                  <img
+                    data-layer="b"
+                    src=""
+                    alt=""
+                    loading="eager"
+                    class="partner-logo-layer absolute max-h-full max-w-full object-contain opacity-0 pointer-events-none transition-transform duration-200 group-hover/logo:scale-105"
+                    style="transform: scale(0.85);"
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+
+    <!-- DESKTOP GRID: 10 columns x 2 rows (10x2, visible on screens >= md) -->
+    <div class="relative w-full overflow-x-clip overflow-y-visible py-2 hidden md:block">
+      <div
+        class="partners-grid-root relative w-full grid grid-cols-10 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none"
+      >
+        {desktopDisplayCells.map((cell) => {
+          const { index, row, col, diagSet, initialPartner } = cell;
+          const isFirstCol = col === 0;
+          const isLastCol = col === desktopCols - 1;
+          const isLastRow = row === desktopRows - 1;
+
+          return (
+            <div
+              class={`group relative flex items-center justify-center p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
+              data-partner-cell
+              data-cell-index={index}
+              data-diag-set={diagSet}
+            >
+              <!-- Circular Node: Top-Left vertex -->
+              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+
+              <!-- Circular Node: Top-Right vertex -->
+              {isLastCol && (
+                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              )}
+
+              <!-- Circular Node: Bottom-Left vertex -->
+              {isLastRow && (
+                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              )}
+
+              <!-- Circular Node: Bottom-Right vertex -->
+              {isLastRow && isLastCol && (
+                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              )}
+
+              <!-- Logo Content -->
+              <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
                 <div
                   class="partner-logo-target relative flex items-center justify-center w-[70%] h-[70%] max-w-[78%] max-h-[65%] cursor-pointer group/logo"
                   data-partner-target
@@ -199,69 +280,174 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
           );
         })}
       </div>
+    </div>
 
-      <!-- Floating Tooltip for Partner Name (Appears when logo itself is hovered) -->
-      <div
-        id="partner-tooltip"
-        role="tooltip"
-        class="pointer-events-none fixed z-50 px-3.5 py-1.5 rounded-lg bg-[#1E2029] text-white text-xs sm:text-[13px] font-sans font-medium tracking-wide shadow-[0_8px_24px_rgba(0,0,0,0.35)] border border-[#383B47] transition-[opacity,transform] duration-200 ease-out opacity-0 scale-95 select-none"
-        style="transform: translate(-50%, -100%); top: -9999px; left: -9999px;"
-      >
-        <span id="partner-tooltip-text"></span>
-        <span
-          id="partner-tooltip-arrow"
-          class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-[#1E2029]"
-        ></span>
-      </div>
+    <!-- Floating Tooltip for Partner Name (Appears when logo itself is hovered) -->
+    <div
+      id="partner-tooltip"
+      role="tooltip"
+      class="pointer-events-none fixed z-50 px-3.5 py-1.5 rounded-lg bg-[#1E2029] text-white text-xs sm:text-[13px] font-sans font-medium tracking-wide shadow-[0_8px_24px_rgba(0,0,0,0.35)] border border-[#383B47] transition-[opacity,transform] duration-200 ease-out opacity-0 scale-95 select-none"
+      style="transform: translate(-50%, -100%); top: -9999px; left: -9999px;"
+    >
+      <span id="partner-tooltip-text"></span>
+      <span
+        id="partner-tooltip-arrow"
+        class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-4 border-transparent border-t-[#1E2029]"
+      ></span>
     </div>
   </div>
+
   <!-- ========================================== -->
-  <!-- SECTION B: Our Persistent Growth           -->
-  <!-- Full Width Edge-to-Edge (Mentok Kanan-Kiri)-->
+  <!-- BOTTOM HALF (Mobile) / SECTION B (Desktop) -->
   <!-- ========================================== -->
-  <div id="history-growth-section" class="relative w-full flex-1 flex flex-col justify-end pt-6 sm:pt-8 pb-0 overflow-hidden select-none">
+  <div id="history-growth-section" class="relative w-full h-1/2 md:h-auto md:flex-1 flex flex-col justify-between md:justify-end pb-0 overflow-hidden select-none">
     
-    <!-- Section Title (centered) -->
-    <div class="w-full text-center px-4 mb-1 sm:mb-2">
-      <h2 class="relative z-10 inline-block text-2xl sm:text-3xl md:text-4xl lg:text-[35px] xl:text-[40px] font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
+    <!-- Section Title (centered with matched top/bottom margins) -->
+    <div class="w-full text-center px-4 my-3 sm:my-4 md:my-5 flex-shrink-0">
+      <h2 class="relative z-10 inline-block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-normal tracking-[0.015em] text-gray-900 font-sans leading-tight">
         Our Persistent Growth
       </h2>
     </div>
     
-    <!-- Floating Scattered Images (Static scrapbook layout) -->
+    <!-- Floating Scattered Images (Contained strictly in bottom half on mobile; original positions on desktop) -->
     <div class="pointer-events-none select-none absolute inset-0 z-0 overflow-hidden">
       <!-- Floating 1: Left above 2025 -->
-      <div class="absolute left-[5%] md:left-[6%] top-[25%] md:top-[28%] w-28 h-18 sm:w-36 sm:h-22 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-50 filter grayscale">
+      <div class="absolute left-[4%] md:left-[6%] top-[34%] md:top-[28%] w-20 h-14 sm:w-32 sm:h-20 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-50 filter grayscale">
         <img src={staticFloatingImgs[0].url} alt={staticFloatingImgs[0].alt} class="w-full h-full object-cover" />
       </div>
 
-      <!-- Floating 2: Top-left center (above title) -->
-      <div class="absolute left-[24%] md:left-[26%] top-[2%] md:top-[4%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-80 filter grayscale">
+      <!-- Floating 2: Top-left corner on mobile (away from title); centered top-left on desktop -->
+      <div class="absolute left-[3%] md:left-[26%] top-[4%] md:top-[4%] w-8 h-8 sm:w-11 sm:h-11 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-80 filter grayscale">
         <img src={staticFloatingImgs[1].url} alt={staticFloatingImgs[1].alt} class="w-full h-full object-cover" />
       </div>
 
-      <!-- Floating 3: Right of Title (wide group photo) -->
-      <div class="absolute left-[64%] md:left-[67%] top-[4%] md:top-[6%] w-32 h-20 sm:w-40 sm:h-24 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-50 filter grayscale">
+      <!-- Floating 3: Top-right corner on mobile (away from title); right of title on desktop -->
+      <div class="absolute right-[3%] md:right-auto md:left-[67%] top-[4%] md:top-[6%] w-22 h-14 sm:w-36 sm:h-22 md:w-48 md:h-30 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-50 filter grayscale">
         <img src={staticFloatingImgs[2].url} alt={staticFloatingImgs[2].alt} class="w-full h-full object-cover" />
       </div>
 
       <!-- Floating 4: Far Right Top/Mid -->
-      <div class="absolute right-[4%] md:right-[5%] top-[22%] md:top-[26%] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-100 filter grayscale">
+      <div class="absolute right-[4%] md:right-[5%] top-[32%] md:top-[26%] w-8 h-8 sm:w-11 sm:h-11 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-100 filter grayscale">
         <img src={staticFloatingImgs[3].url} alt={staticFloatingImgs[3].alt} class="w-full h-full object-cover" />
       </div>
 
       <!-- Floating 5: Bottom Right under description text -->
-      <div class="absolute left-[85%] md:left-[86%] bottom-[16px] md:bottom-[20px] w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-80 filter grayscale">
+      <div class="absolute left-[82%] md:left-[86%] bottom-[12px] md:bottom-[20px] w-8 h-8 sm:w-11 sm:h-11 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-80 filter grayscale">
         <img src={staticFloatingImgs[4].url} alt={staticFloatingImgs[4].alt} class="w-full h-full object-cover" />
       </div>
     </div>
     
 
-    <!-- Timeline & Time Slider Container (Directly at the bottom edge, cut at bottom) -->
-    <!-- Supports direct click, mouse drag & touch swipe to slide through years -->
+    <!-- ======================================================== -->
+    <!-- MOBILE VIEW (md:hidden): Vertical Flipped Timeline (Left Half) + Milestone Info (Right Half) -->
+    <!-- ======================================================== -->
+    <div class="relative z-10 w-full flex-1 min-h-0 flex flex-row items-center overflow-hidden md:hidden pb-1">
+      
+      <!-- LEFT HALF (w-1/2): Vertical Sliding Timeline (Ruler Flipped Vertically) -->
+      <div
+        id="mobile-history-timeline-track"
+        class="relative w-1/2 h-full select-none overflow-hidden cursor-grab"
+        title="Geser atau klik tahun untuk navigasi milestone"
+        style="mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%); touch-action: none;"
+      >
+        <!-- Continuous vertical axis line along the left edge -->
+        <div class="absolute top-0 bottom-0 left-0 w-[2.5px] bg-[#C8CAD4] pointer-events-none z-10"></div>
+
+        <!-- The sliding ruler container (moves vertically along Y) -->
+        <div
+          id="mobile-timeline-slider"
+          class="absolute top-0 left-0 right-0 will-change-transform"
+          style="transform: translate3d(0, 0px, 0);"
+        >
+          <!-- 1. Ruler Ticks Container (Intermediate ticks extending horizontally from left-0) -->
+          <div id="mobile-timeline-ticks" class="absolute inset-0 pointer-events-none">
+            {resolvedMilestones.slice(0, -1).map((_, i) => (
+              <>
+                <span
+                  data-mobile-milestone-step={i}
+                  data-mobile-tick-sub="1"
+                  class="mobile-timeline-tick absolute left-0 h-[2px] w-5 sm:w-7 bg-[#C8CAD4] -translate-y-1/2"
+                ></span>
+                <span
+                  data-mobile-milestone-step={i}
+                  data-mobile-tick-sub="2"
+                  class="mobile-timeline-tick absolute left-0 h-[2px] w-5 sm:w-7 bg-[#C8CAD4] -translate-y-1/2"
+                ></span>
+                <span
+                  data-mobile-milestone-step={i}
+                  data-mobile-tick-sub="3"
+                  class="mobile-timeline-tick absolute left-0 h-[2px] w-5 sm:w-7 bg-[#C8CAD4] -translate-y-1/2"
+                ></span>
+              </>
+            ))}
+          </div>
+
+          <!-- 2. Dynamic Milestones: Horizontal stem, circular node, and year number -->
+          {resolvedMilestones.map((milestone, idx) => {
+            const isActive = idx === activeIndex;
+
+            return (
+              <button
+                type="button"
+                class="mobile-milestone-btn absolute left-0 flex flex-row items-center cursor-pointer group focus:outline-none select-none z-20 py-1"
+                data-index={idx}
+                data-year={milestone.year}
+                aria-label={`Pilih tahun ${milestone.year}`}
+              >
+                <!-- Horizontal Stem touching left-0 -->
+                <div
+                  class={`mobile-milestone-stem h-[2.5px] w-6 sm:w-8 transition-colors duration-200 ${
+                    isActive ? 'bg-[#1E2029]' : 'bg-[#C8CAD4]'
+                  }`}
+                ></div>
+
+                <!-- Circular Node at the end of stem -->
+                <div
+                  class={`mobile-milestone-node -ml-[2px] w-4 h-4 rounded-full border-[2px] bg-white z-10 flex items-center justify-center transition-all duration-200 ${
+                    isActive ? 'border-[#1E2029] ring-2 ring-gray-300' : 'border-[#C8CAD4]'
+                  }`}
+                >
+                  <div
+                    class={`mobile-milestone-inner-dot w-2 h-2 rounded-full transition-all duration-200 ${
+                      isActive ? 'bg-[#1E2029]' : 'bg-transparent'
+                    }`}
+                  ></div>
+                </div>
+
+                <!-- Year Number -->
+                <span
+                  class={`mobile-milestone-year-text ml-2 font-tech text-4xl sm:text-5xl tracking-wider leading-none select-none uppercase transition-all duration-200 ${
+                    isActive ? 'text-[#1E2029]' : 'text-[#8F94A6]'
+                  }`}
+                >
+                  {milestone.year}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <!-- RIGHT HALF (w-1/2): Description Text of Active Milestone -->
+      <div class="relative w-1/2 h-full flex flex-col justify-center px-3 sm:px-4 py-2 z-20 pointer-events-auto">
+        <div class="max-w-[170px] sm:max-w-[200px]">
+          <p
+            id="mobile-milestone-desc-text"
+            class="text-xs sm:text-[13px] text-gray-900 leading-[1.55] font-sans font-normal tracking-[0.015em] transition-opacity duration-200"
+          >
+            {initialMilestone.description}
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- DESKTOP VIEW (hidden md:block): Original Horizontal Timeline Track -->
+    <!-- ======================================================== -->
     <div
       id="history-timeline-track"
-      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab select-none overflow-hidden touch-pan-y"
+      class="relative z-10 w-full h-[170px] sm:h-[185px] md:h-[200px] lg:h-[210px] cursor-grab select-none overflow-hidden touch-pan-y hidden md:block"
       title="Geser atau klik tahun untuk navigasi milestone"
     >
       <!-- Timeline Sliding Track Viewport with right fade-out mask -->
@@ -370,14 +556,22 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     const milestones = milestonesData || [];
     let currentIndex = typeof initialIdx === 'number' ? initialIdx : milestones.length - 1;
 
-    const growthSection = document.getElementById('history-growth-section');
-    const track = document.getElementById('history-timeline-track');
-    const slider = document.getElementById('timeline-slider');
-    const descText = document.getElementById('milestone-desc-text');
-    const buttons = Array.from(document.querySelectorAll('.milestone-btn'));
+    // Desktop elements
+    const desktopTrack = document.getElementById('history-timeline-track');
+    const desktopSlider = document.getElementById('timeline-slider');
+    const desktopDescText = document.getElementById('milestone-desc-text');
+    const desktopButtons = Array.from(document.querySelectorAll('.milestone-btn'));
 
-    if (!track || !slider || milestones.length === 0) return;
+    // Mobile elements
+    const mobileTrack = document.getElementById('mobile-history-timeline-track');
+    const mobileSlider = document.getElementById('mobile-timeline-slider');
+    const mobileDescText = document.getElementById('mobile-milestone-desc-text');
+    const mobileYearBadge = document.getElementById('mobile-milestone-year-badge');
+    const mobileButtons = Array.from(document.querySelectorAll('.mobile-milestone-btn'));
 
+    if (milestones.length === 0) return;
+
+    // Desktop geometry
     let focalX = 0;
     let stepX = 240;
     let currentSliderX = 0;
@@ -387,61 +581,96 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     let startSliderX = 0;
     let lastPointerX = 0;
 
+    // Mobile geometry
+    let mobileFocalY = 0;
+    let mobileStepY = 72;
+    let currentMobileSliderY = 0;
+    let isMobileDragging = false;
+    let hasMobileDragged = false;
+    let startMobilePointerY = 0;
+    let startMobileSliderY = 0;
+    let lastMobilePointerY = 0;
+
     function calculateDimensions() {
-      const trackWidth = track.clientWidth || window.innerWidth;
-      if (trackWidth >= 1024) {
-        focalX = Math.round(trackWidth * 0.50);
-        stepX = Math.round(Math.min(270, Math.max(220, trackWidth * 0.18)));
-      } else if (trackWidth >= 640) {
-        focalX = Math.round(trackWidth * 0.48);
-        stepX = Math.round(Math.min(230, Math.max(180, trackWidth * 0.22)));
-      } else {
-        focalX = Math.round(trackWidth * 0.40);
-        stepX = Math.round(Math.min(190, Math.max(140, trackWidth * 0.30)));
+      // 1. Desktop Horizontal Timeline
+      if (desktopTrack && desktopSlider) {
+        const trackWidth = desktopTrack.clientWidth || window.innerWidth;
+        if (trackWidth >= 1024) {
+          focalX = Math.round(trackWidth * 0.50);
+          stepX = Math.round(Math.min(270, Math.max(220, trackWidth * 0.18)));
+        } else if (trackWidth >= 640) {
+          focalX = Math.round(trackWidth * 0.48);
+          stepX = Math.round(Math.min(230, Math.max(180, trackWidth * 0.22)));
+        } else {
+          focalX = Math.round(trackWidth * 0.40);
+          stepX = Math.round(Math.min(190, Math.max(140, trackWidth * 0.30)));
+        }
+
+        desktopButtons.forEach((btn, idx) => {
+          btn.style.left = `${idx * stepX}px`;
+        });
+
+        const intermediateTicks = desktopSlider.querySelectorAll('[data-milestone-step]');
+        intermediateTicks.forEach((tick) => {
+          const stepIdx = parseInt(tick.getAttribute('data-milestone-step') || '0', 10);
+          const subIdx = parseInt(tick.getAttribute('data-tick-sub') || '1', 10);
+          tick.style.left = `${stepIdx * stepX + subIdx * 0.25 * stepX}px`;
+        });
       }
 
-      // Position milestone buttons on slider
-      buttons.forEach((btn, idx) => {
-        const x = idx * stepX;
-        btn.style.left = `${x}px`;
-      });
+      // 2. Mobile Vertical Timeline
+      if (mobileTrack && mobileSlider) {
+        const trackHeight = mobileTrack.clientHeight || 280;
+        mobileFocalY = Math.round(trackHeight * 0.50);
+        mobileStepY = Math.round(Math.min(85, Math.max(68, trackHeight * 0.24)));
 
-      // Position intermediate ticks between milestones (Ends at 2022, no leading ticks)
-      const intermediateTicks = slider.querySelectorAll('[data-milestone-step]');
-      intermediateTicks.forEach((tick) => {
-        const stepIdx = parseInt(tick.getAttribute('data-milestone-step') || '0', 10);
-        const subIdx = parseInt(tick.getAttribute('data-tick-sub') || '1', 10);
-        const tickX = stepIdx * stepX + subIdx * 0.25 * stepX;
-        tick.style.left = `${tickX}px`;
-      });
+        mobileButtons.forEach((btn, idx) => {
+          btn.style.top = `${idx * mobileStepY}px`;
+        });
+
+        const mobileIntermediateTicks = mobileSlider.querySelectorAll('[data-mobile-milestone-step]');
+        mobileIntermediateTicks.forEach((tick) => {
+          const stepIdx = parseInt(tick.getAttribute('data-mobile-milestone-step') || '0', 10);
+          const subIdx = parseInt(tick.getAttribute('data-mobile-tick-sub') || '1', 10);
+          tick.style.top = `${stepIdx * mobileStepY + subIdx * 0.25 * mobileStepY}px`;
+        });
+      }
     }
 
-    function setSliderPosition(x, animate = true) {
+    function setDesktopSliderPosition(x, animate = true) {
       currentSliderX = x;
+      if (!desktopSlider) return;
       if (animate) {
-        slider.style.transition = 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1)';
+        desktopSlider.style.transition = 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1)';
       } else {
-        slider.style.transition = 'none';
+        desktopSlider.style.transition = 'none';
       }
-      slider.style.transform = `translate3d(${x}px, 0, 0)`;
+      desktopSlider.style.transform = `translate3d(${x}px, 0, 0)`;
     }
 
-    function updateVisuals(index) {
-      buttons.forEach((btn, idx) => {
+    function setMobileSliderPosition(y, animate = true) {
+      currentMobileSliderY = y;
+      if (!mobileSlider) return;
+      if (animate) {
+        mobileSlider.style.transition = 'transform 450ms cubic-bezier(0.16, 1, 0.3, 1)';
+      } else {
+        mobileSlider.style.transition = 'none';
+      }
+      mobileSlider.style.transform = `translate3d(0, ${y}px, 0)`;
+    }
+
+    function updateDesktopVisuals(index) {
+      desktopButtons.forEach((btn, idx) => {
         const yearText = btn.querySelector('.milestone-year-text');
         const node = btn.querySelector('.milestone-node');
         const innerDot = btn.querySelector('.milestone-inner-dot');
         const stem = btn.querySelector('.milestone-stem');
-
         const diff = idx - index;
 
-        // The line (stem and node) under unselected years NEVER fades out!
-        // Button container is ALWAYS full opacity 1 at baseline
         btn.style.opacity = '1';
         btn.style.transform = 'translateX(-50%)';
 
         if (diff === 0) {
-          // Selected Active Year
           btn.setAttribute('aria-current', 'true');
           btn.style.pointerEvents = 'auto';
           if (yearText) {
@@ -462,7 +691,6 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
             stem.classList.add('bg-[#1E2029]');
           }
         } else {
-          // Unselected Years: keep stem and node solid #C8CAD4 with full opacity 1
           btn.removeAttribute('aria-current');
           if (node) {
             node.classList.remove('border-[#1E2029]', 'ring-2', 'ring-gray-300');
@@ -478,27 +706,81 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
           }
 
           if (diff < 0) {
-            // Older years (to the left): visible and clickable
             btn.style.pointerEvents = 'auto';
             if (yearText) {
               yearText.classList.remove('text-[#1E2029]');
               yearText.classList.add('text-[#8F94A6]');
-              if (diff === -1) {
-                yearText.style.opacity = '0.70';
-              } else if (diff === -2) {
-                yearText.style.opacity = '0.50';
-              } else if (diff === -3) {
-                yearText.style.opacity = '0.35';
-              } else {
-                yearText.style.opacity = '0.22';
-              }
+              if (diff === -1) yearText.style.opacity = '0.70';
+              else if (diff === -2) yearText.style.opacity = '0.50';
+              else if (diff === -3) yearText.style.opacity = '0.35';
+              else yearText.style.opacity = '0.22';
             }
           } else {
-            // More recent years (to the right of selected):
-            // Year text is hidden so it appears as empty gradient space
+            if (yearText) yearText.style.opacity = '0';
+            btn.style.pointerEvents = 'auto';
+          }
+        }
+      });
+    }
+
+    function updateMobileVisuals(index) {
+      mobileButtons.forEach((btn, idx) => {
+        const yearText = btn.querySelector('.mobile-milestone-year-text');
+        const node = btn.querySelector('.mobile-milestone-node');
+        const innerDot = btn.querySelector('.mobile-milestone-inner-dot');
+        const stem = btn.querySelector('.mobile-milestone-stem');
+        const diff = idx - index;
+
+        btn.style.opacity = '1';
+        btn.style.transform = 'translateY(-50%)';
+
+        if (diff === 0) {
+          btn.setAttribute('aria-current', 'true');
+          btn.style.pointerEvents = 'auto';
+          if (yearText) {
+            yearText.classList.remove('text-[#8F94A6]');
+            yearText.classList.add('text-[#1E2029]');
+            yearText.style.opacity = '1';
+          }
+          if (node) {
+            node.classList.remove('border-[#C8CAD4]');
+            node.classList.add('border-[#1E2029]', 'ring-2', 'ring-gray-300');
+          }
+          if (innerDot) {
+            innerDot.classList.remove('bg-transparent');
+            innerDot.classList.add('bg-[#1E2029]');
+          }
+          if (stem) {
+            stem.classList.remove('bg-[#C8CAD4]');
+            stem.classList.add('bg-[#1E2029]');
+          }
+        } else {
+          btn.removeAttribute('aria-current');
+          if (node) {
+            node.classList.remove('border-[#1E2029]', 'ring-2', 'ring-gray-300');
+            node.classList.add('border-[#C8CAD4]');
+          }
+          if (innerDot) {
+            innerDot.classList.remove('bg-[#1E2029]');
+            innerDot.classList.add('bg-transparent');
+          }
+          if (stem) {
+            stem.classList.remove('bg-[#1E2029]');
+            stem.classList.add('bg-[#C8CAD4]');
+          }
+
+          if (diff < 0) {
+            btn.style.pointerEvents = 'auto';
             if (yearText) {
-              yearText.style.opacity = '0';
+              yearText.classList.remove('text-[#1E2029]');
+              yearText.classList.add('text-[#8F94A6]');
+              if (diff === -1) yearText.style.opacity = '0.70';
+              else if (diff === -2) yearText.style.opacity = '0.50';
+              else if (diff === -3) yearText.style.opacity = '0.35';
+              else yearText.style.opacity = '0.22';
             }
+          } else {
+            if (yearText) yearText.style.opacity = '0';
             btn.style.pointerEvents = 'auto';
           }
         }
@@ -510,23 +792,36 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       currentIndex = index;
       const target = milestones[index];
 
-      // 1. Center the selected year directly at the center of the screen
-      const targetX = focalX - currentIndex * stepX;
-      setSliderPosition(targetX, animate);
-
-      // 2. Update button styles, opacities, and states
-      updateVisuals(index);
-
-      // 3. Update description with fade
-      if (descText) {
-        descText.style.opacity = '0';
-        setTimeout(() => {
-          descText.textContent = target.description || '';
-          descText.style.opacity = '1';
-        }, 140);
+      // 1. Desktop Update
+      if (desktopSlider) {
+        const targetX = focalX - currentIndex * stepX;
+        setDesktopSliderPosition(targetX, animate);
+        updateDesktopVisuals(index);
+        if (desktopDescText) {
+          desktopDescText.style.opacity = '0';
+          setTimeout(() => {
+            desktopDescText.textContent = target.description || '';
+            desktopDescText.style.opacity = '1';
+          }, 140);
+        }
       }
 
-      // Background images are completely static (no randomization / swapping)
+      // 2. Mobile Update
+      if (mobileSlider) {
+        const targetY = mobileFocalY - currentIndex * mobileStepY;
+        setMobileSliderPosition(targetY, animate);
+        updateMobileVisuals(index);
+        if (mobileDescText) {
+          mobileDescText.style.opacity = '0';
+          setTimeout(() => {
+            mobileDescText.textContent = target.description || '';
+            mobileDescText.style.opacity = '1';
+          }, 140);
+        }
+        if (mobileYearBadge) {
+          mobileYearBadge.textContent = String(target.year || '');
+        }
+      }
     }
 
     // Initialize layout and state
@@ -536,152 +831,253 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     // Window resize handler
     window.addEventListener('resize', () => {
       calculateDimensions();
-      setSliderPosition(focalX - currentIndex * stepX, false);
-      updateVisuals(currentIndex);
+      if (desktopSlider) {
+        setDesktopSliderPosition(focalX - currentIndex * stepX, false);
+        updateDesktopVisuals(currentIndex);
+      }
+      if (mobileSlider) {
+        setMobileSliderPosition(mobileFocalY - currentIndex * mobileStepY, false);
+        updateMobileVisuals(currentIndex);
+      }
     });
 
     // ==========================================
-    // 1. Unified Click Handler on Track
+    // 1. Desktop Track Click Handler
     // ==========================================
-    track.addEventListener('click', (e) => {
-      // Ignore click if a drag just occurred
-      if (hasDragged) return;
+    if (desktopTrack) {
+      desktopTrack.addEventListener('click', (e) => {
+        if (hasDragged) return;
+        if (e.target && e.target.closest('#milestone-desc-text')) return;
 
-      // Don't navigate if clicking description box
-      if (e.target && e.target.closest('#milestone-desc-text')) return;
+        const trackRect = desktopTrack.getBoundingClientRect();
+        const clickX = e.clientX - trackRect.left;
+        const activeScreenX = currentSliderX + currentIndex * stepX;
 
-      const trackRect = track.getBoundingClientRect();
-      const clickX = e.clientX - trackRect.left;
-      const activeScreenX = currentSliderX + currentIndex * stepX;
+        const clickedBtn = e.target.closest('.milestone-btn');
+        if (clickedBtn) {
+          const idx = parseInt(clickedBtn.getAttribute('data-index') || '0', 10);
+          if (idx !== currentIndex) {
+            goToMilestone(idx, true);
+          }
+          return;
+        }
 
-      // 1. Check if user clicked directly on or inside a milestone button
-      const clickedBtn = e.target.closest('.milestone-btn');
-      if (clickedBtn) {
-        const idx = parseInt(clickedBtn.getAttribute('data-index') || '0', 10);
-        if (idx > currentIndex) {
-          // If clicked on a year to the right, advance to next year
+        if (clickX > activeScreenX + 35) {
           if (currentIndex < milestones.length - 1) {
             goToMilestone(currentIndex + 1, true);
           }
           return;
-        } else if (idx < currentIndex) {
-          goToMilestone(idx, true);
+        }
+
+        if (clickX < activeScreenX - 35) {
+          const sliderClickX = clickX - currentSliderX;
+          const targetIdx = Math.round(sliderClickX / stepX);
+          if (targetIdx >= 0 && targetIdx < currentIndex) {
+            goToMilestone(targetIdx, true);
+          }
           return;
         }
-        return;
-      }
+      });
+    }
 
-      // 2. Click on the right side of the selected year (empty gradient space)
-      // "clicking on the rightside of selected year (which is empty gradient space) will select the next year. unless its the latest year"
-      if (clickX > activeScreenX + 35) {
-        if (currentIndex < milestones.length - 1) {
-          goToMilestone(currentIndex + 1, true);
-        }
-        return;
-      }
-
-      // 3. Click on the timeline ticks / space to the left of the selected year
-      if (clickX < activeScreenX - 35) {
-        const sliderClickX = clickX - currentSliderX;
-        const targetIdx = Math.round(sliderClickX / stepX);
-        if (targetIdx >= 0 && targetIdx < currentIndex) {
-          goToMilestone(targetIdx, true);
-        }
-        return;
-      }
-    });
-
-    // Also attach direct click listeners to buttons to guarantee instantaneous response
-    buttons.forEach((btn) => {
+    desktopButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         if (hasDragged) return;
         const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
-        if (idx > currentIndex) {
-          if (currentIndex < milestones.length - 1) {
-            goToMilestone(currentIndex + 1, true);
-          }
-        } else if (idx < currentIndex) {
+        if (idx !== currentIndex) {
           goToMilestone(idx, true);
         }
       });
     });
 
     // ==========================================
-    // 2. Draggable Navigation (Mouse & Touch)
+    // 2. Mobile Track Click Handler
     // ==========================================
-    track.addEventListener('pointerdown', (e) => {
-      // Don't drag if clicking description
-      if (e.target && e.target.closest('#milestone-desc-text')) return;
+    if (mobileTrack) {
+      mobileTrack.addEventListener('click', (e) => {
+        if (hasMobileDragged) return;
 
-      isDragging = true;
-      hasDragged = false;
-      startPointerX = e.clientX;
-      lastPointerX = e.clientX;
-      startSliderX = currentSliderX;
-      slider.style.transition = 'none';
-      // Notice: Do NOT call setPointerCapture here!
-      // Calling setPointerCapture on pointerdown suppresses click events on child buttons.
-    });
-
-    window.addEventListener('pointermove', (e) => {
-      if (!isDragging) return;
-
-      lastPointerX = e.clientX;
-      const deltaX = e.clientX - startPointerX;
-
-      // Only engage drag mode and pointer capture after moving past threshold (6px)
-      if (!hasDragged && Math.abs(deltaX) > 6) {
-        hasDragged = true;
-        track.classList.add('cursor-grabbing');
-        try {
-          if (e.pointerId) track.setPointerCapture(e.pointerId);
-        } catch (_) {}
-      }
-
-      if (hasDragged) {
-        const minX = focalX - (milestones.length - 1) * stepX;
-        const maxX = focalX;
-        let newX = startSliderX + deltaX;
-
-        // Apply rubber banding at edges
-        if (newX > maxX) {
-          newX = maxX + (newX - maxX) * 0.25;
-        } else if (newX < minX) {
-          newX = minX + (newX - minX) * 0.25;
+        const clickedBtn = e.target.closest('.mobile-milestone-btn');
+        if (clickedBtn) {
+          const idx = parseInt(clickedBtn.getAttribute('data-index') || '0', 10);
+          if (idx !== currentIndex) {
+            goToMilestone(idx, true);
+          }
+          return;
         }
 
-        setSliderPosition(newX, false);
+        const trackRect = mobileTrack.getBoundingClientRect();
+        const clickY = e.clientY - trackRect.top;
+        const activeScreenY = currentMobileSliderY + currentIndex * mobileStepY;
+
+        if (clickY > activeScreenY + 25) {
+          if (currentIndex < milestones.length - 1) {
+            goToMilestone(currentIndex + 1, true);
+          }
+          return;
+        }
+
+        if (clickY < activeScreenY - 25) {
+          const sliderClickY = clickY - currentMobileSliderY;
+          const targetIdx = Math.round(sliderClickY / mobileStepY);
+          if (targetIdx >= 0 && targetIdx < currentIndex) {
+            goToMilestone(targetIdx, true);
+          }
+          return;
+        }
+      });
+
+      mobileTrack.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        if (Math.abs(e.deltaY) > 15) {
+          if (e.deltaY > 0) {
+            if (currentIndex < milestones.length - 1) goToMilestone(currentIndex + 1, true);
+          } else {
+            if (currentIndex > 0) goToMilestone(currentIndex - 1, true);
+          }
+        }
+      }, { passive: false });
+    }
+
+    mobileButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        if (hasMobileDragged) return;
+        const idx = parseInt(btn.getAttribute('data-index') || '0', 10);
+        if (idx !== currentIndex) {
+          goToMilestone(idx, true);
+        }
+      });
+    });
+
+    // ==========================================
+    // 3. Desktop Dragging (Horizontal)
+    // ==========================================
+    if (desktopTrack && desktopSlider) {
+      desktopTrack.addEventListener('pointerdown', (e) => {
+        if (e.target && e.target.closest('#milestone-desc-text')) return;
+        isDragging = true;
+        hasDragged = false;
+        startPointerX = e.clientX;
+        lastPointerX = e.clientX;
+        startSliderX = currentSliderX;
+        desktopSlider.style.transition = 'none';
+      });
+    }
+
+    // ==========================================
+    // 4. Mobile Dragging (Vertical)
+    // ==========================================
+    if (mobileTrack && mobileSlider) {
+      mobileTrack.addEventListener('pointerdown', (e) => {
+        isMobileDragging = true;
+        hasMobileDragged = false;
+        startMobilePointerY = e.clientY;
+        lastMobilePointerY = e.clientY;
+        startMobileSliderY = currentMobileSliderY;
+        mobileSlider.style.transition = 'none';
+      });
+    }
+
+    // Unified pointermove
+    window.addEventListener('pointermove', (e) => {
+      if (isDragging && desktopTrack) {
+        lastPointerX = e.clientX;
+        const deltaX = e.clientX - startPointerX;
+        if (!hasDragged && Math.abs(deltaX) > 6) {
+          hasDragged = true;
+          desktopTrack.classList.add('cursor-grabbing');
+          try {
+            if (e.pointerId) desktopTrack.setPointerCapture(e.pointerId);
+          } catch (_) {}
+        }
+        if (hasDragged) {
+          const minX = focalX - (milestones.length - 1) * stepX;
+          const maxX = focalX;
+          let newX = startSliderX + deltaX;
+          if (newX > maxX) newX = maxX + (newX - maxX) * 0.25;
+          else if (newX < minX) newX = minX + (newX - minX) * 0.25;
+          setDesktopSliderPosition(newX, false);
+        }
+      }
+
+      if (isMobileDragging && mobileTrack) {
+        lastMobilePointerY = e.clientY;
+        const deltaY = e.clientY - startMobilePointerY;
+        if (!hasMobileDragged && Math.abs(deltaY) > 6) {
+          hasMobileDragged = true;
+          mobileTrack.classList.add('cursor-grabbing');
+          try {
+            if (e.pointerId) mobileTrack.setPointerCapture(e.pointerId);
+          } catch (_) {}
+        }
+        if (hasMobileDragged) {
+          const minY = mobileFocalY - (milestones.length - 1) * mobileStepY;
+          const maxY = mobileFocalY;
+          let newY = startMobileSliderY + deltaY;
+          if (newY > maxY) newY = maxY + (newY - maxY) * 0.25;
+          else if (newY < minY) newY = minY + (newY - minY) * 0.25;
+          setMobileSliderPosition(newY, false);
+        }
       }
     });
 
     function finishDrag(e) {
-      if (!isDragging) return;
-      isDragging = false;
-      track.classList.remove('cursor-grabbing');
-      try {
-        if (e && e.pointerId && track.hasPointerCapture && track.hasPointerCapture(e.pointerId)) {
-          track.releasePointerCapture(e.pointerId);
+      if (isDragging && desktopTrack) {
+        isDragging = false;
+        desktopTrack.classList.remove('cursor-grabbing');
+        try {
+          if (e && e.pointerId && desktopTrack.hasPointerCapture && desktopTrack.hasPointerCapture(e.pointerId)) {
+            desktopTrack.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
+
+        if (hasDragged) {
+          const currentX = (e && typeof e.clientX === 'number') ? e.clientX : lastPointerX;
+          const deltaX = currentX - startPointerX;
+          let snappedIdx = Math.round((focalX - currentSliderX) / stepX);
+
+          if (deltaX < -25 && snappedIdx <= currentIndex) {
+            snappedIdx = Math.min(milestones.length - 1, currentIndex + 1);
+          } else if (deltaX > 25 && snappedIdx >= currentIndex) {
+            snappedIdx = Math.max(0, currentIndex - 1);
+          }
+
+          snappedIdx = Math.max(0, Math.min(milestones.length - 1, snappedIdx));
+          goToMilestone(snappedIdx, true);
+
+          setTimeout(() => {
+            hasDragged = false;
+          }, 80);
         }
-      } catch (_) {}
+      }
 
-      if (hasDragged) {
-        const currentX = (e && typeof e.clientX === 'number') ? e.clientX : lastPointerX;
-        const deltaX = currentX - startPointerX;
-        let snappedIdx = Math.round((focalX - currentSliderX) / stepX);
+      if (isMobileDragging && mobileTrack) {
+        isMobileDragging = false;
+        mobileTrack.classList.remove('cursor-grabbing');
+        try {
+          if (e && e.pointerId && mobileTrack.hasPointerCapture && mobileTrack.hasPointerCapture(e.pointerId)) {
+            mobileTrack.releasePointerCapture(e.pointerId);
+          }
+        } catch (_) {}
 
-        if (deltaX < -25 && snappedIdx <= currentIndex) {
-          snappedIdx = Math.min(milestones.length - 1, currentIndex + 1);
-        } else if (deltaX > 25 && snappedIdx >= currentIndex) {
-          snappedIdx = Math.max(0, currentIndex - 1);
+        if (hasMobileDragged) {
+          const currentY = (e && typeof e.clientY === 'number') ? e.clientY : lastMobilePointerY;
+          const deltaY = currentY - startMobilePointerY;
+          let snappedIdx = Math.round((mobileFocalY - currentMobileSliderY) / mobileStepY);
+
+          if (deltaY < -20 && snappedIdx <= currentIndex) {
+            snappedIdx = Math.min(milestones.length - 1, currentIndex + 1);
+          } else if (deltaY > 20 && snappedIdx >= currentIndex) {
+            snappedIdx = Math.max(0, currentIndex - 1);
+          }
+
+          snappedIdx = Math.max(0, Math.min(milestones.length - 1, snappedIdx));
+          goToMilestone(snappedIdx, true);
+
+          setTimeout(() => {
+            hasMobileDragged = false;
+          }, 80);
         }
-
-        snappedIdx = Math.max(0, Math.min(milestones.length - 1, snappedIdx));
-        goToMilestone(snappedIdx, true);
-
-        // Keep hasDragged true briefly to suppress immediate click trigger
-        setTimeout(() => {
-          hasDragged = false;
-        }, 80);
       }
     }
 
@@ -689,7 +1085,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     window.addEventListener('pointercancel', finishDrag);
 
     // ==========================================
-    // 3. Keyboard Navigation
+    // 5. Keyboard Navigation
     // ==========================================
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -708,12 +1104,12 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
 <!-- Client Script: Diagonal Wave Looping Animation & Partner Logo Tooltip -->
 <script is:inline define:vars={{ partnersPool: uniquePartnersList }}>
   (function () {
-    const gridRoot = document.getElementById('partners-grid-root');
+    const gridRoots = Array.from(document.querySelectorAll('.partners-grid-root'));
     const tooltip = document.getElementById('partner-tooltip');
     const tooltipText = document.getElementById('partner-tooltip-text');
     const tooltipArrow = document.getElementById('partner-tooltip-arrow');
 
-    if (!gridRoot || !Array.isArray(partnersPool) || partnersPool.length < 2) return;
+    if (gridRoots.length === 0 || !Array.isArray(partnersPool) || partnersPool.length < 2) return;
 
     // Check user preference for reduced motion
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -726,41 +1122,8 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       }
     });
 
-    const cells = Array.from(gridRoot.querySelectorAll('[data-partner-cell]'));
-    const targets = Array.from(gridRoot.querySelectorAll('[data-partner-target]'));
-
-    // Group cells by diagonal set (diagSet = 0 to 10)
-    // d = 0 is leftmost corner (1 cell)
-    // d = 1..9 are diagonal pairs (2 cells each)
-    // d = 10 is rightmost corner (1 cell)
-    const setsMap = new Map();
-    cells.forEach((cell) => {
-      const diagSet = parseInt(cell.getAttribute('data-diag-set') || '0', 10);
-      if (!setsMap.has(diagSet)) {
-        setsMap.set(diagSet, []);
-      }
-      setsMap.get(diagSet).push(cell);
-    });
-
-    // Track which layer is currently active ('a' or 'b') for each cell
     const cellActiveLayer = new Map();
-    cells.forEach((cell) => {
-      cellActiveLayer.set(cell, 'a');
-    });
-
-    const totalSets = setsMap.size; // 11 sets: 0 through 10
-    const staggerDelay = 140; // ms delay between consecutive diagonal sets (wave ripple speed)
-    const shrinkDuration = 320; // ms for shrink animation
-    const fadeInDuration = 400; // ms for fade-in animation
-    const waveRestInterval = 2800; // ms pause between complete wave loops
-
-    let currentWave = 0;
-    let isWaveActive = false;
-    let isVisible = true;
     let isHovered = false;
-    let nextWaveTimeout = null;
-    let stepTimer = null;
-    let currentSetIndex = 0;
 
     // ========================================================
     // Tooltip Engine (Targeted strictly to the logo element)
@@ -822,8 +1185,9 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       tooltip.classList.add('opacity-0', 'scale-95');
     }
 
-    // Attach hover listeners ONLY to the logo interactive targets
-    targets.forEach((target) => {
+    // Attach hover listeners to all partner targets across both mobile & desktop grids
+    const allTargets = Array.from(document.querySelectorAll('[data-partner-target]'));
+    allTargets.forEach((target) => {
       target.addEventListener('mouseenter', () => {
         isHovered = true;
         showTooltip(target);
@@ -832,9 +1196,6 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       target.addEventListener('mouseleave', () => {
         isHovered = false;
         hideTooltip();
-        if (!isWaveActive) {
-          scheduleNextWave(1200);
-        }
       });
     });
 
@@ -842,133 +1203,160 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     window.addEventListener('resize', hideTooltip, { passive: true });
 
     // ========================================================
-    // Looping Diagonal Wave Animation Engine with Pause Support
+    // Looping Diagonal Wave Animation Engine per Grid Root
     // ========================================================
-    function runWave() {
-      if (!isVisible || isHovered) {
-        scheduleNextWave(600);
-        return;
-      }
+    function initGridWave(gridRoot) {
+      const cells = Array.from(gridRoot.querySelectorAll('[data-partner-cell]'));
+      if (cells.length === 0) return;
 
-      isWaveActive = true;
-      currentWave++;
-      currentSetIndex = 0;
+      const setsMap = new Map();
+      cells.forEach((cell) => {
+        const diagSet = parseInt(cell.getAttribute('data-diag-set') || '0', 10);
+        if (!setsMap.has(diagSet)) {
+          setsMap.set(diagSet, []);
+        }
+        setsMap.get(diagSet).push(cell);
+        cellActiveLayer.set(cell, 'a');
+      });
 
-      stepNextSet();
-    }
+      const totalSets = setsMap.size;
+      const staggerDelay = 140; // ms delay between consecutive diagonal sets (wave ripple speed)
+      const shrinkDuration = 320; // ms for shrink animation
+      const fadeInDuration = 400; // ms for fade-in animation
+      const waveRestInterval = 2800; // ms pause between complete wave loops
 
-    function stepNextSet() {
-      if (stepTimer) clearTimeout(stepTimer);
+      let currentWave = 0;
+      let isWaveActive = false;
+      let isVisible = true;
+      let nextWaveTimeout = null;
+      let stepTimer = null;
+      let currentSetIndex = 0;
 
-      // If user is hovering on a logo, pause the wave and check periodically
-      if (isHovered) {
-        stepTimer = setTimeout(stepNextSet, 120);
-        return;
-      }
-
-      if (currentSetIndex < totalSets) {
-        const d = currentSetIndex;
-        animateDiagonalSet(d);
-        currentSetIndex++;
-        stepTimer = setTimeout(stepNextSet, staggerDelay);
-      } else {
-        // All diagonal sets in this wave have been triggered; wait for transition to finish
-        setTimeout(() => {
-          isWaveActive = false;
-          scheduleNextWave(waveRestInterval);
-        }, shrinkDuration + fadeInDuration);
-      }
-    }
-
-    function animateDiagonalSet(d) {
-      const setCells = setsMap.get(d) || [];
-      const nextPartnerIndex = (d + currentWave) % partnersPool.length;
-      const nextPartner = partnersPool[nextPartnerIndex];
-
-      setCells.forEach((cell) => {
-        const activeLayerKey = cellActiveLayer.get(cell) || 'a';
-        const nextLayerKey = activeLayerKey === 'a' ? 'b' : 'a';
-
-        const activeImg = cell.querySelector(`[data-layer="${activeLayerKey}"]`);
-        const nextImg = cell.querySelector(`[data-layer="${nextLayerKey}"]`);
-
-        if (!activeImg || !nextImg) return;
-
-        // 1. Prepare nextImg with the new partner details while still hidden
-        nextImg.src = nextPartner.logo;
-        nextImg.alt = nextPartner.name;
-        nextImg.style.transition = 'none';
-        nextImg.style.transform = prefersReducedMotion ? 'scale(1)' : 'scale(0.85)';
-        nextImg.style.opacity = '0';
-
-        // 2. Shrink currently active image
-        if (prefersReducedMotion) {
-          activeImg.style.transition = `opacity ${shrinkDuration}ms ease-in`;
-          activeImg.style.opacity = '0';
-        } else {
-          activeImg.style.transition = `transform ${shrinkDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${Math.round(shrinkDuration * 0.85)}ms ease-in`;
-          activeImg.style.transform = 'scale(0)';
-          activeImg.style.opacity = '0';
+      function runWave() {
+        if (!isVisible || isHovered) {
+          scheduleNextWave(600);
+          return;
         }
 
-        // 3. Fade in replacing image as the previous image shrinks out
-        const fadeInDelay = Math.round(shrinkDuration * 0.8);
-        setTimeout(() => {
-          if (!isVisible) return;
-          void nextImg.offsetWidth; // Force reflow to commit prep styles
+        isWaveActive = true;
+        currentWave++;
+        currentSetIndex = 0;
+        stepNextSet();
+      }
 
+      function stepNextSet() {
+        if (stepTimer) clearTimeout(stepTimer);
+
+        if (isHovered) {
+          stepTimer = setTimeout(stepNextSet, 120);
+          return;
+        }
+
+        if (currentSetIndex < totalSets) {
+          const d = currentSetIndex;
+          animateDiagonalSet(d);
+          currentSetIndex++;
+          stepTimer = setTimeout(stepNextSet, staggerDelay);
+        } else {
+          setTimeout(() => {
+            isWaveActive = false;
+            scheduleNextWave(waveRestInterval);
+          }, shrinkDuration + fadeInDuration);
+        }
+      }
+
+      function animateDiagonalSet(d) {
+        const setCells = setsMap.get(d) || [];
+        const nextPartnerIndex = (d + currentWave) % partnersPool.length;
+        const nextPartner = partnersPool[nextPartnerIndex];
+
+        setCells.forEach((cell) => {
+          const activeLayerKey = cellActiveLayer.get(cell) || 'a';
+          const nextLayerKey = activeLayerKey === 'a' ? 'b' : 'a';
+
+          const activeImg = cell.querySelector(`[data-layer="${activeLayerKey}"]`);
+          const nextImg = cell.querySelector(`[data-layer="${nextLayerKey}"]`);
+
+          if (!activeImg || !nextImg) return;
+
+          // 1. Prepare nextImg with the new partner details while still hidden
+          nextImg.src = nextPartner.logo;
+          nextImg.alt = nextPartner.name;
+          nextImg.style.transition = 'none';
+          nextImg.style.transform = prefersReducedMotion ? 'scale(1)' : 'scale(0.85)';
+          nextImg.style.opacity = '0';
+
+          // 2. Shrink currently active image
           if (prefersReducedMotion) {
-            nextImg.style.transition = `opacity ${fadeInDuration}ms ease-out`;
-            nextImg.style.opacity = '1';
+            activeImg.style.transition = `opacity ${shrinkDuration}ms ease-in`;
+            activeImg.style.opacity = '0';
           } else {
-            nextImg.style.transition = `transform ${fadeInDuration}ms cubic-bezier(0.16, 1, 0.3, 1), opacity ${fadeInDuration}ms ease-out`;
-            nextImg.style.transform = 'scale(1)';
-            nextImg.style.opacity = '1';
+            activeImg.style.transition = `transform ${shrinkDuration}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${Math.round(shrinkDuration * 0.85)}ms ease-in`;
+            activeImg.style.transform = 'scale(0)';
+            activeImg.style.opacity = '0';
           }
 
-          // 4. Update the active layer reference for this cell
-          cellActiveLayer.set(cell, nextLayerKey);
-
-          // 5. Clean up old active image once fade-in finishes
+          // 3. Fade in replacing image as the previous image shrinks out
+          const fadeInDelay = Math.round(shrinkDuration * 0.8);
           setTimeout(() => {
-            activeImg.style.transition = 'none';
-            activeImg.style.transform = 'scale(0.85)';
-            activeImg.style.opacity = '0';
-          }, fadeInDuration);
-        }, fadeInDelay);
+            if (!isVisible) return;
+            void nextImg.offsetWidth; // Force reflow to commit prep styles
+
+            if (prefersReducedMotion) {
+              nextImg.style.transition = `opacity ${fadeInDuration}ms ease-out`;
+              nextImg.style.opacity = '1';
+            } else {
+              nextImg.style.transition = `transform ${fadeInDuration}ms cubic-bezier(0.16, 1, 0.3, 1), opacity ${fadeInDuration}ms ease-out`;
+              nextImg.style.transform = 'scale(1)';
+              nextImg.style.opacity = '1';
+            }
+
+            // 4. Update the active layer reference for this cell
+            cellActiveLayer.set(cell, nextLayerKey);
+
+            // 5. Clean up old active image once fade-in finishes
+            setTimeout(() => {
+              activeImg.style.transition = 'none';
+              activeImg.style.transform = 'scale(0.85)';
+              activeImg.style.opacity = '0';
+            }, fadeInDuration);
+          }, fadeInDelay);
+        });
+      }
+
+      function scheduleNextWave(delayMs) {
+        if (nextWaveTimeout) clearTimeout(nextWaveTimeout);
+        nextWaveTimeout = setTimeout(() => {
+          runWave();
+        }, delayMs);
+      }
+
+      // Initial start after 2.2 seconds
+      scheduleNextWave(2200);
+
+      // Viewport intersection observer to save CPU/battery when not visible
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            isVisible = entry.isIntersecting && document.visibilityState === 'visible';
+            if (isVisible && !isWaveActive && !nextWaveTimeout) {
+              scheduleNextWave(1000);
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+      observer.observe(gridRoot);
+
+      document.addEventListener('visibilitychange', () => {
+        isVisible = document.visibilityState === 'visible';
+        if (isVisible && !isWaveActive && !nextWaveTimeout) {
+          scheduleNextWave(1000);
+        }
       });
     }
 
-    function scheduleNextWave(delayMs) {
-      if (nextWaveTimeout) clearTimeout(nextWaveTimeout);
-      nextWaveTimeout = setTimeout(() => {
-        runWave();
-      }, delayMs);
-    }
-
-    // Initial start after 2.2 seconds
-    scheduleNextWave(2200);
-
-    // Viewport intersection observer to save CPU/battery when not visible
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          isVisible = entry.isIntersecting && document.visibilityState === 'visible';
-          if (isVisible && !isWaveActive && !nextWaveTimeout) {
-            scheduleNextWave(1000);
-          }
-        });
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(gridRoot);
-
-    document.addEventListener('visibilitychange', () => {
-      isVisible = document.visibilityState === 'visible';
-      if (isVisible && !isWaveActive && !nextWaveTimeout) {
-        scheduleNextWave(1000);
-      }
-    });
+    gridRoots.forEach((gridRoot) => initGridWave(gridRoot));
   })();
 </script>
 

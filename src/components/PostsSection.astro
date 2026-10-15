@@ -48,11 +48,11 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
           <div class="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none"></div>
 
           <!-- Post Info (Title, Post Type, Author) - visible only when highlighted -->
-          <div class="featured-info absolute inset-x-0 bottom-0 p-4 sm:p-5 md:p-7 text-white z-10 pointer-events-none">
-            <h3 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-white leading-tight mb-1.5 md:mb-2 line-clamp-2 max-w-2xl drop-shadow-md">
+          <div class="featured-info absolute inset-x-0 bottom-0 p-3 sm:p-5 md:p-7 text-white z-10 pointer-events-none">
+            <h3 class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold text-white leading-tight mb-1 md:mb-2 line-clamp-2 max-w-2xl drop-shadow-md">
               {post.title}
             </h3>
-            <p class="text-xs sm:text-sm text-neutral-300 font-normal drop-shadow-sm">
+            <p class="text-[11px] sm:text-xs md:text-sm text-neutral-300 font-normal drop-shadow-sm">
               {post.type} by {post.author}
             </p>
           </div>
@@ -170,6 +170,38 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
     transition: none;
   }
 
+  /* Mobile: Single full-width card with smooth cross-fade rotation */
+  @media (max-width: 639px) {
+    .featured-row {
+      aspect-ratio: 16 / 9;
+      min-height: 200px;
+      max-height: 280px;
+      position: relative;
+    }
+    .featured-card {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      flex: none;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.98);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+      z-index: 1;
+    }
+    .featured-card.is-active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+      z-index: 5;
+    }
+    .featured-card .featured-info {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* Second Row Grid: identical gap */
   .recent-posts-grid {
     gap: var(--posts-card-gap);
@@ -244,6 +276,31 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
         }
       });
     });
+
+    // Touch swipe support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    row.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        touchStartX = e.touches[0].clientX;
+      }
+    }, { passive: true });
+
+    row.addEventListener('touchend', (e) => {
+      if (e.changedTouches && e.changedTouches.length > 0) {
+        touchEndX = e.changedTouches[0].clientX;
+        const diffX = touchEndX - touchStartX;
+        if (Math.abs(diffX) > 40) {
+          elapsedBeforePause = 0;
+          if (diffX < 0) {
+            setActive(currentIndex + 1);
+          } else {
+            setActive(currentIndex - 1);
+          }
+        }
+      }
+    }, { passive: true });
 
     // Pause on hover so the user can read comfortably
     row.addEventListener('mouseenter', () => {
