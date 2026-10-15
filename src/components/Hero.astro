@@ -1,37 +1,281 @@
 ---
+import { featuredPosts } from "../data/posts";
 ---
+
 <section class="relative w-full h-screen bg-black overflow-hidden font-sans">
-  <!-- Background Image -->
-  <img src="/hero-rafid.png" alt="Hero Background" class="absolute inset-0 w-full h-full object-cover" />
+  <!-- Background Images (Alternating hero-kabinet & hero-rafid) -->
+  <div
+    class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
+  >
+    <!-- Slide 1: hero-kabinet -->
+    <picture
+      class="hero-bg-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-100"
+    >
+      <source srcset="/hero-kabinet.webp" type="image/webp" />
+      <img
+        src="/hero-kabinet.JPG"
+        alt="IEEE SB IPB Cabinet"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+    </picture>
+
+    <!-- Slide 2: hero-rafid -->
+    <picture
+      class="hero-bg-slide absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out opacity-0"
+    >
+      <source srcset="/hero-rafid.webp" type="image/webp" />
+      <img
+        src="/hero-rafid.png"
+        alt="IEEE SB IPB Community"
+        class="w-full h-full object-cover"
+        loading="eager"
+      />
+    </picture>
+  </div>
 
   <!-- Content Container -->
-  <div class="relative z-10 w-full h-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col justify-center pb-16 pt-24">
-    
+  <div
+    class="relative z-10 w-full h-full max-w-7xl mx-auto px-6 lg:px-12 flex flex-col justify-center pb-16 pt-24"
+  >
     <!-- Left side (Logo) -->
     <div class="flex-1 flex flex-col justify-center max-w-md">
-      <img src="/ieee-ipb.svg" alt="IPB University IEEE Student Branch" class="w-[400px] h-auto drop-shadow-lg" />
+      <img
+        src="/ieee-ipb.svg"
+        alt="IPB University IEEE Student Branch"
+        class="w-[400px] h-auto drop-shadow-lg"
+      />
     </div>
 
     <!-- Bottom right side (Latest Article) -->
     <div class="absolute bottom-12 right-6 lg:right-12 flex flex-col items-end">
-      <span class="text-white text-lg font-medium mb-3 mr-2 drop-shadow-md">Latest article</span>
+      <span class="text-white text-sm font-light mb-1">Latest article</span>
       <!-- Card -->
-      <div class="flex items-stretch bg-[#0a0a0a] overflow-hidden max-w-[340px] shadow-2xl relative border border-gray-800/50">
-        <!-- Text Content -->
-        <div class="p-4 pr-1 flex-1 relative z-20 flex flex-col justify-center w-3/5">
-          <h3 class="text-white text-xs font-bold leading-snug mb-2 pr-2">
-            How the Activated Sludge Process Powers Modern Urban Wastewater Treatment
-          </h3>
-          <p class="text-gray-400 text-[10px] font-medium">Mikailia Khiva</p>
+      <a
+        id="hero-article-card"
+        href={`/posts#${featuredPosts[0].slug}`}
+        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-[296px] max-w-full h-[80px] relative group cursor-pointer block select-none"
+        aria-label="Latest featured article"
+      >
+        <!-- Sliding Images Track -->
+        <div
+          id="hero-carousel-images"
+          class="absolute inset-0 w-full h-full flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] z-0"
+          style="transform: translateX(0%);"
+        >
+          {
+            featuredPosts.map((post) => (
+              <div class="w-full h-full flex-shrink-0 relative">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  class="w-full h-full object-cover object-right"
+                  loading="lazy"
+                />
+              </div>
+            ))
+          }
         </div>
-        
-        <!-- Image with Fade -->
-        <div class="relative w-2/5 min-h-[120px] flex-shrink-0">
-          <!-- Fade overlay (from dark #0a0a0a on left to transparent on right) -->
-          <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10"></div>
-          <img src="/post-cover-dummy.png" alt="Article thumbnail" class="absolute inset-0 w-full h-full object-cover z-0" />
+
+        <!-- Fade Overlay (ends at ~60% of card) -->
+        <div
+          class="absolute inset-0 z-10 pointer-events-none"
+          style="background: linear-gradient(to right, #0a0a0a 0%, rgba(10, 10, 10, 0.71) 40%, rgba(10, 10, 10, 0) 60%);"
+        >
         </div>
-      </div>
+
+        <!-- Text Content (Fade Transition) -->
+        <div class="relative z-20 w-3/5 h-full">
+          {
+            featuredPosts.map((post, idx) => (
+              <div
+                class={`hero-slide-text absolute inset-0 p-2.5 pr-2 flex flex-col justify-between transition-opacity duration-500 ease-in-out ${
+                  idx === 0
+                    ? "opacity-100 pointer-events-auto"
+                    : "opacity-0 pointer-events-none"
+                }`}
+                data-slide-index={idx}
+                data-slug={`/posts#${post.slug}`}
+              >
+                <h3 class="text-white text-xs font-bold leading-tight line-clamp-3">
+                  {post.title}
+                </h3>
+                <p class="text-gray-400 text-[9px] font-medium leading-none">
+                  {post.author}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+
+        <!-- Three Transparent Dots at Right Bottom (aligned with author's text) -->
+        <div
+          class="absolute right-3 bottom-[11.5px] z-30 flex items-center gap-1.5"
+          id="hero-carousel-dots"
+          aria-label="Carousel navigation dots"
+        >
+          {
+            featuredPosts.map((_, idx) => (
+              <button
+                type="button"
+                class={`hero-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === 0
+                    ? "bg-white/90 scale-125 shadow-[0_0_5px_rgba(255,255,255,0.7)]"
+                    : "bg-white/30 hover:bg-white/60 border border-white/20"
+                }`}
+                data-dot-index={idx}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))
+          }
+        </div>
+      </a>
     </div>
   </div>
 </section>
+
+<script>
+  function initHeroCarousel() {
+    const card = document.getElementById(
+      "hero-article-card",
+    ) as HTMLAnchorElement | null;
+    const imagesTrack = document.getElementById("hero-carousel-images");
+    const dots = document.querySelectorAll<HTMLElement>(".hero-dot");
+    const textSlides =
+      document.querySelectorAll<HTMLElement>(".hero-slide-text");
+
+    if (!imagesTrack || dots.length === 0 || textSlides.length === 0) return;
+
+    const totalSlides = dots.length;
+    let currentIndex = 0;
+    let intervalId: number | null = null;
+    let isHovered = false;
+
+    const cardLinks = Array.from(textSlides).map(
+      (el) => el.getAttribute("data-slug") || "/posts",
+    );
+
+    function goToSlide(index: number) {
+      currentIndex = (index + totalSlides) % totalSlides;
+
+      // 1. Smooth sliding image track
+      imagesTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+      // 2. Smooth fading text
+      textSlides.forEach((slide, i) => {
+        if (i === currentIndex) {
+          slide.classList.remove("opacity-0", "pointer-events-none");
+          slide.classList.add("opacity-100", "pointer-events-auto");
+        } else {
+          slide.classList.remove("opacity-100", "pointer-events-auto");
+          slide.classList.add("opacity-0", "pointer-events-none");
+        }
+      });
+
+      // 3. Update dots
+      dots.forEach((dot, i) => {
+        if (i === currentIndex) {
+          dot.className =
+            "hero-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer bg-white/90 scale-125 shadow-[0_0_5px_rgba(255,255,255,0.7)]";
+        } else {
+          dot.className =
+            "hero-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer bg-white/30 hover:bg-white/60 border border-white/20";
+        }
+      });
+
+      // 4. Update card target href
+      if (card && cardLinks[currentIndex]) {
+        card.href = cardLinks[currentIndex];
+      }
+    }
+
+    function nextSlide() {
+      goToSlide(currentIndex + 1);
+    }
+
+    function startAutoplay() {
+      stopAutoplay();
+      intervalId = window.setInterval(() => {
+        if (!isHovered) {
+          nextSlide();
+        }
+      }, 4500);
+    }
+
+    function stopAutoplay() {
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    }
+
+    // Dot click handling
+    dots.forEach((dot) => {
+      dot.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetIndex = Number(dot.getAttribute("data-dot-index"));
+        if (!isNaN(targetIndex)) {
+          goToSlide(targetIndex);
+          startAutoplay();
+        }
+      });
+    });
+
+    // Pause alternating on card hover
+    if (card) {
+      card.addEventListener("mouseenter", () => {
+        isHovered = true;
+      });
+      card.addEventListener("mouseleave", () => {
+        isHovered = false;
+      });
+    }
+
+    startAutoplay();
+  }
+
+  let bgIntervalId: number | null = null;
+
+  function initHeroBackgroundCarousel() {
+    const bgSlides = document.querySelectorAll<HTMLElement>(".hero-bg-slide");
+    if (bgSlides.length < 2) return;
+
+    if (bgIntervalId !== null) {
+      clearInterval(bgIntervalId);
+      bgIntervalId = null;
+    }
+
+    let currentBgIndex = 0;
+    const totalBgs = bgSlides.length;
+
+    bgIntervalId = window.setInterval(() => {
+      currentBgIndex = (currentBgIndex + 1) % totalBgs;
+      bgSlides.forEach((slide, idx) => {
+        if (idx === currentBgIndex) {
+          slide.classList.remove("opacity-0");
+          slide.classList.add("opacity-100");
+        } else {
+          slide.classList.remove("opacity-100");
+          slide.classList.add("opacity-0");
+        }
+      });
+    }, 6000);
+  }
+
+  function initHeroAll() {
+    initHeroCarousel();
+    initHeroBackgroundCarousel();
+  }
+
+  // Initialize on DOM ready & Astro transitions
+  if (
+    document.readyState === "complete" ||
+    document.readyState === "interactive"
+  ) {
+    initHeroAll();
+  } else {
+    document.addEventListener("DOMContentLoaded", initHeroAll);
+  }
+  document.addEventListener("astro:page-load", initHeroAll);
+</script>
