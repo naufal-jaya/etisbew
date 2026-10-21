@@ -1,0 +1,333 @@
+---
+import "../styles/global.css";
+import { featuredPosts, recentPosts } from '../data/posts'; // Sesuaikan jika struktur datamu berbeda
+
+// Gabungkan semua data post atau ambil dari database/CMS
+const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts]; 
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News & Articles - IPB University IEEE Student Branch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@100..900&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      
+      /* Featured Carousel Styles */
+      :root {
+        --posts-card-gap: 16px;
+      }
+      .featured-row {
+        gap: var(--posts-card-gap);
+        aspect-ratio: 1835 / 590;
+        min-height: 220px;
+        max-height: 480px;
+      }
+      .featured-card {
+        flex: 404 1 0%;
+        min-width: 0;
+        height: 100%;
+        transition: flex 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .featured-card.is-active {
+        flex: 1027 1 0%;
+      }
+      .featured-card .featured-info {
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+      .featured-card.is-active .featured-info {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.18s;
+      }
+      .featured-card .featured-progress-bar {
+        width: 0%;
+        transition: none;
+      }
+
+      /* Mobile: Single full-width card with smooth cross-fade rotation */
+      @media (max-width: 639px) {
+        .featured-row {
+          aspect-ratio: 16 / 9;
+          min-height: 200px;
+          max-height: 280px;
+          position: relative;
+        }
+        .featured-card {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          flex: none;
+          opacity: 0;
+          pointer-events: none;
+          transform: scale(0.98);
+          transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+          z-index: 1;
+        }
+        .featured-card.is-active {
+          opacity: 1;
+          pointer-events: auto;
+          transform: scale(1);
+          z-index: 5;
+        }
+        .featured-card .featured-info {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        /* Menyembunyikan scrollbar pada navigasi kategori */
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white text-black antialiased">
+    <!-- Pembungkus luar untuk Margin Global -->
+    <main class="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-8 md:py-12">
+      <!-- Pembungkus dalam untuk membatasi lebar konten maksimal 6xl -->
+      <div class="w-full max-w-6xl mx-auto flex flex-col justify-center">
+        
+      <!-- Header: Back Arrow & Logo -->
+        <header class="mb-8 mt-2">
+          <a href="/" class="flex items-center gap-3 sm:gap-4 hover:opacity-75 transition-opacity duration-200 w-fit" aria-label="Go back to Home">
+            <!-- Tanda Panah -->
+            <span class="text-xl sm:text-2xl font-light">&larr;</span>
+            
+            <!-- Gambar Logo -->
+            <img 
+              src="/ieee-black.png" 
+              alt="IPB University IEEE Student Branch" 
+              class="h-6 sm:h-7 md:h-8 w-auto object-contain"
+            />
+          </a>
+        </header>
+
+        <!-- Featured Row -->
+        <section class="mb-4">
+          <div id="featured-row" class="featured-row flex w-full overflow-hidden" data-active-index="1">
+            {featuredPosts.map((post, idx) => {
+              // Buat slug url
+              const slug = post.title.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '-');
+              
+              return (
+                <div
+                  class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === 1 ? 'is-active' : ''}`}
+                  data-card-index={idx}
+                  data-slug={slug} 
+                >
+                  <img
+                    src={post.image}
+                    alt={post.title}
+                    class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div class="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none"></div>
+                  
+                  <div class="featured-info absolute inset-x-0 bottom-0 p-3 sm:p-5 md:p-7 text-white z-10 pointer-events-none">
+                    <h3 class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-1 md:mb-2 line-clamp-2 max-w-2xl drop-shadow-md">
+                      {post.title}
+                    </h3>
+                    <p class="text-[11px] sm:text-xs md:text-sm text-neutral-300 font-normal drop-shadow-sm">
+                      {post.type} by {post.author}
+                    </p>
+                  </div>
+
+                  <div class="featured-progress-track absolute inset-x-0 bottom-0 h-1 bg-black/40 z-20 overflow-hidden">
+                    <div class="featured-progress-bar h-full bg-white/90 w-0"></div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <!-- Filter Categories -->
+        <nav class="border-b border-black mb-4 pb-2">
+          <!-- Ganti flex-wrap menjadi flex-nowrap overflow-x-auto dan tambahkan no-scrollbar -->
+          <ul class="flex flex-nowrap overflow-x-auto gap-4 sm:gap-6 text-sm font-medium no-scrollbar">
+            <!-- Tambahkan shrink-0 di setiap li agar teksnya tidak menyusut/tergencet -->
+            <li class="shrink-0"><a href="#" class="hover:text-gray-600">All Post</a></li>
+            <li class="shrink-0"><a href="#" class="hover:text-gray-600">IEEEnsight</a></li>
+            <li class="shrink-0"><a href="#" class="hover:text-gray-600">Tech Insight</a></li>
+            <li class="shrink-0">
+              <a href="#" class="bg-[#d4ed31] px-2 py-0.5 inline-block text-black">
+                BizInsight
+              </a>
+            </li>
+            <li class="shrink-0"><a href="#" class="hover:text-gray-600">Activities</a></li>
+          </ul>
+        </nav>
+
+        <!-- Article Grid (3 Columns) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {allPosts.map((post) => {
+            // Membuat slug URL dari judul artikel
+            const slug = post.title.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '-');
+            
+            return (
+              <a href={`/posts/${slug}`} class="flex flex-col group cursor-pointer w-full">
+                <!-- Thumbnail -->
+                <div class="relative w-full aspect-[440/248] overflow-hidden mb-3 bg-neutral-900 block">
+                  <img 
+                    src={post.image} 
+                    alt={post.title} 
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+                
+                <!-- Content -->
+                <h2 class="text-xs sm:text-sm font-bold leading-snug mb-1 md:mb-2 line-clamp-2 group-hover:underline decoration-2 underline-offset-2">
+                  {post.title}
+                </h2>
+                
+                <div class="flex justify-between items-center text-[10px] sm:text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
+                  <span>by {post.author}</span>
+                  <span>1st August 2026</span>
+                </div>
+                
+                <p class="text-[10px] sm:text-xs text-gray-700 line-clamp-3">
+                  Click to read the full article about {post.title}...
+                </p>
+              </a>
+            );
+          })}
+        </div>
+        
+      </div>
+    </main>
+
+    <!-- Carousel Script -->
+    <script>
+      function setupFeaturedCarousel() {
+        const row = document.getElementById('featured-row');
+        if (!row) return;
+
+        const cards = Array.from(row.querySelectorAll<HTMLElement>('.featured-card'));
+        if (cards.length < 2) return;
+
+        const DURATION_MS = 7000;
+        let currentIndex = 1;
+        let timerStartTime = 0;
+        let animFrameId: number | null = null;
+        let isPaused = false;
+        let elapsedBeforePause = 0;
+
+        function setActive(index: number) {
+          currentIndex = (index + cards.length) % cards.length;
+          row.dataset.activeIndex = String(currentIndex);
+
+          cards.forEach((card, idx) => {
+            const bar = card.querySelector<HTMLElement>('.featured-progress-bar');
+            if (idx === currentIndex) {
+              card.classList.add('is-active');
+              if (bar) bar.style.width = '0%';
+            } else {
+              card.classList.remove('is-active');
+              if (bar) bar.style.width = '0%';
+            }
+          });
+
+          startProgress(0);
+        }
+
+        function startProgress(startElapsed: number) {
+          if (animFrameId) cancelAnimationFrame(animFrameId);
+          timerStartTime = performance.now() - startElapsed;
+
+          function step(now: number) {
+            if (isPaused) return;
+            const elapsed = now - timerStartTime;
+            const progress = Math.min(1, elapsed / DURATION_MS);
+            const activeCard = cards[currentIndex];
+            const bar = activeCard?.querySelector<HTMLElement>('.featured-progress-bar');
+            
+            if (bar) bar.style.width = `${(progress * 100).toFixed(1)}%`;
+
+            if (progress >= 1) {
+              setActive(currentIndex + 1);
+            } else {
+              animFrameId = requestAnimationFrame(step);
+            }
+          }
+          animFrameId = requestAnimationFrame(step);
+        }
+
+        cards.forEach((card, idx) => {
+          card.addEventListener('click', () => {
+            if (currentIndex !== idx) {
+              // Jika card belum aktif/kecil, klik akan memperbesar card
+              elapsedBeforePause = 0;
+              setActive(idx);
+            } else {
+              // Jika card sudah aktif/besar, klik akan mengarahkan ke halaman news
+              const slug = card.getAttribute('data-slug');
+              if (slug) {
+                window.location.href = `/posts/${slug}`;
+              }
+            }
+          });
+        });
+
+        // Touch swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        row.addEventListener('touchstart', (e) => {
+          if (e.touches && e.touches.length > 0) {
+            touchStartX = e.touches[0].clientX;
+          }
+        }, { passive: true });
+
+        row.addEventListener('touchend', (e) => {
+          if (e.changedTouches && e.changedTouches.length > 0) {
+            touchEndX = e.changedTouches[0].clientX;
+            const diffX = touchEndX - touchStartX;
+            if (Math.abs(diffX) > 40) {
+              elapsedBeforePause = 0;
+              if (diffX < 0) {
+                setActive(currentIndex + 1);
+              } else {
+                setActive(currentIndex - 1);
+              }
+            }
+          }
+        }, { passive: true });
+
+        row.addEventListener('mouseenter', () => {
+          isPaused = true;
+          elapsedBeforePause = performance.now() - timerStartTime;
+          if (animFrameId) cancelAnimationFrame(animFrameId);
+        });
+
+        row.addEventListener('mouseleave', () => {
+          if (isPaused) {
+            isPaused = false;
+            startProgress(elapsedBeforePause);
+          }
+        });
+
+        setActive(currentIndex);
+      }
+
+      setupFeaturedCarousel();
+      document.addEventListener('astro:page-load', setupFeaturedCarousel);
+    </script>
+  </body>
+</html>
