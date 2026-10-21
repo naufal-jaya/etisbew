@@ -68,3 +68,11 @@ export const recentPosts: PostItem[] = [
     slug: "biological-effluent-analysis",
   },
 ];
+
+// Re-export Sanity backend types for convenience
+export type {
+  NewsCategory,
+  NewsItem,
+  NewsInlineImage,
+  NewsBlockContent,
+} from '../sanity/types';
