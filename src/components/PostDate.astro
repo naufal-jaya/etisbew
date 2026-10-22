@@ -1,0 +1,10 @@
+---
+interface Props { date?: string }
+const { date } = Astro.props;
+const parsed = date ? new Date(date) : null;
+const valid = parsed && !Number.isNaN(parsed.getTime());
+const day = valid ? parsed.getDate() : 0;
+const suffix = day % 100 >= 11 && day % 100 <= 13 ? 'th' : (['th', 'st', 'nd', 'rd'][day % 10] || 'th');
+const monthYear = valid ? parsed.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : 'August 2026';
+---
+{valid ? <time datetime={date}>{day}<sup>{suffix}</sup> {monthYear}</time> : <span>{monthYear}</span>}

@@ -2,14 +2,14 @@ import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const newsSchema = defineType({
   name: 'news',
-  title: 'News & Articles',
+  title: 'Posts',
   type: 'document',
   fields: [
     defineField({
       name: 'title',
-      title: 'Judul Berita (Title)',
+      title: 'Judul Post (Title)',
       type: 'string',
-      description: 'Teks judul berita utama',
+      description: 'Teks judul post utama',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -24,39 +24,32 @@ export const newsSchema = defineType({
     }),
     defineField({
       name: 'category',
-      title: 'Category Berita',
+      title: 'Post Category',
       type: 'reference',
       to: [{ type: 'category' }],
-      description: 'Pilih kategori berita (kategori memiliki warna khas masing-masing)',
+      description: 'Pilih kategori post (kategori memiliki warna khas masing-masing)',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'writer',
-      title: 'Writer / Penulis',
+      title: 'Writer / Penulis Post',
       type: 'string',
-      description: 'Nama penulis berita / artikel',
+      description: 'Nama penulis post',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'publishedAt',
-      title: 'Tanggal Berita',
+      title: 'Tanggal Post',
       type: 'datetime',
-      description: 'Tanggal & waktu publikasi berita',
+      description: 'Tanggal & waktu publikasi post',
       initialValue: () => new Date().toISOString(),
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'isFeatured',
-      title: 'Featured News (Berita Utama)',
-      type: 'boolean',
-      description: 'Centang jika ingin ditampilkan pada baris atas highlight featured news',
-      initialValue: false,
-    }),
-    defineField({
       name: 'coverImage',
-      title: 'Gambar Cover Berita',
+      title: 'Gambar Cover Post',
       type: 'image',
-      description: 'Gambar utama untuk thumbnail dan header kartu berita',
+      description: 'Gambar utama untuk thumbnail dan header kartu post',
       options: {
         hotspot: true,
       },
@@ -77,10 +70,10 @@ export const newsSchema = defineType({
     }),
     defineField({
       name: 'summary',
-      title: 'Ringkasan Teks Berita (Excerpt)',
+      title: 'Ringkasan Teks Post (Excerpt)',
       type: 'text',
       rows: 3,
-      description: 'Ringkasan singkat berita untuk ditampilkan di bawah judul pada kartu / preview',
+      description: 'Ringkasan singkat post untuk ditampilkan di bawah judul pada kartu / preview',
       validation: (Rule) =>
         Rule.required()
           .max(300)
@@ -88,9 +81,9 @@ export const newsSchema = defineType({
     }),
     defineField({
       name: 'content',
-      title: 'Teks Konten Berita',
+      title: 'Teks Konten Post',
       description:
-        'Teks isi berita lengkap. Anda dapat menyisipkan gambar di dalam paragraf dan memberikan teks deskripsi pada setiap gambar.',
+        'Teks isi post lengkap. Anda dapat menyisipkan gambar di dalam paragraf dan memberikan teks deskripsi pada setiap gambar.',
       type: 'array',
       of: [
         defineArrayMember({
@@ -132,7 +125,7 @@ export const newsSchema = defineType({
         defineArrayMember({
           type: 'image',
           name: 'inlineImage',
-          title: 'Gambar Dalam Berita',
+          title: 'Gambar Dalam Post',
           options: {
             hotspot: true,
           },
@@ -162,9 +155,8 @@ export const newsSchema = defineType({
       categoryColor: 'category.color',
       media: 'coverImage',
       date: 'publishedAt',
-      isFeatured: 'isFeatured',
     },
-    prepare({ title, writer, categoryName, media, date, isFeatured }) {
+    prepare({ title, writer, categoryName, media, date }) {
       const formattedDate = date
         ? new Date(date).toLocaleDateString('id-ID', {
             year: 'numeric',
@@ -173,7 +165,6 @@ export const newsSchema = defineType({
           })
         : '';
       const badges = [
-        isFeatured ? '★ FEATURED' : null,
         categoryName ? `[${categoryName}]` : null,
         writer ? `by ${writer}` : null,
         formattedDate,
@@ -182,7 +173,7 @@ export const newsSchema = defineType({
         .join(' • ');
 
       return {
-        title: title || 'Untitled News',
+        title: title || 'Untitled Post',
         subtitle: badges,
         media,
       };

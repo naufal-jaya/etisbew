@@ -1,9 +1,9 @@
 /**
  * TypeScript Interfaces untuk Data Backend Sanity
- * Sesuai skema: 'news' dan 'category'
+ * Sesuai skema: 'news'/'post', 'category', dan 'featuredPost'
  */
 
-export interface NewsCategory {
+export interface PostCategory {
   _id?: string;
   title: string;
   slug?:
@@ -13,9 +13,10 @@ export interface NewsCategory {
     | string;
   color: string; // Kode hex warna khas kategori (contoh: '#00629B', '#10B981')
   description?: string;
+  order?: number;
 }
 
-export interface NewsInlineImage {
+export interface PostInlineImage {
   _type: 'image' | 'inlineImage';
   asset?: {
     _ref?: string;
@@ -23,7 +24,7 @@ export interface NewsInlineImage {
     url?: string;
   } | any;
   alt?: string;
-  caption?: string; // Teks deskripsi gambar di dalam artikel berita
+  caption?: string; // Teks deskripsi gambar di dalam post
   hotspot?: {
     x: number;
     y: number;
@@ -32,12 +33,12 @@ export interface NewsInlineImage {
   };
 }
 
-export interface NewsBlockContent {
+export interface PostBlockContent {
   _type: 'block' | 'inlineImage';
   [key: string]: any;
 }
 
-export interface NewsItem {
+export interface PostBackendItem {
   _id: string;
   _createdAt?: string;
   _updatedAt?: string;
@@ -47,9 +48,9 @@ export interface NewsItem {
         current: string;
       }
     | string;
-  category: NewsCategory;
+  category: PostCategory;
   writer: string;
-  publishedAt: string; // Tanggal publikasi berita (ISO 8601 string)
+  publishedAt: string; // Tanggal publikasi post (ISO 8601 string)
   isFeatured?: boolean;
   coverImage: {
     _type?: 'image';
@@ -57,6 +58,12 @@ export interface NewsItem {
     alt?: string;
     caption?: string;
   } | string;
-  summary: string; // Ringkasan teks berita untuk ditaruh di bawah judul
-  content?: NewsBlockContent[]; // Isi teks berita + inline images beserta deskripsi
+  summary: string; // Ringkasan teks post untuk ditaruh di bawah judul
+  content?: PostBlockContent[]; // Isi teks post + inline images beserta deskripsi
 }
+
+// Backwards-compatible aliases
+export type NewsCategory = PostCategory;
+export type NewsInlineImage = PostInlineImage;
+export type NewsBlockContent = PostBlockContent;
+export type NewsItem = PostBackendItem;

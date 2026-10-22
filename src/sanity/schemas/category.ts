@@ -2,7 +2,7 @@ import { defineField, defineType } from 'sanity';
 
 export const categorySchema = defineType({
   name: 'category',
-  title: 'News Category',
+  title: 'Post Category',
   type: 'document',
   fields: [
     defineField({
@@ -37,6 +37,13 @@ export const categorySchema = defineType({
           .error('Masukkan kode hex warna yang valid, diawali dengan # (contoh: #00629B)'),
     }),
     defineField({
+      name: 'order',
+      title: 'Urutan Tampilan (Display Order)',
+      type: 'number',
+      description: 'Nomor urutan kategori pada filter tab (contoh: 1, 2, 3...)',
+      initialValue: 1,
+    }),
+    defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
@@ -48,12 +55,21 @@ export const categorySchema = defineType({
     select: {
       title: 'title',
       color: 'color',
+      order: 'order',
     },
-    prepare({ title, color }) {
+    prepare({ title, color, order }) {
+      const orderBadge = typeof order === 'number' ? `#${order} • ` : '';
       return {
         title: title || 'Unnamed Category',
-        subtitle: color ? `Color: ${color}` : 'No color set',
+        subtitle: `${orderBadge}${color ? `Color: ${color}` : 'No color set'}`,
       };
     },
   },
+  orderings: [
+    {
+      title: 'Display Order',
+      name: 'orderAsc',
+      by: [{ field: 'order', direction: 'asc' }, { field: 'title', direction: 'asc' }],
+    },
+  ],
 });

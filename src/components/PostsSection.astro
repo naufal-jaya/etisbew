@@ -5,9 +5,12 @@
 // - Bottom row: 4 recent posts in 440/248 ratio with title & 'Post_type by Author'.
 // - Strict identical horizontal and vertical gaps between cards.
 // - Fade to black bottom gradient on each card.
-// - Button leading to /posts with read_more.png and 'Read other articles' text.
+// - Button leading to /posts with read_more.png and 'Read other posts' text.
 
-import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
+import { getFeaturedPosts, getRecentPosts, type PostItem } from '../data/posts';
+
+const featuredPosts = await getFeaturedPosts();
+const recentPosts = await getRecentPosts();
 ---
 
 <section
@@ -19,7 +22,7 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
   <div class="posts-wrapper w-full max-w-6xl mx-auto flex flex-col justify-center">
     <!-- Section Heading -->
     <h2 class="text-sm sm:text-xl italic text-neutral-900 tracking-tight mb-3 md:mb-4">
-      Read amazing articles!
+      Read amazing posts!
     </h2>
 
     <!-- Top Row: 3 Featured Posts (Alternating Highlight) -->
@@ -32,6 +35,7 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
         <div
           class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === 1 ? 'is-active' : ''}`}
           data-card-index={idx}
+          data-slug={post.slug}
           role="button"
           tabindex="0"
           aria-label={post.title}
@@ -40,7 +44,7 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
           <img
             src={post.image}
             alt={post.title}
-            class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+            class="absolute inset-0 w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-transform duration-700"
             loading="lazy"
           />
 
@@ -69,7 +73,7 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
     <div class="recent-posts-grid grid grid-cols-2 md:grid-cols-4 w-full">
       {recentPosts.map((post) => (
         <a
-          href="/posts"
+          href={`/posts/${post.slug}`}
           class="recent-card group relative aspect-[440/248] overflow-hidden bg-neutral-900 block"
           aria-label={post.title}
         >
@@ -77,7 +81,7 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
           <img
             src={post.image}
             alt={post.title}
-            class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            class="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-500"
             loading="lazy"
           />
 
@@ -89,7 +93,7 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
             <h4 class="text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 drop-shadow-sm transition-colors">
               {post.title}
             </h4>
-            <p class="text-[10px] sm:text-xs font-normal mt-1 drop-shadow-sm">
+            <p class="text-[10px] sm:text-xs font-normal mt-1 drop-shadow-sm text-neutral-300">
               {post.type} by {post.author}
             </p>
           </div>
@@ -97,21 +101,21 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
       ))}
     </div>
 
-    <!-- Bottom Button Container: Image + "Read other articles" text directing to /posts -->
+    <!-- Bottom Button Container: Image + "Read other posts" text directing to /posts -->
     <div class="flex justify-end pt-3 sm:pt-4">
       <a
         href="/posts"
         class="group flex flex-col items-center gap-1 cursor-pointer select-none transition-transform duration-200"
-        aria-label="Read other articles"
+        aria-label="Read other posts"
       >
         <img
           src="/read_more.png"
-          alt="Read other articles"
+          alt="Read other posts"
           class="h-10 sm:h-12 md:h-14 w-auto object-contain transition-opacity group-hover:opacity-90"
           loading="lazy"
         />
         <span class="text-xs sm:text-sm font-medium transition-colors">
-          Read other articles
+          Read other posts
         </span>
       </a>
     </div>
@@ -267,12 +271,17 @@ import { featuredPosts, recentPosts, type PostItem } from '../data/posts';
       animFrameId = requestAnimationFrame(step);
     }
 
-    // Manual click on any card to highlight it
+    // Manual click on any card to highlight it, or open post if already active
     cards.forEach((card, idx) => {
       card.addEventListener('click', () => {
         if (currentIndex !== idx) {
           elapsedBeforePause = 0;
           setActive(idx);
+        } else {
+          const slug = card.getAttribute('data-slug');
+          if (slug) {
+            window.location.href = `/posts/${slug}`;
+          }
         }
       });
     });

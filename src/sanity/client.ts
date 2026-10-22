@@ -1,8 +1,18 @@
 import { createClient } from '@sanity/client';
 
-export const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID || import.meta.env.NEXT_PUBLIC_SANITY_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || '';
-export const dataset = import.meta.env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET || import.meta.env.NEXT_PUBLIC_SANITY_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET || 'v2';
-export const apiVersion = import.meta.env.PUBLIC_SANITY_API_VERSION || process.env.PUBLIC_SANITY_API_VERSION || '2024-01-01';
+const getEnvVar = (name: string): string => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[name]) {
+    return import.meta.env[name];
+  }
+  if (typeof process !== 'undefined' && process.env && process.env[name]) {
+    return process.env[name];
+  }
+  return '';
+};
+
+export const projectId = getEnvVar('PUBLIC_SANITY_PROJECT_ID') || getEnvVar('NEXT_PUBLIC_SANITY_PROJECT_ID') || '';
+export const dataset = getEnvVar('PUBLIC_SANITY_DATASET') || getEnvVar('NEXT_PUBLIC_SANITY_DATASET') || 'v2';
+export const apiVersion = getEnvVar('PUBLIC_SANITY_API_VERSION') || '2024-01-01';
 
 export const isSanityConfigured = Boolean(projectId && projectId !== 'your-project-id');
 

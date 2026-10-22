@@ -1,5 +1,7 @@
 ---
-import { featuredPosts } from "../data/posts";
+import { getFeaturedPosts } from "../data/posts";
+
+const featuredPosts = await getFeaturedPosts();
 ---
 
 <section class="relative w-full h-screen bg-black overflow-hidden font-sans">
@@ -47,15 +49,15 @@ import { featuredPosts } from "../data/posts";
       />
     </div>
 
-    <!-- Bottom right side (Latest Article) -->
+    <!-- Bottom right side (Latest Post) -->
     <div class="relative sm:absolute sm:bottom-12 sm:right-6 lg:right-12 flex flex-col items-start sm:items-end w-full sm:w-auto mt-auto sm:mt-0">
-      <span class="text-white text-xs sm:text-sm font-light mb-1">Latest article</span>
+      <span class="text-white text-xs sm:text-sm font-light mb-1">Latest post</span>
       <!-- Card -->
       <a
-        id="hero-article-card"
-        href={`/posts#${featuredPosts[0].slug}`}
+        id="hero-post-card"
+        href={`/posts/${featuredPosts[0].slug}`}
         class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-full sm:w-[296px] max-w-full h-[72px] sm:h-[80px] relative group cursor-pointer block select-none"
-        aria-label="Latest featured article"
+        aria-label="Latest featured post"
       >
         <!-- Sliding Images Track -->
         <div
@@ -95,7 +97,7 @@ import { featuredPosts } from "../data/posts";
                     : "opacity-0 pointer-events-none"
                 }`}
                 data-slide-index={idx}
-                data-slug={`/posts#${post.slug}`}
+                data-slug={`/posts/${post.slug}`}
               >
                 <h3 class="text-white text-xs font-bold leading-tight line-clamp-3">
                   {post.title}
@@ -137,7 +139,7 @@ import { featuredPosts } from "../data/posts";
 <script>
   function initHeroCarousel() {
     const card = document.getElementById(
-      "hero-article-card",
+      "hero-post-card",
     ) as HTMLAnchorElement | null;
     const imagesTrack = document.getElementById("hero-carousel-images");
     const dots = document.querySelectorAll<HTMLElement>(".hero-dot");

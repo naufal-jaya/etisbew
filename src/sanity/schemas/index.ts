@@ -3,13 +3,15 @@ import { milestoneSchema } from './milestone';
 import { divisionSchema } from './division';
 import { categorySchema } from './category';
 import { newsSchema } from './news';
+import { featuredPostSchema } from './featuredPost';
 
 export const schemaTypes = [
-  partnerSchema,
-  milestoneSchema,
-  divisionSchema,
-  categorySchema,
+  featuredPostSchema,
   newsSchema,
+  categorySchema,
+  divisionSchema,
+  milestoneSchema,
+  partnerSchema,
 ];
 export {
   partnerSchema,
@@ -17,4 +19,5 @@ export {
   divisionSchema,
   categorySchema,
   newsSchema,
+  featuredPostSchema,
 };

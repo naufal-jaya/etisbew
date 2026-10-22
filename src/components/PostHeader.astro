@@ -1,0 +1,62 @@
+---
+import BackArrow from './BackArrow.astro';
+interface Props { backHref: string; backLabel: string; listing?: boolean }
+const { backHref, backLabel, listing = false } = Astro.props;
+---
+<div class:list={['post-header-slot relative mt-2', listing ? 'mb-4 sm:mb-8' : 'mb-8']} data-post-header-slot>
+  <span class="absolute top-0 left-0 h-px w-px pointer-events-none" data-header-sentinel aria-hidden="true"></span>
+  <header class="post-header" data-post-header>
+    <div class="post-header-inner flex items-center justify-between">
+      <a href={backHref} aria-label={backLabel} class="flex items-center text-black hover:opacity-60 transition-opacity shrink-0">
+        <BackArrow />
+      </a>
+      <a href="/" aria-label="IEEE Student Branch IPB Homepage" class="shrink-0">
+        <img src="/ieee-black.png" alt="IPB University IEEE Student Branch" class="w-auto object-contain h-6 sm:h-7 md:h-8" />
+      </a>
+    </div>
+  </header>
+</div>
+
+<style>
+  .post-header[data-scrolled] {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    padding: 14px 16px;
+    background: rgb(255 255 255 / 80%);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid black;
+  }
+  .post-header[data-scrolled] .post-header-inner {
+    max-width: 72rem;
+    margin-inline: auto;
+  }
+  @media (min-width: 640px) { .post-header[data-scrolled] { padding-inline: 24px; } }
+  @media (min-width: 768px) { .post-header[data-scrolled] { padding-inline: 40px; } }
+  @media (min-width: 1024px) { .post-header[data-scrolled] { padding-inline: 64px; } }
+</style>
+
+<script>
+  function initPostHeader() {
+    const slot = document.querySelector<HTMLElement>('[data-post-header-slot]');
+    const header = slot?.querySelector<HTMLElement>('[data-post-header]');
+    const sentinel = slot?.querySelector<HTMLElement>('[data-header-sentinel]');
+    if (!slot || !header || !sentinel || slot.dataset.initialized) return;
+    slot.dataset.initialized = 'true';
+    const reserveSpace = () => {
+      if (!header.hasAttribute('data-scrolled')) slot.style.height = `${header.offsetHeight}px`;
+    };
+    reserveSpace();
+    const observer = new IntersectionObserver(([entry]) => {
+      header.toggleAttribute('data-scrolled', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    observer.observe(sentinel);
+    window.addEventListener('resize', reserveSpace);
+    document.addEventListener('astro:before-swap', () => {
+      observer.disconnect();
+      window.removeEventListener('resize', reserveSpace);
+    }, { once: true });
+  }
+  initPostHeader();
+  document.addEventListener('astro:page-load', initPostHeader);
+</script>

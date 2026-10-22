@@ -1,9 +1,17 @@
 ---
 import "../styles/global.css";
-import { featuredPosts, recentPosts } from '../data/posts'; // Sesuaikan jika struktur datamu berbeda
+import PostCard from "../components/PostCard.astro";
+import PostHeader from "../components/PostHeader.astro";
+import Footer from "../components/Footer.astro";
+import { getFeaturedPosts, getAllPosts, getAllCategories, type PostItem, type PostCategory } from '../data/posts';
 
-// Gabungkan semua data post atau ambil dari database/CMS
-const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts]; 
+const [featuredPosts, allPosts, categories] = await Promise.all([
+  getFeaturedPosts(),
+  getAllPosts(),
+  getAllCategories(),
+]);
+
+
 ---
 
 <!doctype html>
@@ -11,7 +19,7 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>News & Articles - IPB University IEEE Student Branch</title>
+    <title>Posts - IPB University IEEE Student Branch</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,7 +30,7 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
       body {
         font-family: "Inter", sans-serif;
       }
-      
+
       /* Featured Carousel Styles */
       :root {
         --posts-card-gap: 16px;
@@ -60,9 +68,9 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
       /* Mobile: Single full-width card with smooth cross-fade rotation */
       @media (max-width: 639px) {
         .featured-row {
-          aspect-ratio: 16 / 9;
-          min-height: 200px;
-          max-height: 280px;
+          aspect-ratio: 2 / 1;
+          min-height: 150px;
+          max-height: 190px;
           position: relative;
         }
         .featured-card {
@@ -87,134 +95,123 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
           opacity: 1;
           transform: translateY(0);
         }
-        /* Menyembunyikan scrollbar pada navigasi kategori */
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none; /* IE and Edge */
-          scrollbar-width: none; /* Firefox */
-        }
+      }
+
+      @media (max-width: 639px) {
+        #posts-grid { gap: 0; }
+      }
+
+      .featured-info h3 {
+        overflow: hidden;
+        max-height: 2.5em;
+        overflow-wrap: anywhere;
+      }
+
+      /* Hide horizontal scrollbar */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
     </style>
   </head>
   <body class="bg-white text-black antialiased">
-    <!-- Pembungkus luar untuk Margin Global -->
-    <main class="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-8 md:py-12">
-      <!-- Pembungkus dalam untuk membatasi lebar konten maksimal 6xl -->
+    <!-- Outer container with global padding -->
+    <main class="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-4 sm:py-8 md:py-12">
+      <!-- Inner max-width wrapper -->
       <div class="w-full max-w-6xl mx-auto flex flex-col justify-center">
-        
-      <!-- Header: Back Arrow & Logo -->
-        <header class="mb-8 mt-2">
-          <a href="/" class="flex items-center gap-3 sm:gap-4 hover:opacity-75 transition-opacity duration-200 w-fit" aria-label="Go back to Home">
-            <!-- Tanda Panah -->
-            <span class="text-xl sm:text-2xl font-light">&larr;</span>
-            
-            <!-- Gambar Logo -->
-            <img 
-              src="/ieee-black.png" 
-              alt="IPB University IEEE Student Branch" 
-              class="h-6 sm:h-7 md:h-8 w-auto object-contain"
-            />
-          </a>
-        </header>
+        <PostHeader backHref="/" backLabel="Home" listing />
 
-        <!-- Featured Row -->
-        <section class="mb-4">
+
+
+        <!-- Featured Row Carousel -->
+        <section class="mb-4 sm:mb-6">
           <div id="featured-row" class="featured-row flex w-full overflow-hidden" data-active-index="1">
-            {featuredPosts.map((post, idx) => {
-              // Buat slug url
-              const slug = post.title.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '-');
-              
-              return (
-                <div
-                  class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === 1 ? 'is-active' : ''}`}
-                  data-card-index={idx}
-                  data-slug={slug} 
-                >
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div class="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none"></div>
-                  
-                  <div class="featured-info absolute inset-x-0 bottom-0 p-3 sm:p-5 md:p-7 text-white z-10 pointer-events-none">
-                    <h3 class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-1 md:mb-2 line-clamp-2 max-w-2xl drop-shadow-md">
-                      {post.title}
-                    </h3>
-                    <p class="text-[11px] sm:text-xs md:text-sm text-neutral-300 font-normal drop-shadow-sm">
-                      {post.type} by {post.author}
-                    </p>
-                  </div>
+            {featuredPosts.map((post, idx) => (
+              <div
+                class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === 1 ? 'is-active' : ''}`}
+                data-card-index={idx}
+                data-slug={post.slug}
+                role="button"
+                tabindex="0"
+                aria-label={post.title}
+              >
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  class="absolute inset-0 w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-transform duration-700"
+                  loading={idx === 1 ? 'eager' : 'lazy'}
+                />
+                <div class="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/90 via-black/45 to-transparent pointer-events-none"></div>
 
-                  <div class="featured-progress-track absolute inset-x-0 bottom-0 h-1 bg-black/40 z-20 overflow-hidden">
-                    <div class="featured-progress-bar h-full bg-white/90 w-0"></div>
-                  </div>
+                <div class="featured-info absolute inset-x-0 bottom-0 p-3 sm:p-5 md:p-7 text-white z-10 pointer-events-none">
+                  <h3 class="text-sm sm:text-lg md:text-xl lg:text-2xl font-bold leading-tight mb-1 md:mb-2 line-clamp-2 max-w-2xl drop-shadow-md">
+                    {post.title}
+                  </h3>
+                  <p class="text-[11px] sm:text-xs md:text-sm text-neutral-300 font-normal drop-shadow-sm truncate">
+                    {post.type} by {post.author}
+                  </p>
                 </div>
-              );
-            })}
+
+                <div class="featured-progress-track absolute inset-x-0 bottom-0 h-1 bg-black/40 z-20 overflow-hidden">
+                  <div class="featured-progress-bar h-full bg-white/90 w-0"></div>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
-        <!-- Filter Categories -->
-        <nav class="border-b border-black mb-4 pb-2">
-          <!-- Ganti flex-wrap menjadi flex-nowrap overflow-x-auto dan tambahkan no-scrollbar -->
-          <ul class="flex flex-nowrap overflow-x-auto gap-4 sm:gap-6 text-sm font-medium no-scrollbar">
-            <!-- Tambahkan shrink-0 di setiap li agar teksnya tidak menyusut/tergencet -->
-            <li class="shrink-0"><a href="#" class="hover:text-gray-600">All Post</a></li>
-            <li class="shrink-0"><a href="#" class="hover:text-gray-600">IEEEnsight</a></li>
-            <li class="shrink-0"><a href="#" class="hover:text-gray-600">Tech Insight</a></li>
-            <li class="shrink-0">
-              <a href="#" class="bg-[#d4ed31] px-2 py-0.5 inline-block text-black">
-                BizInsight
-              </a>
-            </li>
-            <li class="shrink-0"><a href="#" class="hover:text-gray-600">Activities</a></li>
+        <!-- Dynamic Category Navigation & Filter -->
+        <nav class="border-b border-black mb-1 sm:mb-6 pb-2" aria-label="Post categories">
+          <ul class="flex w-full min-w-0 flex-nowrap overflow-x-auto overscroll-x-contain touch-pan-x gap-2 sm:gap-3 text-xs sm:text-sm font-medium no-scrollbar items-center" id="category-filter-list">
+            {categories.map((cat, idx) => {
+              const isActive = idx === 0;
+              const isAll = cat.slug === 'all';
+              const bgColor = isAll ? '#000000' : cat.color;
+
+              return (
+                <li class="shrink-0">
+                  <button
+                    type="button"
+                    class={`category-tab px-3 py-2 sm:py-1 transition-all duration-200 cursor-pointer font-medium ${
+                      isActive
+                        ? 'is-active ring-1 ring-black/20 font-semibold shadow-sm text-white'
+                        : 'text-neutral-700 hover:text-black hover:bg-neutral-100'
+                    }`}
+                    data-cat-slug={cat.slug}
+                    data-bg-color={bgColor}
+                    style={isActive ? `background-color: ${bgColor}; color: #ffffff !important;` : ''}
+                  >
+                    {cat.title}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
-        <!-- Article Grid (3 Columns) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allPosts.map((post) => {
-            // Membuat slug URL dari judul artikel
-            const slug = post.title.toLowerCase().replace(/[^a-zA-Z0-9]+/g, '-');
-            
-            return (
-              <a href={`/posts/${slug}`} class="flex flex-col group cursor-pointer w-full">
-                <!-- Thumbnail -->
-                <div class="relative w-full aspect-[440/248] overflow-hidden mb-3 bg-neutral-900 block">
-                  <img 
-                    src={post.image} 
-                    alt={post.title} 
-                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-                
-                <!-- Content -->
-                <h2 class="text-xs sm:text-sm font-bold leading-snug mb-1 md:mb-2 line-clamp-2 group-hover:underline decoration-2 underline-offset-2">
-                  {post.title}
-                </h2>
-                
-                <div class="flex justify-between items-center text-[10px] sm:text-xs text-gray-500 mb-2 border-b border-gray-200 pb-2">
-                  <span>by {post.author}</span>
-                  <span>1st August 2026</span>
-                </div>
-                
-                <p class="text-[10px] sm:text-xs text-gray-700 line-clamp-3">
-                  Click to read the full article about {post.title}...
-                </p>
-              </a>
-            );
-          })}
+        <!-- Post Grid (3 Columns) -->
+        <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allPosts.map((post) => <PostCard post={post} />)}
+
+          <!-- Empty State Message when filtering -->
+          <div id="no-posts-msg" class="hidden col-span-full py-16 text-center text-neutral-500 text-sm">
+            <p class="font-medium text-base text-neutral-700 mb-1">No posts found</p>
+            <p class="text-xs text-neutral-500">There are currently no published posts in this category.</p>
+          </div>
         </div>
-        
+
       </div>
     </main>
 
-    <!-- Carousel Script -->
+    <!-- Footer -->
+    <Footer />
+
+    <!-- Carousel & Filtering Scripts -->
     <script>
+      // 1. Featured Carousel Logic
       function setupFeaturedCarousel() {
         const row = document.getElementById('featured-row');
         if (!row) return;
@@ -257,7 +254,7 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
             const progress = Math.min(1, elapsed / DURATION_MS);
             const activeCard = cards[currentIndex];
             const bar = activeCard?.querySelector<HTMLElement>('.featured-progress-bar');
-            
+
             if (bar) bar.style.width = `${(progress * 100).toFixed(1)}%`;
 
             if (progress >= 1) {
@@ -272,11 +269,9 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
         cards.forEach((card, idx) => {
           card.addEventListener('click', () => {
             if (currentIndex !== idx) {
-              // Jika card belum aktif/kecil, klik akan memperbesar card
               elapsedBeforePause = 0;
               setActive(idx);
             } else {
-              // Jika card sudah aktif/besar, klik akan mengarahkan ke halaman news
               const slug = card.getAttribute('data-slug');
               if (slug) {
                 window.location.href = `/posts/${slug}`;
@@ -326,8 +321,89 @@ const allPosts = [...featuredPosts, ...recentPosts, ...recentPosts];
         setActive(currentIndex);
       }
 
-      setupFeaturedCarousel();
-      document.addEventListener('astro:page-load', setupFeaturedCarousel);
+      // 2. Interactive Category Filter Logic (Integrated with Sanity Backend & always white text)
+      function setupCategoryFilter() {
+        const tabs = document.querySelectorAll<HTMLButtonElement>('.category-tab');
+        const cards = document.querySelectorAll<HTMLElement>('.post-grid-card');
+        const noMsg = document.getElementById('no-posts-msg');
+        if (!tabs.length || !cards.length) return;
+
+        function applyFilter(targetSlug: string, updateUrl: boolean = true) {
+          let activeTab: HTMLButtonElement | null = null;
+
+          tabs.forEach((t) => {
+            const catSlug = t.getAttribute('data-cat-slug') || 'all';
+            if (catSlug === targetSlug) {
+              activeTab = t;
+            }
+            t.classList.remove('is-active', 'ring-1', 'ring-black/20', 'font-semibold', 'shadow-sm', 'text-white');
+            t.classList.add('text-neutral-700', 'hover:text-black', 'hover:bg-neutral-100');
+            t.style.backgroundColor = '';
+            t.style.color = '';
+          });
+
+          // Fallback to 'all' if category slug not found
+          if (!activeTab) {
+            activeTab = tabs[0];
+            targetSlug = activeTab.getAttribute('data-cat-slug') || 'all';
+          }
+
+          if (activeTab) {
+            const bg = activeTab.getAttribute('data-bg-color') || '#000000';
+            activeTab.classList.add('is-active', 'ring-1', 'ring-black/20', 'font-semibold', 'shadow-sm', 'text-white');
+            activeTab.classList.remove('text-neutral-700', 'hover:text-black', 'hover:bg-neutral-100');
+            activeTab.style.backgroundColor = bg;
+            activeTab.style.color = '#ffffff'; // ALWAYS white font color when selected
+          }
+
+          let visibleCount = 0;
+          cards.forEach((card) => {
+            const cardCat = card.getAttribute('data-category-slug');
+            if (targetSlug === 'all' || cardCat === targetSlug) {
+              card.style.display = '';
+              visibleCount++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (noMsg) {
+            noMsg.classList.toggle('hidden', visibleCount > 0);
+          }
+
+          if (updateUrl && typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+            if (targetSlug === 'all') {
+              url.searchParams.delete('category');
+            } else {
+              url.searchParams.set('category', targetSlug);
+            }
+            window.history.replaceState({}, '', url.toString());
+          }
+        }
+
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            const targetSlug = tab.getAttribute('data-cat-slug') || 'all';
+            applyFilter(targetSlug, true);
+          });
+        });
+
+        // Sync with URL query parameter on page load (e.g. ?category=activities)
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryCategory = urlParams.get('category');
+        if (queryCategory) {
+          applyFilter(queryCategory, false);
+        }
+      }
+
+      function initPostsPage() {
+        setupFeaturedCarousel();
+        setupCategoryFilter();
+      }
+
+      initPostsPage();
+      document.addEventListener('astro:page-load', initPostsPage);
     </script>
   </body>
 </html>

@@ -12,6 +12,8 @@ import 'lenis/dist/lenis.css';
     }
   }
 
+  function enableDesktopScrolling() {
+  const events = new AbortController();
   // 1. Initialize Lenis for fluid, responsive inertial scrolling
   const lenis = new Lenis({
     duration: 0.95,
@@ -37,9 +39,9 @@ import 'lenis/dist/lenis.css';
   // Run Lenis in RAF loop
   function raf(time: number) {
     lenis.raf(time);
-    requestAnimationFrame(raf);
+    frame = requestAnimationFrame(raf);
   }
-  requestAnimationFrame(raf);
+  let frame = requestAnimationFrame(raf);
 
   // 2. In-Flight Magnetic Landing Engine
   // Eliminates delayed post-stop snapping completely.
@@ -222,28 +224,28 @@ import 'lenis/dist/lenis.css';
     landingTimer = setTimeout(() => {
       guideInFlight();
     }, 70);
-  }, { passive: true });
+  }, { passive: true, signal: events.signal });
 
   window.addEventListener('touchstart', () => {
     cancelGuiding();
-  }, { passive: true });
+  }, { passive: true, signal: events.signal });
 
   window.addEventListener('touchmove', () => {
     cancelGuiding();
-  }, { passive: true });
+  }, { passive: true, signal: events.signal });
 
   window.addEventListener('touchend', () => {
     if (landingTimer) clearTimeout(landingTimer);
     landingTimer = setTimeout(() => {
       guideInFlight();
     }, 80);
-  }, { passive: true });
+  }, { passive: true, signal: events.signal });
 
   window.addEventListener('pointerdown', (e) => {
     if (e.target && !(e.target as Element).closest('button, a, input, select')) {
       cancelGuiding();
     }
-  }, { passive: true });
+  }, { passive: true, signal: events.signal });
 
   window.addEventListener('keydown', (e) => {
     if (['ArrowDown', 'PageDown', ' '].includes(e.key)) {
@@ -267,7 +269,7 @@ import 'lenis/dist/lenis.css';
       cancelGuiding();
       lenis.scrollTo('bottom', { duration: 0.8 });
     }
-  }, { passive: true });
+  }, { passive: true, signal: events.signal });
 
   // Monitor velocity updates
   lenis.on('scroll', (e: { scroll: number; velocity: number; direction: number }) => {
@@ -275,4 +277,27 @@ import 'lenis/dist/lenis.css';
       scrollDirection = e.direction >= 0 ? 1 : -1;
     }
   });
+
+  return () => {
+    events.abort();
+    cancelAnimationFrame(frame);
+    if (landingTimer) clearTimeout(landingTimer);
+    lenis.destroy();
+    delete window.lenis;
+  };
+  }
+
+  const mobileViewport = window.matchMedia('(max-width: 767px)');
+  let cleanup: (() => void) | undefined;
+  function updateScrolling() {
+    cleanup?.();
+    cleanup = undefined;
+    if (!mobileViewport.matches) cleanup = enableDesktopScrolling();
+  }
+  updateScrolling();
+  mobileViewport.addEventListener('change', updateScrolling);
+  document.addEventListener('astro:before-swap', () => {
+    cleanup?.();
+    mobileViewport.removeEventListener('change', updateScrolling);
+  }, { once: true });
 </script>
