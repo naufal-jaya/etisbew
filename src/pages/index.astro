@@ -13,7 +13,7 @@ import SmoothScroll from "../components/SmoothScroll.astro";
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>IPB University IEEE Student Branch</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -24,6 +24,12 @@ import SmoothScroll from "../components/SmoothScroll.astro";
     <style>
       body {
         font-family: "Inter", sans-serif;
+      }
+      @media (max-width: 767px) {
+        /* Reserve the height available while browser toolbars are expanded. */
+        #section-hero {
+          height: 100svh;
+        }
       }
     </style>
   </head>

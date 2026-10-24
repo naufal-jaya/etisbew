@@ -4,7 +4,7 @@ import { getFeaturedPosts } from "../data/posts";
 const featuredPosts = await getFeaturedPosts();
 ---
 
-<section class="relative w-full h-screen bg-black overflow-hidden font-sans">
+<section class="hero-section relative w-full h-screen bg-black overflow-hidden font-sans">
   <!-- Background Images (Alternating hero-kabinet & hero-rafid) -->
   <div
     class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
@@ -38,25 +38,25 @@ const featuredPosts = await getFeaturedPosts();
 
   <!-- Content Container -->
   <div
-    class="relative z-10 w-full h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col justify-between sm:justify-center pb-8 sm:pb-16 pt-20 sm:pt-24"
+    class="hero-content relative z-10 w-full h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 flex flex-col justify-between sm:justify-center pb-8 sm:pb-16 pt-20 sm:pt-24"
   >
     <!-- Left side (Logo) -->
     <div class="my-auto sm:my-0 flex-1 flex flex-col justify-center max-w-md">
       <img
-        src="/ieee-ipb.svg"
+        src="/images/layout/Logo_IEEE_IPB.svg"
         alt="IPB University IEEE Student Branch"
-        class="w-[260px] sm:w-[340px] lg:w-[400px] h-auto drop-shadow-lg"
+        class="w-[260px] sm:w-[340px] lg:w-[400px] h-auto drop-shadow-[0_3px_5px_rgba(0,0,0,0.75)]"
       />
     </div>
 
     <!-- Bottom right side (Latest Post) -->
-    <div class="relative sm:absolute sm:bottom-12 sm:right-6 lg:right-12 flex flex-col items-start sm:items-end w-full sm:w-auto mt-auto sm:mt-0">
-      <span class="text-white text-xs sm:text-sm font-light mb-1">Latest post</span>
+    <div class="hero-latest relative sm:absolute sm:bottom-12 sm:right-6 lg:right-12 flex flex-col items-end w-full sm:w-auto mt-auto sm:mt-0">
+      <span class="text-white text-xs font-light mb-1 drop-shadow-[0_2px_3px_rgba(0,0,0,0.85)]">Latest posts</span>
       <!-- Card -->
       <a
         id="hero-post-card"
         href={`/posts/${featuredPosts[0].slug}`}
-        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-full sm:w-[296px] max-w-full h-[72px] sm:h-[80px] relative group cursor-pointer block select-none"
+        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-[52%] sm:w-[164px] max-w-full h-[60px] relative group cursor-pointer block select-none"
         aria-label="Latest featured post"
       >
         <!-- Sliding Images Track -->
@@ -79,19 +79,19 @@ const featuredPosts = await getFeaturedPosts();
           }
         </div>
 
-        <!-- Fade Overlay (ends at ~60% of card) -->
+        <!-- Darken the compact text area while keeping the thumbnail visible. -->
         <div
           class="absolute inset-0 z-10 pointer-events-none"
-          style="background: linear-gradient(to right, #0a0a0a 0%, rgba(10, 10, 10, 0.71) 40%, rgba(10, 10, 10, 0) 60%);"
+          style="background: linear-gradient(to right, #0a0a0a 0%, rgba(10, 10, 10, 0.8) 65%, rgba(10, 10, 10, 0) 100%);"
         >
         </div>
 
         <!-- Text Content (Fade Transition) -->
-        <div class="relative z-20 w-3/5 h-full">
+        <div class="relative z-20 w-full h-full">
           {
             featuredPosts.map((post, idx) => (
               <div
-                class={`hero-slide-text absolute inset-0 p-2.5 pr-2 flex flex-col justify-between transition-opacity duration-500 ease-in-out ${
+                class={`hero-slide-text absolute inset-0 p-2 grid grid-rows-[minmax(0,1fr)_auto] gap-1 transition-opacity duration-500 ease-in-out ${
                   idx === 0
                     ? "opacity-100 pointer-events-auto"
                     : "opacity-0 pointer-events-none"
@@ -99,10 +99,10 @@ const featuredPosts = await getFeaturedPosts();
                 data-slide-index={idx}
                 data-slug={`/posts/${post.slug}`}
               >
-                <h3 class="text-white text-xs font-bold leading-tight line-clamp-3">
+                <h3 class="text-white text-[9px] font-bold leading-[1.2] line-clamp-2 min-h-0 overflow-hidden">
                   {post.title}
                 </h3>
-                <p class="text-gray-400 text-[9px] font-medium leading-none">
+                <p class="text-gray-400 text-[9px] font-medium leading-[10px] truncate pr-10">
                   {post.author}
                 </p>
               </div>
@@ -112,7 +112,7 @@ const featuredPosts = await getFeaturedPosts();
 
         <!-- Three Transparent Dots at Right Bottom (aligned with author's text) -->
         <div
-          class="absolute right-3 bottom-[9px] sm:bottom-[11.5px] z-30 flex items-center gap-1.5"
+          class="absolute right-3 bottom-2 z-30 flex items-center gap-1.5"
           id="hero-carousel-dots"
           aria-label="Carousel navigation dots"
         >
@@ -120,10 +120,10 @@ const featuredPosts = await getFeaturedPosts();
             featuredPosts.map((_, idx) => (
               <button
                 type="button"
-                class={`hero-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                class={`hero-dot w-1.5 h-1.5 rounded-full transition-opacity duration-300 cursor-pointer ${
                   idx === 0
-                    ? "bg-white/90 scale-125 shadow-[0_0_5px_rgba(255,255,255,0.7)]"
-                    : "bg-white/30 hover:bg-white/60 border border-white/20"
+                    ? "bg-white/90"
+                    : "bg-white/30 hover:bg-white/60"
                 }`}
                 data-dot-index={idx}
                 aria-label={`Go to slide ${idx + 1}`}
@@ -178,10 +178,10 @@ const featuredPosts = await getFeaturedPosts();
       dots.forEach((dot, i) => {
         if (i === currentIndex) {
           dot.className =
-            "hero-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer bg-white/90 scale-125 shadow-[0_0_5px_rgba(255,255,255,0.7)]";
+            "hero-dot w-1.5 h-1.5 rounded-full transition-opacity duration-300 cursor-pointer bg-white/90";
         } else {
           dot.className =
-            "hero-dot w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer bg-white/30 hover:bg-white/60 border border-white/20";
+            "hero-dot w-1.5 h-1.5 rounded-full transition-opacity duration-300 cursor-pointer bg-white/30 hover:bg-white/60";
         }
       });
 
@@ -281,3 +281,28 @@ const featuredPosts = await getFeaturedPosts();
   }
   document.addEventListener("astro:page-load", initHeroAll);
 </script>
+
+<style>
+  .hero-latest {
+    transform: translateY(-30px);
+  }
+  @media (max-width: 767px) {
+    .hero-section {
+      height: 100%;
+    }
+    .hero-content {
+      padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+      padding-left: max(1rem, env(safe-area-inset-left, 0px));
+      padding-right: max(1rem, env(safe-area-inset-right, 0px));
+    }
+  }
+  @media (min-width: 640px) and (max-width: 767px) {
+    .hero-content {
+      padding-inline: max(1.5rem, env(safe-area-inset-left, 0px)) max(1.5rem, env(safe-area-inset-right, 0px));
+    }
+    .hero-latest {
+      bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+      right: max(1.5rem, env(safe-area-inset-right, 0px));
+    }
+  }
+</style>

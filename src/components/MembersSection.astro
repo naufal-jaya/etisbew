@@ -276,7 +276,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
 ---
 
 <section
-  class="relative z-20 w-full min-h-screen min-h-[100dvh] bg-black select-none flex flex-col justify-stretch p-0 m-0"
+  class="relative z-20 w-full bg-black select-none flex flex-col justify-stretch p-0 m-0"
   id="members-section"
   data-lead-section="members"
   aria-label="Meet Our People"
@@ -352,7 +352,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
   <!-- Division Detail Showcase Drawer (opens between Row 1 and Row 2) - Size: 1918x367.36px -->
   <div
     id="division-drawer"
-    class="division-drawer w-full bg-white text-black relative z-30 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-y border-neutral-200"
+    class="division-drawer w-full bg-white text-black relative z-30 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border-neutral-200"
   >
     <div class="division-drawer-inner relative w-full overflow-hidden">
 
@@ -365,7 +365,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
           <div class="flex flex-col lg:flex-row items-start lg:items-center gap-2 w-full h-full py-4 box-border">
             
             <!-- Left Column: Division Title, Description & Badge -->
-            <div class="w-full lg:w-[280px] xl:w-[320px] flex-shrink-0 flex flex-col justify-center h-full py-1">
+            <div class="w-full lg:w-[280px] xl:w-[320px] flex-shrink-0 flex flex-col justify-center lg:justify-start h-full py-1 px-4 sm:px-16 lg:px-0 lg:pt-[6px]">
               <div>
                 <h3 class="text-2xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight leading-[0.93] mb-2">
                   {division.nameLines.map((line) => (
@@ -384,7 +384,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
             <div class="carousel-container relative flex-1 min-w-0 w-full overflow-hidden group flex items-center h-full">
               
               <!-- Left White Fading Overlay – sits right at the carousel edge, next to the text column -->
-<div class="carousel-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-10 md:w-16 z-20 bg-[linear-gradient(to_right,#fff_0%,rgba(255,255,255,0.66)_45%,transparent_100%)]"></div>
+              <div class="carousel-fade-left pointer-events-none absolute top-0 bottom-0 z-20" aria-hidden="true"></div>
 
               <!-- Desktop Navigation Arrows -->
               <button
@@ -812,6 +812,15 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
     const tracks = document.querySelectorAll<HTMLElement>('.members-draggable-track');
 
     tracks.forEach((track) => {
+      const fade = track.closest('.carousel-container')?.querySelector<HTMLElement>('.carousel-fade-left');
+      if (fade && !track.dataset.fadeInitialized) {
+        track.dataset.fadeInitialized = 'true';
+        const updateFade = () => {
+          fade.style.opacity = String(Math.min(1, Math.max(0, track.scrollLeft) / 32));
+        };
+        track.addEventListener('scroll', updateFade, { passive: true });
+        updateFade();
+      }
       let isDown = false;
       let startX = 0;
       let scrollLeft = 0;
@@ -912,6 +921,24 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
 </script>
 
 <style>
+  .carousel-fade-left {
+    --fade-width: 64px;
+    width: var(--fade-width);
+    left: calc(var(--fade-width) * -0.5);
+    opacity: 0;
+    background: linear-gradient(to right, white 0%, white 50%, rgba(255, 255, 255, 0.65) 72%, transparent 100%);
+    transition: opacity 150ms ease-out;
+  }
+  @media (min-width: 640px) {
+    .carousel-fade-left { --fade-width: 128px; }
+  }
+  @media (min-width: 768px) {
+    .carousel-fade-left { --fade-width: 192px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-fade-left { transition: none; }
+  }
+
   .pixel-heading {
     font-family: 'Press Start 2P', 'Silkscreen', monospace;
     letter-spacing: 0.05em;
@@ -923,10 +950,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
     color: #ffffff;
     opacity: 1;
     z-index: 1;
-    text-shadow:
-      -2px 3px 0px rgba(0, 0, 0, 0.85),
-      0 4px 16px rgba(0, 0, 0, 0.65),
-      0 8px 24px rgba(0, 0, 0, 0.5);
+    text-shadow: none;
   }
 
   .pixel-heading-main {
@@ -935,10 +959,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
     color: #ffffff;
     opacity: 1;
     z-index: 2;
-    text-shadow:
-      -2px 3px 0px rgba(0, 0, 0, 0.85),
-      0 4px 16px rgba(0, 0, 0, 0.65),
-      0 8px 24px rgba(0, 0, 0, 0.5);
+    text-shadow: -1px 2px 6px rgba(0, 0, 0, 0.65);
   }
 
   .font-pixel {
@@ -978,6 +999,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
 
   /* Division Drawer Smooth Grid Expansion */
   .division-drawer {
+    border-block-width: 0;
     display: grid;
     grid-template-rows: 0fr;
     transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
@@ -987,9 +1009,15 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
   }
 
   .division-drawer.is-open {
+    border-block-width: 1px;
     grid-template-rows: 1fr;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* Overlap one pixel to prevent fractional viewport-height seams between rows. */
+  .division-drawer:not(.is-open) + .marquee-row {
+    margin-top: -1px;
   }
 
   .division-drawer-inner {
