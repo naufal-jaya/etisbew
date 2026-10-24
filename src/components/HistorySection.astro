@@ -1,4 +1,5 @@
 ---
+import MobilePartnerGrid from './MobilePartnerGrid.astro';
 import { sanityClient, isSanityConfigured } from '../sanity/client';
 import { urlForImage } from '../sanity/image';
 import {
@@ -55,11 +56,6 @@ const desktopCols = 10;
 const desktopRows = 2;
 const desktopSlots = desktopRows * desktopCols;
 
-// Mobile Grid layout parameters (5 columns x 3 rows = 15 slots)
-const mobileCols = 5;
-const mobileRows = 3;
-const mobileSlots = mobileRows * mobileCols;
-
 const sourcePartners = partners.length > 0 ? partners : fallbackPartners;
 
 // Extract unique partners list with resolved image URLs
@@ -79,21 +75,6 @@ const uniquePartnersList = Array.from(uniquePartnersMap.values());
 const desktopDisplayCells = Array.from({ length: desktopSlots }, (_, index) => {
   const row = Math.floor(index / desktopCols);
   const col = index % desktopCols;
-  const diagSet = row + col;
-  const initialPartner = uniquePartnersList[diagSet % uniquePartnersList.length] || { name: '', logo: '' };
-  return {
-    index,
-    row,
-    col,
-    diagSet,
-    initialPartner,
-  };
-});
-
-// Generate Mobile 15 display cells (5x3)
-const mobileDisplayCells = Array.from({ length: mobileSlots }, (_, index) => {
-  const row = Math.floor(index / mobileCols);
-  const col = index % mobileCols;
   const diagSet = row + col;
   const initialPartner = uniquePartnersList[diagSet % uniquePartnersList.length] || { name: '', logo: '' };
   return {
@@ -152,75 +133,17 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       </h2>
     </div>
 
-    <!-- MOBILE GRID: 5 columns x 3 rows (5x3, visible on screens < md) -->
-    <div class="relative w-full flex-1 flex items-center justify-center overflow-hidden py-1 md:hidden">
-      <div
-        class="partners-grid-root relative w-full grid grid-cols-5 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none"
-      >
-        {mobileDisplayCells.map((cell) => {
-          const { index, row, col, diagSet, initialPartner } = cell;
-          const isFirstCol = col === 0;
-          const isLastCol = col === mobileCols - 1;
-          const isLastRow = row === mobileRows - 1;
-
-          return (
-            <div
-              class={`group relative flex items-center justify-center p-1 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
-              data-partner-cell
-              data-cell-index={index}
-              data-diag-set={diagSet}
-            >
-              <!-- Circular Node: Top-Left vertex -->
-              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
-
-              <!-- Circular Node: Top-Right vertex -->
-              {isLastCol && (
-                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
-              )}
-
-              <!-- Circular Node: Bottom-Left vertex -->
-              {isLastRow && (
-                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
-              )}
-
-              <!-- Circular Node: Bottom-Right vertex -->
-              {isLastRow && isLastCol && (
-                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 h-3.5 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
-              )}
-
-              <!-- Logo Content -->
-              <div class="relative w-full h-full flex items-center justify-center overflow-hidden">
-                <div
-                  class="partner-logo-target relative flex items-center justify-center w-[72%] h-[72%] cursor-pointer group/logo"
-                  data-partner-target
-                >
-                  <img
-                    data-layer="a"
-                    src={initialPartner.logo}
-                    alt={initialPartner.name}
-                    loading="eager"
-                    class="partner-logo-layer absolute max-h-full max-w-full object-contain pointer-events-none transition-transform duration-200 group-hover/logo:scale-105"
-                  />
-                  <img
-                    data-layer="b"
-                    src=""
-                    alt=""
-                    loading="eager"
-                    class="partner-logo-layer absolute max-h-full max-w-full object-contain opacity-0 pointer-events-none transition-transform duration-200 group-hover/logo:scale-105"
-                    style="transform: scale(0.85);"
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+    <!-- Three independent grids retain the existing diagonal logo-wave behavior. -->
+    <div class="mobile-partners-stage md:hidden">
+      <MobilePartnerGrid partners={uniquePartnersList} small offset={1} />
+      <MobilePartnerGrid partners={uniquePartnersList} />
+      <MobilePartnerGrid partners={uniquePartnersList} small offset={2} />
     </div>
 
     <!-- DESKTOP GRID: 10 columns x 2 rows (10x2, visible on screens >= md) -->
     <div class="relative w-full overflow-x-clip overflow-y-visible py-2 hidden md:block">
       <div
-        class="partners-grid-root relative w-full grid grid-cols-10 border-t-[2.5px] border-b-[2.5px] border-[#C8CAD4] select-none"
+        class="partners-grid-root relative w-full grid grid-cols-10 border-t-[2px] border-b-[2px] border-[#C8CAD4] select-none"
       >
         {desktopDisplayCells.map((cell) => {
           const { index, row, col, diagSet, initialPartner } = cell;
@@ -230,27 +153,27 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
 
           return (
             <div
-              class={`group relative flex items-center justify-center p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2.5px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2.5px] border-[#C8CAD4]' : ''}`}
+              class={`group relative flex items-center justify-center p-1.5 md:p-2 aspect-square bg-white ${!isLastCol ? 'border-r-[2px] border-[#C8CAD4]' : ''} ${!isLastRow ? 'border-b-[2px] border-[#C8CAD4]' : ''}`}
               data-partner-cell
               data-cell-index={index}
               data-diag-set={diagSet}
             >
               <!-- Circular Node: Top-Left vertex -->
-              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+              <span class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-[12px] h-[12px] rounded-full border-[2px] border-[#C8CAD4] bg-white z-20 pointer-events-none"></span>
 
               <!-- Circular Node: Top-Right vertex -->
               {isLastCol && (
-                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+                <span class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-[12px] h-[12px] rounded-full border-[2px] border-[#C8CAD4] bg-white z-20 pointer-events-none"></span>
               )}
 
               <!-- Circular Node: Bottom-Left vertex -->
               {isLastRow && (
-                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+                <span class="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 w-[12px] h-[12px] rounded-full border-[2px] border-[#C8CAD4] bg-white z-20 pointer-events-none"></span>
               )}
 
               <!-- Circular Node: Bottom-Right vertex -->
               {isLastRow && isLastCol && (
-                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-3.5 md:w-4 h-3.5 md:h-4 rounded-full border-[2.5px] border-[#C8CAD4] bg-white z-20 pointer-events-none ring-2 ring-white"></span>
+                <span class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-[12px] h-[12px] rounded-full border-[2px] border-[#C8CAD4] bg-white z-20 pointer-events-none"></span>
               )}
 
               <!-- Logo Content -->
@@ -310,7 +233,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     </div>
     
     <!-- Floating Scattered Images (Contained strictly in bottom half on mobile; original positions on desktop) -->
-    <div class="pointer-events-none select-none absolute inset-0 z-0 overflow-hidden">
+    <div class="history-floating-images pointer-events-none select-none absolute inset-0 z-0 overflow-hidden">
       <!-- Floating 1: Left above 2025 -->
       <div class="absolute left-[4%] md:left-[6%] top-[34%] md:top-[28%] w-20 h-14 sm:w-32 sm:h-20 md:w-44 md:h-28 bg-gray-200 border border-gray-300 shadow-[5px_5px_0px_rgba(203,213,225,0.9)] opacity-50 filter grayscale">
         <img src={staticFloatingImgs[0].url} alt={staticFloatingImgs[0].alt} class="w-full h-full object-cover" />
@@ -328,12 +251,13 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
 
       <!-- Floating 4: Far Right Top/Mid -->
       <div class="absolute right-[4%] md:right-[5%] top-[32%] md:top-[26%] w-8 h-8 sm:w-11 sm:h-11 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-100 filter grayscale">
-        <img src={staticFloatingImgs[3].url} alt={staticFloatingImgs[3].alt} class="w-full h-full object-cover" />
+        <img src={staticFloatingImgs[2].url} alt={staticFloatingImgs[2].alt} class="w-full h-full object-cover" />
       </div>
 
       <!-- Floating 5: Bottom Right under description text -->
       <div class="absolute left-[82%] md:left-[86%] bottom-[12px] md:bottom-[20px] w-8 h-8 sm:w-11 sm:h-11 md:w-14 md:h-14 bg-gray-200 border border-gray-300 shadow-[4px_4px_0px_rgba(203,213,225,0.9)] opacity-80 filter grayscale">
-        <img src={staticFloatingImgs[4].url} alt={staticFloatingImgs[4].alt} class="w-full h-full object-cover" />
+        <img src={staticFloatingImgs[4].url} alt={staticFloatingImgs[4].alt} class="hidden md:block w-full h-full object-cover" />
+        <img src={staticFloatingImgs[3].url} alt={staticFloatingImgs[3].alt} class="md:hidden w-full h-full object-cover" />
       </div>
     </div>
     
@@ -341,7 +265,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     <!-- ======================================================== -->
     <!-- MOBILE VIEW (md:hidden): Vertical Flipped Timeline (Left Half) + Milestone Info (Right Half) -->
     <!-- ======================================================== -->
-    <div class="relative z-10 w-full flex-1 min-h-0 flex flex-row items-center overflow-hidden md:hidden pb-1">
+    <div class="mobile-history-layout relative z-10 w-full flex-1 min-h-0 flex flex-row items-center overflow-hidden md:hidden pb-1">
       
       <!-- LEFT HALF (w-1/2): Vertical Sliding Timeline (Ruler Flipped Vertically) -->
       <div
@@ -389,6 +313,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
             return (
               <button
                 type="button"
+                aria-current={isActive ? 'true' : undefined}
                 class="mobile-milestone-btn absolute left-0 flex flex-row items-center cursor-pointer group focus:outline-none select-none z-20 py-1"
                 data-index={idx}
                 data-year={milestone.year}
@@ -401,18 +326,8 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
                   }`}
                 ></div>
 
-                <!-- Circular Node at the end of stem -->
-                <div
-                  class={`mobile-milestone-node -ml-[2px] w-4 h-4 rounded-full border-[2px] bg-white z-10 flex items-center justify-center transition-all duration-200 ${
-                    isActive ? 'border-[#1E2029] ring-2 ring-gray-300' : 'border-[#C8CAD4]'
-                  }`}
-                >
-                  <div
-                    class={`mobile-milestone-inner-dot w-2 h-2 rounded-full transition-all duration-200 ${
-                      isActive ? 'bg-[#1E2029]' : 'bg-transparent'
-                    }`}
-                  ></div>
-                </div>
+                <!-- Plain circle with a white edge masking the needle beneath it. -->
+                <div class="mobile-milestone-node" aria-hidden="true"></div>
 
                 <!-- Year Number -->
                 <span
@@ -429,7 +344,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       </div>
 
       <!-- RIGHT HALF (w-1/2): Description Text of Active Milestone -->
-      <div class="relative w-1/2 h-full flex flex-col justify-center px-3 sm:px-4 py-2 z-20 pointer-events-auto">
+      <div class="mobile-history-description relative w-1/2 h-full flex flex-col justify-center px-3 sm:px-4 py-2 z-20 pointer-events-auto">
         <div class="max-w-[170px] sm:max-w-[200px]">
           <p
             id="mobile-milestone-desc-text"
@@ -492,6 +407,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
             return (
               <button
                 type="button"
+                aria-current={isActive ? 'true' : undefined}
                 class="milestone-btn absolute bottom-0 flex flex-col items-center cursor-pointer group focus:outline-none select-none z-20 px-2"
                 data-index={idx}
                 data-year={milestone.year}
@@ -506,18 +422,8 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
                   {milestone.year}
                 </span>
 
-                <!-- Circular Node -->
-                <div
-                  class={`milestone-node w-4 h-4 sm:w-5 sm:h-5 rounded-full border-[2.5px] bg-white z-10 flex items-center justify-center transition-all duration-200 ${
-                    isActive ? 'border-[#1E2029] ring-2 ring-gray-300' : 'border-[#C8CAD4] group-hover:border-gray-500'
-                  }`}
-                >
-                  <div
-                    class={`milestone-inner-dot w-2 h-2 rounded-full transition-all duration-200 ${
-                      isActive ? 'bg-[#1E2029]' : 'bg-transparent'
-                    }`}
-                  ></div>
-                </div>
+                <!-- A single circle; its white border overlaps the stem. -->
+                <div class="milestone-node" aria-hidden="true"></div>
 
                 <!-- Vertical Stem touching bottom-0 -->
                 <div
@@ -621,8 +527,8 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       // 2. Mobile Vertical Timeline
       if (mobileTrack && mobileSlider) {
         const trackHeight = mobileTrack.clientHeight || 280;
-        mobileFocalY = Math.round(trackHeight * 0.50);
-        mobileStepY = Math.round(Math.min(85, Math.max(68, trackHeight * 0.24)));
+        mobileFocalY = Math.round(trackHeight * 0.46);
+        mobileStepY = Math.round(trackHeight * 0.33);
 
         mobileButtons.forEach((btn, idx) => {
           btn.style.top = `${idx * mobileStepY}px`;
@@ -662,8 +568,6 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     function updateDesktopVisuals(index) {
       desktopButtons.forEach((btn, idx) => {
         const yearText = btn.querySelector('.milestone-year-text');
-        const node = btn.querySelector('.milestone-node');
-        const innerDot = btn.querySelector('.milestone-inner-dot');
         const stem = btn.querySelector('.milestone-stem');
         const diff = idx - index;
 
@@ -678,28 +582,12 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
             yearText.classList.add('text-[#1E2029]');
             yearText.style.opacity = '1';
           }
-          if (node) {
-            node.classList.remove('border-[#C8CAD4]');
-            node.classList.add('border-[#1E2029]', 'ring-2', 'ring-gray-300');
-          }
-          if (innerDot) {
-            innerDot.classList.remove('bg-transparent');
-            innerDot.classList.add('bg-[#1E2029]');
-          }
           if (stem) {
             stem.classList.remove('bg-[#C8CAD4]');
             stem.classList.add('bg-[#1E2029]');
           }
         } else {
           btn.removeAttribute('aria-current');
-          if (node) {
-            node.classList.remove('border-[#1E2029]', 'ring-2', 'ring-gray-300');
-            node.classList.add('border-[#C8CAD4]');
-          }
-          if (innerDot) {
-            innerDot.classList.remove('bg-[#1E2029]');
-            innerDot.classList.add('bg-transparent');
-          }
           if (stem) {
             stem.classList.remove('bg-[#1E2029]');
             stem.classList.add('bg-[#C8CAD4]');
@@ -726,8 +614,6 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     function updateMobileVisuals(index) {
       mobileButtons.forEach((btn, idx) => {
         const yearText = btn.querySelector('.mobile-milestone-year-text');
-        const node = btn.querySelector('.mobile-milestone-node');
-        const innerDot = btn.querySelector('.mobile-milestone-inner-dot');
         const stem = btn.querySelector('.mobile-milestone-stem');
         const diff = idx - index;
 
@@ -742,28 +628,12 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
             yearText.classList.add('text-[#1E2029]');
             yearText.style.opacity = '1';
           }
-          if (node) {
-            node.classList.remove('border-[#C8CAD4]');
-            node.classList.add('border-[#1E2029]', 'ring-2', 'ring-gray-300');
-          }
-          if (innerDot) {
-            innerDot.classList.remove('bg-transparent');
-            innerDot.classList.add('bg-[#1E2029]');
-          }
           if (stem) {
             stem.classList.remove('bg-[#C8CAD4]');
             stem.classList.add('bg-[#1E2029]');
           }
         } else {
           btn.removeAttribute('aria-current');
-          if (node) {
-            node.classList.remove('border-[#1E2029]', 'ring-2', 'ring-gray-300');
-            node.classList.add('border-[#C8CAD4]');
-          }
-          if (innerDot) {
-            innerDot.classList.remove('bg-[#1E2029]');
-            innerDot.classList.add('bg-transparent');
-          }
           if (stem) {
             stem.classList.remove('bg-[#1E2029]');
             stem.classList.add('bg-[#C8CAD4]');
@@ -1122,6 +992,31 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       }
     });
 
+    // Fill the viewport horizontally, increasing columns if the rows would reach history.
+    const partnersSection = document.getElementById('history-partners-section');
+    const mobileStage = document.querySelector('.mobile-partners-stage');
+    function fitMobilePartnerGrids() {
+      if (!partnersSection || !mobileStage || window.innerWidth >= 768) return;
+      const heading = partnersSection.firstElementChild;
+      const availableHeight = Math.max(1, partnersSection.clientHeight - heading.offsetHeight - 8);
+      const gridWidth = mobileStage.clientWidth * 1.2;
+      let columns = 6;
+      let smallColumns = 10;
+      while (columns < 24 && gridWidth * (2 / (columns * 1.2) + 2 / smallColumns) > availableHeight) {
+        columns++;
+        smallColumns = Math.ceil(columns * 5 / 3);
+      }
+      mobileStage.querySelectorAll('.mobile-partner-grid').forEach((grid) => {
+        const count = grid.classList.contains('is-small') ? smallColumns : columns;
+        grid.style.setProperty('--partner-columns', count);
+        grid.querySelectorAll('[data-partner-cell]').forEach((cell) => {
+          cell.hidden = Number(cell.getAttribute('data-partner-col')) >= count;
+        });
+      });
+    }
+    fitMobilePartnerGrids();
+    if (partnersSection) new ResizeObserver(fitMobilePartnerGrids).observe(partnersSection);
+
     const cellActiveLayer = new Map();
     let isHovered = false;
 
@@ -1210,22 +1105,25 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       if (cells.length === 0) return;
 
       const setsMap = new Map();
-      cells.forEach((cell) => {
-        const diagSet = parseInt(cell.getAttribute('data-diag-set') || '0', 10);
-        if (!setsMap.has(diagSet)) {
-          setsMap.set(diagSet, []);
-        }
-        setsMap.get(diagSet).push(cell);
-        cellActiveLayer.set(cell, 'a');
-      });
+      let totalSets = 0;
+      function refreshDiagonalSets() {
+        setsMap.clear();
+        cells.filter((cell) => !cell.hidden).forEach((cell) => {
+          const diagSet = Number(cell.getAttribute('data-diag-set') || 0);
+          if (!setsMap.has(diagSet)) setsMap.set(diagSet, []);
+          setsMap.get(diagSet).push(cell);
+          if (!cellActiveLayer.has(cell)) cellActiveLayer.set(cell, 'a');
+        });
+        totalSets = setsMap.size;
+      }
+      refreshDiagonalSets();
 
-      const totalSets = setsMap.size;
       const staggerDelay = 140; // ms delay between consecutive diagonal sets (wave ripple speed)
       const shrinkDuration = 320; // ms for shrink animation
       const fadeInDuration = 400; // ms for fade-in animation
       const waveRestInterval = 2800; // ms pause between complete wave loops
 
-      let currentWave = 0;
+      let currentWave = Number(gridRoot.getAttribute('data-partner-offset') || 0);
       let isWaveActive = false;
       let isVisible = true;
       let nextWaveTimeout = null;
@@ -1238,6 +1136,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
           return;
         }
 
+        refreshDiagonalSets();
         isWaveActive = true;
         currentWave++;
         currentSetIndex = 0;
@@ -1381,6 +1280,99 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     font-family: 'Agency FB', sans-serif;
   }
 
+  /* Mobile reference: a light logo mosaic above an airy vertical history ruler. */
+  @media (max-width: 767px) {
+    #section-history {
+      height: 844px;
+      min-height: 0;
+      max-height: none;
+      border-top-width: 1px;
+    }
+    #history-partners-section { height: 46%; flex: none; justify-content: flex-start; }
+    #history-growth-section { height: 54%; flex: none; justify-content: flex-start; }
+    #history-partners-section > div:first-child {
+      height: 100px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #history-growth-section > div:first-child {
+      height: 76px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #section-history h2 {
+      font-size: clamp(18px, 5.55vw, 26px);
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+    .mobile-partners-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      flex: none;
+    }
+    .history-fade-left, .history-fade-right { display: none; }
+    #mobile-history-timeline-track { width: 48%; flex-shrink: 0; }
+    #mobile-history-timeline-track > div:first-child { width: 1px; }
+    .mobile-timeline-tick { height: 1px; width: 10vw; }
+    .mobile-milestone-stem { height: 2px; width: clamp(24px, 10vw, 44px); flex-shrink: 0; }
+    .mobile-milestone-node {
+      width: 16px;
+      height: 16px;
+      margin-left: -8px;
+      flex-shrink: 0;
+      position: relative;
+      border: 3px solid white;
+      border-radius: 50%;
+      background: #c8cad4;
+      box-shadow: none;
+      outline: none;
+    }
+    .mobile-milestone-btn[aria-current="true"] .mobile-milestone-node { background: #1e2029; }
+    .mobile-milestone-year-text {
+      font-size: clamp(36px, 11.5vw, 54px);
+      margin-left: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      letter-spacing: 0;
+    }
+    .mobile-history-description {
+      width: 52%;
+      justify-content: flex-start;
+      padding: 0 20px 0 8px;
+    }
+    .mobile-history-description > div {
+      position: absolute;
+      top: 46%;
+      left: 8px;
+      right: 20px;
+      max-width: none;
+    }
+    #mobile-milestone-desc-text { font-size: clamp(11px, 2.95vw, 14px); line-height: 1.2; letter-spacing: 0; }
+    .history-floating-images > div:nth-child(1) {
+      top: 58%; left: 8%; width: 23vw; height: 13vw; opacity: 0.7;
+    }
+    .history-floating-images > div:nth-child(2) {
+      top: 2%; left: 8%; width: 11vw; height: 10vw; opacity: 0.75;
+    }
+    .history-floating-images > div:nth-child(3) {
+      top: 20%; right: 8%; width: 11vw; height: 10vw; opacity: 0.7;
+      transform: translateY(-20%);
+    }
+    .history-floating-images > div:nth-child(4) {
+      top: auto; bottom: 2%; right: -2%; width: 25vw; height: 15vw; opacity: 0.7;
+      transform: translateY(-20%);
+    }
+    .history-floating-images > div:nth-child(5) {
+      bottom: -3%; left: 27%; width: 23vw; height: 10vw; opacity: 0.7;
+    }
+  }
+
   /* Partner Logo Ping-Pong double-buffered layer styling */
   .partner-logo-layer {
     transform-origin: center center;
@@ -1467,6 +1459,22 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
       transparent var(--timeline-fade-end)
     );
   }
+
+  .milestone-node {
+    position: relative;
+    z-index: 10;
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin-bottom: -10px;
+    flex-shrink: 0;
+    border: 3px solid white;
+    border-radius: 50%;
+    background: #c8cad4;
+    box-shadow: none;
+    outline: none;
+  }
+  .milestone-btn[aria-current="true"] .milestone-node { background: #1e2029; }
 
   .milestone-btn {
     transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);

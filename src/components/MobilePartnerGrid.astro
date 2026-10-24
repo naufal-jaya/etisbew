@@ -1,0 +1,96 @@
+---
+interface Partner { name: string; logo: string }
+interface Props { partners: Partner[]; small?: boolean; offset?: number }
+const { partners, small = false, offset = 0 } = Astro.props;
+// Reserve side cells for wider or shorter mobile viewports.
+const columns = small ? 40 : 24;
+const visibleColumns = small ? 10 : 6;
+const rows = small ? 1 : 2;
+const cells = Array.from({ length: columns * rows }, (_, index) => {
+  const row = Math.floor(index / columns);
+  const col = index % columns;
+  const diagSet = row + col;
+  return {
+    index, row, col, diagSet,
+    partner: partners[(diagSet + offset) % partners.length] || { name: '', logo: '' },
+  };
+});
+---
+<div class:list={['partners-grid-root mobile-partner-grid', { 'is-small': small }]} data-partner-offset={offset} style={`--partner-columns: ${visibleColumns}; --partner-rows: ${rows};`}>
+  {cells.map(({ index, row, col, diagSet, partner }) => (
+    <div class="mobile-partner-cell group" hidden={col >= visibleColumns} style={`grid-column: ${col + 1}; grid-row: ${row + 1};`} data-partner-col={col} data-partner-cell data-cell-index={index} data-diag-set={diagSet}>
+      <span class="grid-node top-left" aria-hidden="true"></span>
+      {col === columns - 1 && <span class="grid-node top-right" aria-hidden="true"></span>}
+      {row === rows - 1 && <span class="grid-node bottom-left" aria-hidden="true"></span>}
+      {row === rows - 1 && col === columns - 1 && <span class="grid-node bottom-right" aria-hidden="true"></span>}
+      <div class="partner-logo-target" data-partner-target>
+        <img data-layer="a" src={partner.logo} alt={partner.name} loading="lazy" class="partner-logo-layer" />
+        <img data-layer="b" alt="" loading="lazy" class="partner-logo-layer" style="opacity: 0; transform: scale(0.85);" />
+      </div>
+    </div>
+  ))}
+</div>
+<style>
+  .mobile-partner-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--partner-columns), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--partner-rows), minmax(0, 1fr));
+    width: 120%;
+    height: auto;
+    aspect-ratio: calc(var(--partner-columns) * 1.2) / var(--partner-rows);
+    flex: none;
+    position: relative;
+    border-top: 1px solid #c8cad4;
+    border-left: 1px solid #c8cad4;
+    user-select: none;
+  }
+  .is-small {
+    aspect-ratio: var(--partner-columns);
+    opacity: 0.6;
+  }
+  .is-small .grid-node { display: none; }
+  .mobile-partner-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    background: white;
+    border-right: 1px solid #c8cad4;
+    border-bottom: 1px solid #c8cad4;
+  }
+  .mobile-partner-cell[hidden] { display: none; }
+  .mobile-partner-grid + .mobile-partner-grid { border-top: 0; }
+  .grid-node {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border: 1px solid #c8cad4;
+    border-radius: 50%;
+    background: white;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .top-left { top: 0; left: 0; transform: translate(-50%, -50%); }
+  .top-right { top: 0; right: 0; transform: translate(50%, -50%); }
+  .bottom-left { bottom: 0; left: 0; transform: translate(-50%, 50%); }
+  .bottom-right { bottom: 0; right: 0; transform: translate(50%, 50%); }
+  .partner-logo-target {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 58%;
+    height: 72%;
+    cursor: pointer;
+  }
+  .partner-logo-layer {
+    position: absolute;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transform-origin: center;
+    backface-visibility: hidden;
+  }
+</style>
