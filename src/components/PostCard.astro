@@ -1,4 +1,5 @@
 ---
+import { responsiveImage } from "../sanity/image";
 import type { PostItem } from "../data/posts";
 import PostDate from "./PostDate.astro";
 interface Props {
@@ -39,7 +40,7 @@ const catSlug = post.category?.slug || "tech-insight";
     class="relative w-full aspect-[440/248] overflow-hidden mb-3 bg-neutral-900 block rounded-none"
   >
     <img
-      src={post.image}
+      {...responsiveImage(post.image, "(max-width: 639px) 104px, (max-width: 1023px) 45vw, 440px")}
       alt={post.title}
       class="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-500"
       loading="lazy"

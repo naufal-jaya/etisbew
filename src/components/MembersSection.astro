@@ -1,4 +1,5 @@
 ---
+import { responsiveImage } from "../sanity/image";
 // Members Section with dual-row infinite marquee & interactive division showcase drawer
 // - Marquee rows: seamless photo cards that loop infinitely
 // - Click card: plays looping video on that card, pauses marquee, opens division detail drawer
@@ -316,7 +317,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
         >
           <!-- Photo layer -->
           <img
-            src={member.image}
+            {...responsiveImage(member.image, "(max-width: 639px) max(205px, 33.2vh), (max-width: 767px) max(253px, 41.1vh), max(300px, 47.4dvh)", undefined, 100)}
             alt={`${member.division} photo`}
             width="594"
             height="781"
@@ -414,7 +415,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
                 <!-- Group Photo Card (Exact 415x257px on desktop, proportional on mobile, sharp corners: rounded-none, no text, no hover effect) -->
                 <div class="group-photo-card relative flex-shrink-0 w-[270px] sm:w-[350px] md:w-[415px] h-[195px] sm:h-[225px] md:h-[257px] rounded-none overflow-hidden bg-neutral-900 border-0 shadow-sm">
                   <img
-                    src={division.groupPhoto}
+                    {...responsiveImage(division.groupPhoto, "(max-width: 639px) 270px, (max-width: 767px) 350px, 415px", undefined, 100)}
                     alt={division.groupCaption}
                     class="w-full h-full object-cover select-none pointer-events-none rounded-none"
                     loading="lazy"
@@ -432,7 +433,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
                   >
                     <!-- Member photo with blur transition -->
                     <img
-                      src={member.image}
+                      {...responsiveImage(member.image, "(max-width: 639px) 140px, (max-width: 767px) 160px, 185px", [160, 280, 370, 560], 100)}
                       alt={member.name}
                       class="member-photo absolute inset-0 w-full h-full object-cover select-none pointer-events-none rounded-none"
                       loading="lazy"
@@ -503,7 +504,7 @@ const row2Track = Array.from({ length: NUM_CYCLES }).flatMap((_, cycleIdx) =>
         >
           <!-- Photo layer -->
           <img
-            src={member.image}
+            {...responsiveImage(member.image, "(max-width: 639px) max(205px, 33.2vh), (max-width: 767px) max(253px, 41.1vh), max(300px, 47.4dvh)", undefined, 100)}
             alt={`${member.division} photo`}
             width="594"
             height="781"

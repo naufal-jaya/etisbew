@@ -1,7 +1,7 @@
 ---
 import MobilePartnerGrid from './MobilePartnerGrid.astro';
 import { sanityClient, isSanityConfigured } from '../sanity/client';
-import { urlForImage } from '../sanity/image';
+import { urlForImage, optimizeImageUrl } from '../sanity/image';
 import {
   fallbackPartners,
   fallbackMilestones,
@@ -65,7 +65,7 @@ sourcePartners.forEach((p) => {
     const logoUrl = urlForImage(p.logo) || (typeof p.logo === 'string' ? p.logo : '');
     uniquePartnersMap.set(p.name, {
       name: p.name,
-      logo: logoUrl,
+      logo: optimizeImageUrl(logoUrl, 480, 90),
     });
   }
 });

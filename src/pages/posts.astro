@@ -1,4 +1,5 @@
 ---
+import { responsiveImage } from "../sanity/image";
 import "../styles/global.css";
 import PostCard from "../components/PostCard.astro";
 import PostHeader from "../components/PostHeader.astro";
@@ -139,7 +140,7 @@ const [featuredPosts, allPosts, categories] = await Promise.all([
                 aria-label={post.title}
               >
                 <img
-                  src={post.image}
+                  {...responsiveImage(post.image, "(max-width: 767px) 90vw, 60vw")}
                   alt={post.title}
                   class="absolute inset-0 w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-transform duration-700"
                   loading={idx === 1 ? 'eager' : 'lazy'}

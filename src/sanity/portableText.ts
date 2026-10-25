@@ -1,4 +1,4 @@
-import { urlForImage } from './image.ts';
+import { urlForImage, responsiveImage } from './image.ts';
 
 export function escapeHtml(str: string): string {
   if (!str) return '';
@@ -52,15 +52,17 @@ export function renderPortableTextToHtml(blocks: any): string {
     // Inline Image or Image block
     if (block._type === 'inlineImage' || block._type === 'image') {
       closeList();
-      const imgUrl = block.url || urlForImage(block);
+      const imgUrl = urlForImage(block.url || block);
       const alt = escapeHtml(block.alt || 'Post image');
       const caption = block.caption ? escapeHtml(block.caption) : '';
 
       if (imgUrl) {
+        const image = responsiveImage(imgUrl, '(max-width: 1023px) 100vw, 70vw');
         html.push(`
           <figure class="my-8 mx-auto w-full lg:max-w-[70%]">
             <img
-              src="${imgUrl}"
+              src="${escapeHtml(image.src)}"
+              ${image.srcset ? `srcset="${escapeHtml(image.srcset)}" sizes="${image.sizes}"` : ''}
               alt="${alt}"
               class="block w-auto h-auto max-w-full max-h-[600px] mx-auto drop-shadow-lg"
               loading="lazy"

@@ -1,4 +1,5 @@
 ---
+import { responsiveImage } from "../../sanity/image";
 import "../../styles/global.css";
 import PostCard from "../../components/PostCard.astro";
 import PostDate from "../../components/PostDate.astro";
@@ -109,7 +110,7 @@ const articleHtml = renderPortableTextToHtml(post.content);
             class="w-full aspect-[16/9] bg-neutral-950 overflow-hidden shadow-sm"
           >
             <img
-              src={post.image}
+              {...responsiveImage(post.image, "(max-width: 1023px) 100vw, 50vw")}
               alt={post.alt || post.title}
               class="w-full h-full object-cover"
               loading="eager"
