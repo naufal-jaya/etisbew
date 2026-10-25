@@ -51,12 +51,12 @@ const featuredPosts = await getFeaturedPosts();
 
     <!-- Bottom right side (Latest Post) -->
     <div class="hero-latest relative sm:absolute sm:bottom-12 sm:right-6 lg:right-12 flex flex-col items-end w-full sm:w-auto mt-auto sm:mt-0">
-      <span class="text-white text-xs font-light mb-1 drop-shadow-[0_2px_3px_rgba(0,0,0,0.85)]">Latest posts</span>
+      <span class="text-white text-xs md:text-sm font-light mb-1 drop-shadow-[0_2px_3px_rgba(0,0,0,0.85)]">Latest posts</span>
       <!-- Card -->
       <a
         id="hero-post-card"
         href={`/posts/${featuredPosts[0].slug}`}
-        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-[52%] sm:w-[164px] max-w-full h-[60px] relative group cursor-pointer block select-none"
+        class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-[52%] sm:w-[164px] md:w-[296px] max-w-full h-[60px] md:h-[80px] relative group cursor-pointer block select-none"
         aria-label="Latest featured post"
       >
         <!-- Sliding Images Track -->
@@ -81,17 +81,16 @@ const featuredPosts = await getFeaturedPosts();
 
         <!-- Darken the compact text area while keeping the thumbnail visible. -->
         <div
-          class="absolute inset-0 z-10 pointer-events-none"
-          style="background: linear-gradient(to right, #0a0a0a 0%, rgba(10, 10, 10, 0.8) 65%, rgba(10, 10, 10, 0) 100%);"
+          class="hero-post-overlay absolute inset-0 z-10 pointer-events-none"
         >
         </div>
 
         <!-- Text Content (Fade Transition) -->
-        <div class="relative z-20 w-full h-full">
+        <div class="relative z-20 w-full md:w-3/5 h-full">
           {
             featuredPosts.map((post, idx) => (
               <div
-                class={`hero-slide-text absolute inset-0 p-2 grid grid-rows-[minmax(0,1fr)_auto] gap-1 transition-opacity duration-500 ease-in-out ${
+                class={`hero-slide-text absolute inset-0 p-2 md:p-2.5 md:pr-2 grid md:flex md:flex-col md:justify-between grid-rows-[minmax(0,1fr)_auto] gap-1 transition-opacity duration-500 ease-in-out ${
                   idx === 0
                     ? "opacity-100 pointer-events-auto"
                     : "opacity-0 pointer-events-none"
@@ -99,10 +98,10 @@ const featuredPosts = await getFeaturedPosts();
                 data-slide-index={idx}
                 data-slug={`/posts/${post.slug}`}
               >
-                <h3 class="text-white text-[9px] font-bold leading-[1.2] line-clamp-2 min-h-0 overflow-hidden">
+                <h3 class="text-white text-[9px] md:text-xs font-bold leading-[1.2] md:leading-tight line-clamp-2 md:line-clamp-3 min-h-0 overflow-hidden">
                   {post.title}
                 </h3>
-                <p class="text-gray-400 text-[9px] font-medium leading-[10px] truncate pr-10">
+                <p class="text-gray-400 text-[9px] font-medium leading-[10px] md:leading-none truncate pr-10 md:pr-0">
                   {post.author}
                 </p>
               </div>
@@ -112,7 +111,7 @@ const featuredPosts = await getFeaturedPosts();
 
         <!-- Three Transparent Dots at Right Bottom (aligned with author's text) -->
         <div
-          class="absolute right-3 bottom-2 z-30 flex items-center gap-1.5"
+          class="absolute right-3 bottom-2 md:bottom-[11.5px] z-30 flex items-center gap-1.5"
           id="hero-carousel-dots"
           aria-label="Carousel navigation dots"
         >
@@ -283,6 +282,15 @@ const featuredPosts = await getFeaturedPosts();
 </script>
 
 <style>
+  .hero-post-overlay {
+    background: linear-gradient(to right, #0a0a0a 0%, rgba(10, 10, 10, 0.8) 65%, rgba(10, 10, 10, 0) 100%);
+  }
+  @media (min-width: 768px) {
+    .hero-post-overlay {
+      background: linear-gradient(to right, #0a0a0a 0%, rgba(10, 10, 10, 0.71) 40%, rgba(10, 10, 10, 0) 60%);
+    }
+  }
+
   .hero-latest {
     transform: translateY(-30px);
   }
