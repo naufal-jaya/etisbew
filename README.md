@@ -41,3 +41,25 @@ All commands are run from the root of the project, from a terminal:
 ## 👀 Want to learn more?
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## LinkedIn post cards
+
+In Sanity Studio, create a **LinkedIn Posts** document:
+
+1. Paste the full HTTPS LinkedIn post URL (`/posts/...` or `/feed/update/...`).
+2. Enter **Title**, set **Published Date**, and upload the **Cover** image (optional image description).
+3. Publish the document and rebuild/redeploy the Astro website.
+
+There is no preview-text or author input. Activities is assigned automatically using its existing CMS color. Cards show only a 16:9 cover, title, and date; LinkedIn cards retain the hover/tap link controls.
+
+LinkedIn cards use the existing layouts and open the original LinkedIn post. They do not create local article pages. Activities posts (including LinkedIn posts) are excluded from featured, recent, and related-post recommendations; they remain available in the main posts listing and Activities filter. Existing articles keep their local links.
+
+This is manual entry: no LinkedIn API, scraping, background job, or automatic text/image import is involved. Deploy the updated Sanity Studio to expose the new document type in a hosted Studio (`npm run studio:deploy`). The website remains statically generated, so Sanity publication alone does not update deployed pages.
+
+Verify the integration without remote CMS requests:
+
+```sh
+node --experimental-strip-types scripts/test-linkedin-posts.mjs
+```
+
+Dummy posts are shown only when Sanity is unconfigured or the posts request fails. Successful responses, including empty responses and short featured/recent lists, are never padded with dummy posts.

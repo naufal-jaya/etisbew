@@ -1,3 +1,4 @@
+import { normalizeLinkedInPostUrl, isActivityPost } from '../utils/postLinks.ts';
 import { sanityClient, isSanityConfigured } from '../sanity/client.ts';
 import { urlForImage } from '../sanity/image.ts';
 
@@ -16,6 +17,7 @@ export interface PostItem {
   author: string;
   image: string;
   slug: string;
+  externalUrl?: string;
   publishedAt?: string;
   isFeatured?: boolean;
   category?: PostCategory;
@@ -25,7 +27,7 @@ export interface PostItem {
   content?: any;
 }
 
-// Fallback featured posts (used when Sanity is offline or to complement layout slots)
+// Fallback featured posts (used only when Sanity is unavailable)
 export const fallbackFeaturedPosts: PostItem[] = [
   {
     id: 'f-1',
@@ -184,16 +186,18 @@ function slugify(text: string): string {
 
 // Map raw Sanity news/post document to clean PostItem
 export function mapSanityNewsToPostItem(item: any): PostItem {
-  const title = item.title || 'Untitled Post';
+  const isLinkedIn = item._type === 'linkedinPost';
+  const title = item.title?.trim() || (isLinkedIn ? item.summary?.split(/\r?\n/).find((line: string) => line.trim())?.trim().slice(0, 160) : '') || 'Untitled Post';
   const rawSlug = typeof item.slug === 'string' ? item.slug : item.slug?.current;
-  const slug = rawSlug || slugify(title);
+  const slug = isLinkedIn ? `linkedin-${item._id}` : rawSlug || slugify(title);
 
-  const categoryTitle = item.category?.title || 'Tech Insight';
-  const categoryColor = item.category?.color || '#1338BE';
-  const categorySlug =
-    typeof item.category?.slug === 'string'
-      ? item.category.slug
-      : item.category?.slug?.current || slugify(categoryTitle);
+  const category = isLinkedIn ? item.activitiesCategory : item.category;
+  const categoryTitle = isLinkedIn ? 'Activities' : category?.title || 'Tech Insight';
+  const categoryColor = category?.color || (isLinkedIn ? '#F59E0B' : '#1338BE');
+  const categorySlug = isLinkedIn ? 'activities' :
+    typeof category?.slug === 'string'
+      ? category.slug
+      : category?.slug?.current || slugify(categoryTitle);
 
   const coverUrl =
     item.coverImage?.url ||
@@ -207,14 +211,15 @@ export function mapSanityNewsToPostItem(item: any): PostItem {
     author: item.writer || 'IEEE SB IPB',
     image: coverUrl,
     slug,
+    externalUrl: isLinkedIn ? normalizeLinkedInPostUrl(item.externalUrl) : undefined,
     publishedAt: item.publishedAt || item._createdAt || new Date().toISOString(),
     isFeatured: Boolean(item.isFeatured),
     category: {
-      _id: item.category?._id,
+      _id: category?._id,
       title: categoryTitle,
       color: categoryColor,
       slug: categorySlug,
-      description: item.category?.description,
+      description: category?.description,
     },
     summary: item.summary || '',
     caption: item.coverImage?.caption || '',
@@ -223,11 +228,13 @@ export function mapSanityNewsToPostItem(item: any): PostItem {
   };
 }
 
-const POSTS_GROQ_QUERY = `*[_type in ["news", "post"]] | order(publishedAt desc, _createdAt desc) {
+const POSTS_GROQ_QUERY = `*[_type in ["news", "post", "linkedinPost"]] | order(publishedAt desc, _createdAt desc) {
   _id,
   _type,
   _createdAt,
+  "activitiesCategory": select(_type == "linkedinPost" => *[_type == "category" && slug.current == "activities"][0]{_id, title, slug, color, description}),
   title,
+  externalUrl,
   slug,
   publishedAt,
   isFeatured,
@@ -276,7 +283,9 @@ const FEATURED_POSTS_GROQ_QUERY = `*[_type == "featuredPost"] | order(order asc,
     _id,
     _type,
     _createdAt,
+    "activitiesCategory": select(_type == "linkedinPost" => *[_type == "category" && slug.current == "activities"][0]{_id, title, slug, color, description}),
     title,
+    externalUrl,
     slug,
     publishedAt,
     isFeatured,
@@ -307,18 +316,24 @@ const FEATURED_POSTS_GROQ_QUERY = `*[_type == "featuredPost"] | order(order asc,
   }
 }`;
 
-// Fetch raw posts from Sanity CMS
-export async function getSanityPosts(): Promise<PostItem[]> {
-  if (!isSanityConfigured) return [];
+// A successful empty response is different from an unavailable CMS.
+async function fetchSanityPosts(): Promise<{ available: boolean; posts: PostItem[] }> {
+  if (!isSanityConfigured) return { available: false, posts: [] };
   try {
     const raw = await sanityClient.fetch(POSTS_GROQ_QUERY);
-    if (Array.isArray(raw) && raw.length > 0) {
-      return raw.map(mapSanityNewsToPostItem);
-    }
+    if (!Array.isArray(raw)) throw new Error('Invalid Sanity posts response');
+    return {
+      available: true,
+      posts: raw.filter((item: any) => item._type !== 'linkedinPost' || normalizeLinkedInPostUrl(item.externalUrl)).map(mapSanityNewsToPostItem),
+    };
   } catch (err) {
     console.warn('Could not fetch posts from Sanity CMS, fallback will be used:', err);
+    return { available: false, posts: [] };
   }
-  return [];
+}
+
+export async function getSanityPosts(): Promise<PostItem[]> {
+  return (await fetchSanityPosts()).posts;
 }
 
 // Backwards-compatible alias
@@ -364,6 +379,10 @@ export async function getAllCategories(): Promise<PostCategory[]> {
 
 // Returns featured posts: Supports CMS 'featuredPost' individual documents (1 post per document), with resilient fallbacks
 export async function getFeaturedPosts(): Promise<PostItem[]> {
+  return selectFeaturedPosts(await fetchSanityPosts());
+}
+
+async function selectFeaturedPosts(snapshot: { available: boolean; posts: PostItem[] }): Promise<PostItem[]> {
   const result: PostItem[] = [];
 
   // 1. Check for individual 'featuredPost' documents in Sanity CMS
@@ -372,9 +391,11 @@ export async function getFeaturedPosts(): Promise<PostItem[]> {
       const featuredDocs = await sanityClient.fetch(FEATURED_POSTS_GROQ_QUERY);
       if (Array.isArray(featuredDocs) && featuredDocs.length > 0) {
         for (const doc of featuredDocs) {
-          if (doc.post && doc.post.title && !result.some((p) => p.slug === (doc.post.slug?.current || doc.post.slug))) {
-            result.push(mapSanityNewsToPostItem({ ...doc.post, isFeatured: true }));
-          }
+          if (!doc.post || !(doc.post.title || doc.post.summary)) continue;
+          if (doc.post._type === 'linkedinPost' && !normalizeLinkedInPostUrl(doc.post.externalUrl)) continue;
+          const post = mapSanityNewsToPostItem({ ...doc.post, isFeatured: true });
+          if (isActivityPost(post)) continue;
+          if (!result.some((existing) => existing.slug === post.slug)) result.push(post);
         }
       }
     } catch (err) {
@@ -383,7 +404,7 @@ export async function getFeaturedPosts(): Promise<PostItem[]> {
   }
 
   // 2. If no featuredPost documents in CMS yet, check posts flagged with isFeatured
-  const sanityPosts = await getSanityPosts();
+  const sanityPosts = snapshot.posts.filter((post) => !isActivityPost(post));
   const sanityFeatured = sanityPosts.filter((p) => p.isFeatured);
 
   for (const item of sanityFeatured) {
@@ -401,63 +422,29 @@ export async function getFeaturedPosts(): Promise<PostItem[]> {
     }
   }
 
-  // 4. If still fewer than 3, supplement with fallback featured posts
-  for (const fb of fallbackFeaturedPosts) {
-    if (result.length >= 3) break;
-    if (!result.some((p) => p.slug === fb.slug)) {
-      result.push(fb);
-    }
-  }
-
-  return result;
+  // Never pad a successful CMS response with dummy posts.
+  if (!snapshot.available && result.length === 0) return fallbackFeaturedPosts.filter((post) => !isActivityPost(post));
+  return result.slice(0, 3);
 }
 
-// Returns recent posts: Exactly 4 distinct posts that are not in the top featured carousel
+// Return up to four CMS posts, excluding the featured selection.
 export async function getRecentPosts(): Promise<PostItem[]> {
-  const featured = await getFeaturedPosts();
+  const snapshot = await fetchSanityPosts();
+  const featured = await selectFeaturedPosts(snapshot);
   const featuredSlugs = new Set(featured.map((p) => p.slug));
-
-  const sanityPosts = await getSanityPosts();
-  const result: PostItem[] = [];
-
-  // Exclude posts that are already showcased in the featured carousel
-  for (const item of sanityPosts) {
-    if (result.length >= 4) break;
-    if (!featuredSlugs.has(item.slug)) {
-      result.push(item);
-    }
-  }
-
-  // Supplement with fallback recent posts up to 4 if needed
-  for (const fb of fallbackRecentPosts) {
-    if (result.length >= 4) break;
-    if (!featuredSlugs.has(fb.slug) && !result.some((p) => p.slug === fb.slug)) {
-      result.push(fb);
-    }
-  }
-
-  return result.slice(0, 4);
+  const source = snapshot.available ? snapshot.posts : fallbackRecentPosts;
+  return source.filter((post) => !isActivityPost(post) && !featuredSlugs.has(post.slug)).slice(0, 4);
 }
 
-// Returns all posts: All Sanity posts first, followed by fallbacks (no duplicates)
 export async function getAllPosts(): Promise<PostItem[]> {
-  const sanityPosts = await getSanityPosts();
-  const result: PostItem[] = [...sanityPosts];
-
-  const allFallbacks = [...fallbackFeaturedPosts, ...fallbackRecentPosts];
-  for (const fb of allFallbacks) {
-    if (!result.some((p) => p.slug === fb.slug)) {
-      result.push(fb);
-    }
-  }
-
-  return result;
+  const snapshot = await fetchSanityPosts();
+  return snapshot.available ? snapshot.posts : [...fallbackFeaturedPosts, ...fallbackRecentPosts];
 }
 
 // Get post by slug
 export async function getPostBySlug(slug: string): Promise<PostItem | null> {
   const all = await getAllPosts();
-  return all.find((p) => p.slug === slug) || null;
+  return all.find((p) => !p.externalUrl && p.slug === slug) || null;
 }
 
 export const mapSanityPostToPostItem = mapSanityNewsToPostItem;

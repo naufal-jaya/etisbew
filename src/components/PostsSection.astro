@@ -1,4 +1,7 @@
 ---
+import ActivityCard from "./ActivityCard.astro";
+import PostDate from "./PostDate.astro";
+import { getPostHref, isActivityPost } from "../utils/postLinks";
 import { responsiveImage } from "../sanity/image";
 // Posts Section
 // - Top row: 3 featured posts with smooth horizontal expansion/shrinking,
@@ -28,15 +31,15 @@ const recentPosts = await getRecentPosts();
 
     <!-- Top Row: 3 Featured Posts (Alternating Highlight) -->
     <div
-      id="featured-row"
+      style={featuredPosts.length ? undefined : "display: none"} id="featured-row"
       class="featured-row flex w-full overflow-hidden"
-      data-active-index="1"
+      data-active-index={Math.min(1, Math.max(0, featuredPosts.length - 1))}
     >
       {featuredPosts.map((post, idx) => (
         <div
-          class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === 1 ? 'is-active' : ''}`}
+          class={`featured-card group relative overflow-hidden bg-neutral-900 cursor-pointer ${idx === Math.min(1, featuredPosts.length - 1) ? 'is-active' : ''}`}
           data-card-index={idx}
-          data-slug={post.slug}
+          data-href={getPostHref(post)}
           role="button"
           tabindex="0"
           aria-label={post.title}
@@ -58,7 +61,7 @@ const recentPosts = await getRecentPosts();
               {post.title}
             </h3>
             <p class="text-[11px] sm:text-xs md:text-sm text-neutral-300 font-normal drop-shadow-sm">
-              {post.type} by {post.author}
+              {(isActivityPost(post) || post.externalUrl) ? <PostDate date={post.publishedAt} /> : <>{post.type} by {post.author}</>}
             </p>
           </div>
 
@@ -72,9 +75,9 @@ const recentPosts = await getRecentPosts();
 
     <!-- Second Row: 4 Recent Posts (Grid) -->
     <div class="recent-posts-grid grid grid-cols-2 md:grid-cols-4 w-full">
-      {recentPosts.map((post) => (
+      {recentPosts.map((post) => (isActivityPost(post) || post.externalUrl) ? <ActivityCard post={post} /> : (
         <a
-          href={`/posts/${post.slug}`}
+          href={getPostHref(post)}
           class="recent-card group relative aspect-[440/248] overflow-hidden bg-neutral-900 block"
           aria-label={post.title}
         >
@@ -95,7 +98,7 @@ const recentPosts = await getRecentPosts();
               {post.title}
             </h4>
             <p class="text-[10px] sm:text-xs font-normal mt-1 drop-shadow-sm text-neutral-300">
-              {post.type} by {post.author}
+              {(isActivityPost(post) || post.externalUrl) ? <PostDate date={post.publishedAt} /> : <>{post.type} by {post.author}</>}
             </p>
           </div>
         </a>
@@ -222,7 +225,7 @@ const recentPosts = await getRecentPosts();
     if (cards.length < 2) return;
 
     const DURATION_MS = 7000;
-    let currentIndex = 1; // Start with the middle card as in mockup
+    let currentIndex = Math.min(1, cards.length - 1); // Start with the middle card as in mockup
     let timerStartTime = 0;
     let animFrameId: number | null = null;
     let isPaused = false;
@@ -279,9 +282,9 @@ const recentPosts = await getRecentPosts();
           elapsedBeforePause = 0;
           setActive(idx);
         } else {
-          const slug = card.getAttribute('data-slug');
-          if (slug) {
-            window.location.href = `/posts/${slug}`;
+          const href = card.getAttribute('data-href');
+          if (href) {
+            window.location.href = href;
           }
         }
       });

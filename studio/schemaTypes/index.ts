@@ -1,3 +1,4 @@
+import { linkedinPostSchema } from './linkedinPost';
 import { partnerSchema } from './partner';
 import { milestoneSchema } from './milestone';
 import { divisionSchema } from './division';
@@ -6,6 +7,7 @@ import { newsSchema } from './news';
 import { featuredPostSchema } from './featuredPost';
 
 export const schemaTypes = [
+  linkedinPostSchema,
   featuredPostSchema,
   newsSchema,
   categorySchema,
@@ -14,7 +16,7 @@ export const schemaTypes = [
   partnerSchema,
 ];
 export {
-  partnerSchema,
+  linkedinPostSchema,  partnerSchema,
   milestoneSchema,
   divisionSchema,
   categorySchema,

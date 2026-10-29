@@ -1,4 +1,6 @@
 ---
+import PostDate from "./PostDate.astro";
+import { getPostHref, isActivityPost } from "../utils/postLinks";
 import { getFeaturedPosts } from "../data/posts";
 
 const featuredPosts = await getFeaturedPosts();
@@ -50,12 +52,13 @@ const featuredPosts = await getFeaturedPosts();
     </div>
 
     <!-- Bottom right side (Latest Post) -->
+    {featuredPosts.length > 0 && (
     <div class="hero-latest relative sm:absolute sm:bottom-12 sm:right-6 lg:right-12 flex flex-col items-end w-full sm:w-auto mt-auto sm:mt-0">
       <span class="text-white text-xs md:text-sm font-light mb-1 drop-shadow-[0_2px_3px_rgba(0,0,0,0.85)]">Latest posts</span>
       <!-- Card -->
       <a
         id="hero-post-card"
-        href={`/posts/${featuredPosts[0].slug}`}
+        href={getPostHref(featuredPosts[0])}
         class="flex items-stretch bg-[#0a0a0a] overflow-hidden w-[52%] sm:w-[164px] md:w-[296px] max-w-full h-[60px] md:h-[80px] relative group cursor-pointer block select-none"
         aria-label="Latest featured post"
       >
@@ -96,13 +99,13 @@ const featuredPosts = await getFeaturedPosts();
                     : "opacity-0 pointer-events-none"
                 }`}
                 data-slide-index={idx}
-                data-slug={`/posts/${post.slug}`}
+                data-href={getPostHref(post)}
               >
                 <h3 class="text-white text-[9px] md:text-xs font-bold leading-[1.2] md:leading-tight line-clamp-2 md:line-clamp-3 min-h-0 overflow-hidden">
                   {post.title}
                 </h3>
                 <p class="text-gray-400 text-[9px] font-medium leading-[10px] md:leading-none truncate pr-10 md:pr-0">
-                  {post.author}
+                  {(isActivityPost(post) || post.externalUrl) ? <PostDate date={post.publishedAt} /> : post.author}
                 </p>
               </div>
             ))
@@ -132,6 +135,7 @@ const featuredPosts = await getFeaturedPosts();
         </div>
       </a>
     </div>
+    )}
   </div>
 </section>
 
@@ -153,7 +157,7 @@ const featuredPosts = await getFeaturedPosts();
     let isHovered = false;
 
     const cardLinks = Array.from(textSlides).map(
-      (el) => el.getAttribute("data-slug") || "/posts",
+      (el) => el.getAttribute("data-href") || "/posts",
     );
 
     function goToSlide(index: number) {

@@ -10,6 +10,7 @@ export const featuredPostSchema = defineType({
       title: 'Post',
       type: 'reference',
       to: [{ type: 'news' }],
+      options: { filter: '!defined(category) || category->slug.current != "activities"' },
       description: 'Pilih post yang ingin dijadikan featured post pada carousel.',
       validation: (Rule) => Rule.required(),
     }),

@@ -1,4 +1,5 @@
 ---
+import { isActivityPost } from "../../utils/postLinks";
 import { responsiveImage } from "../../sanity/image";
 import "../../styles/global.css";
 import PostCard from "../../components/PostCard.astro";
@@ -11,7 +12,7 @@ import { renderPortableTextToHtml } from "../../sanity/portableText";
 
 export async function getStaticPaths() {
   const allPosts = await getAllPosts();
-  return allPosts.map((post) => ({
+  return allPosts.filter((post) => !post.externalUrl).map((post) => ({
     params: { slug: post.slug },
     props: { post },
   }));
@@ -25,7 +26,7 @@ const { post } = Astro.props;
 const allPosts = await getAllPosts();
 
 // Sample three distinct posts, always excluding the current article.
-const candidates = allPosts.filter((candidate) => candidate.slug !== post.slug);
+const candidates = allPosts.filter((candidate) => candidate.slug !== post.slug && !isActivityPost(candidate));
 for (let index = candidates.length - 1; index > 0; index--) {
   const randomIndex = Math.floor(Math.random() * (index + 1));
   [candidates[index], candidates[randomIndex]] = [candidates[randomIndex], candidates[index]];
