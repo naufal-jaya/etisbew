@@ -77,9 +77,11 @@ import 'lenis/dist/lenis.css';
       const topY = Math.round(rect.top + window.scrollY);
       targets.push(topY);
 
-      // If a section is taller than the screen, allow docking at its bottom
+      // Always include the members bottom when it extends beyond one viewport.
+      // Other sections retain the existing extra-height threshold.
       const height = section.offsetHeight;
-      if (height > viewportHeight + 150) {
+      const bottomThreshold = type === 'members' ? viewportHeight : viewportHeight + 150;
+      if (height > bottomThreshold) {
         const bottomY = Math.round(topY + height - viewportHeight);
         targets.push(bottomY);
       }
@@ -104,7 +106,7 @@ import 'lenis/dist/lenis.css';
 
   // Seamlessly steers the ongoing scroll deceleration curve into the destination section
   function guideInFlight() {
-    if (isGuiding) return;
+    if (isGuiding || document.querySelector('#members-section[data-scroll-aligning]')) return;
 
     // Do not interrupt if the members division detail drawer is open and the user is inspecting it
     const drawerOpen = document.querySelector('#division-drawer.is-open') || document.querySelector('#members-drawer.is-open');

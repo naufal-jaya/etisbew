@@ -1,4 +1,5 @@
 ---
+import SiteIcons from "../../components/SiteIcons.astro";
 import { isActivityPost } from "../../utils/postLinks";
 import { responsiveImage } from "../../sanity/image";
 import "../../styles/global.css";
@@ -7,6 +8,7 @@ import PostDate from "../../components/PostDate.astro";
 import BackArrow from "../../components/BackArrow.astro";
 import PostHeader from "../../components/PostHeader.astro";
 import Footer from "../../components/Footer.astro";
+import PostShare from "../../components/PostShare.astro";
 import { getAllPosts, type PostItem } from "../../data/posts";
 import { renderPortableTextToHtml } from "../../sanity/portableText";
 
@@ -39,6 +41,7 @@ const articleHtml = renderPortableTextToHtml(post.content);
 <!doctype html>
 <html lang="en">
   <head>
+    <SiteIcons />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{post.title} - IPB University IEEE Student Branch</title>
@@ -163,5 +166,6 @@ const articleHtml = renderPortableTextToHtml(post.content);
 
     <!-- Footer -->
     <Footer />
+    <PostShare title={post.title} author={post.author} />
   </body>
 </html>

@@ -326,7 +326,7 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
                   }`}
                 ></div>
 
-                <!-- Plain circle with a white edge masking the needle beneath it. -->
+                <!-- Plain circle with a transparent border. -->
                 <div class="mobile-milestone-node" aria-hidden="true"></div>
 
                 <!-- Year Number -->
@@ -1318,23 +1318,24 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     .history-fade-left, .history-fade-right { display: none; }
     #mobile-history-timeline-track { width: 48%; flex-shrink: 0; }
     #mobile-history-timeline-track > div:first-child { width: 1px; }
-    .mobile-timeline-tick { height: 1px; width: 10vw; }
-    .mobile-milestone-stem { height: 2px; width: clamp(24px, 10vw, 44px); flex-shrink: 0; }
+    .mobile-timeline-tick { height: 1px; width: clamp(40px, 18vw, 64px); }
+    .mobile-milestone-stem { height: 2px; width: clamp(40px, 18vw, 64px); flex-shrink: 0; }
     .mobile-milestone-node {
       width: 16px;
       height: 16px;
       margin-left: -8px;
       flex-shrink: 0;
       position: relative;
-      border: 3px solid white;
+      border: 3px solid transparent;
+      background-clip: padding-box;
       border-radius: 50%;
-      background: #c8cad4;
+      background-color: #c8cad4;
       box-shadow: none;
       outline: none;
     }
-    .mobile-milestone-btn[aria-current="true"] .mobile-milestone-node { background: #1e2029; }
+    .mobile-milestone-btn[aria-current="true"] .mobile-milestone-node { background-color: #1e2029; }
     .mobile-milestone-year-text {
-      font-size: clamp(36px, 11.5vw, 54px);
+      font-size: clamp(40px, 14vw, 64px);
       margin-left: 6px;
       white-space: nowrap;
       flex-shrink: 0;
@@ -1348,9 +1349,11 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     .mobile-history-description > div {
       position: absolute;
       top: 46%;
+      transform: translateY(-50%);
       left: 8px;
       right: 20px;
       max-width: none;
+      text-align: left;
     }
     #mobile-milestone-desc-text { font-size: clamp(11px, 2.95vw, 14px); line-height: 1.2; letter-spacing: 0; }
     .history-floating-images > div:nth-child(1) {
@@ -1467,13 +1470,14 @@ const initialMilestone = resolvedMilestones[activeIndex] || resolvedMilestones[0
     height: 24px;
     margin-bottom: -10px;
     flex-shrink: 0;
-    border: 3px solid white;
+    border: 3px solid transparent;
+    background-clip: padding-box;
     border-radius: 50%;
-    background: #c8cad4;
+    background-color: #c8cad4;
     box-shadow: none;
     outline: none;
   }
-  .milestone-btn[aria-current="true"] .milestone-node { background: #1e2029; }
+  .milestone-btn[aria-current="true"] .milestone-node { background-color: #1e2029; }
 
   .milestone-btn {
     transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);

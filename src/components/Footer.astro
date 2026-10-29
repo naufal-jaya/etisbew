@@ -10,7 +10,7 @@ const currentYear = new Date().getFullYear();
   </div>
 
   <div
-    class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8 lg:gap-8 xl:gap-10 relative z-10"
+    class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-8 xl:gap-10 relative z-10"
   >
     <!-- Logo & Description -->
     <div class="space-y-5 lg:col-span-2 lg:pr-6">
@@ -37,45 +37,21 @@ const currentYear = new Date().getFullYear();
       </p>
     </div>
 
-    <!-- Quick Links -->
-    <div class="space-y-6">
-      <h3 class="text-white text-lg font-semibold">Quick Links</h3>
-      <nav class="flex flex-col gap-4">
-        <a
-          class="text-slate-400 hover:text-blue-500 transition-colors text-sm"
-          href="/"
-        >
-          Home
-        </a>
-        <a
-          class="text-slate-400 hover:text-blue-500 transition-colors text-sm"
-          href="/about"
-        >
-          About
-        </a>
-        <a
-          class="text-slate-400 hover:text-blue-500 transition-colors text-sm"
-          href="/posts"
-        >
-          Posts
-        </a>
-      </nav>
-    </div>
-
     <!-- Media Social -->
     <div class="space-y-6">
       <h3 class="text-white text-lg font-semibold">Social Media</h3>
       <div class="flex gap-4">
         <!-- Instagram -->
         <a
-          class="text-slate-400 hover:text-blue-500 transition-colors"
+          class="text-white"
           href="https://instagram.com/ieeesbipb"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Instagram"
+          aria-label="Instagram: @ieeesbipb"
         >
           <svg
-            class="w-5 h-5"
+            class="w-5 h-5 shrink-0"
+            aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
@@ -87,14 +63,15 @@ const currentYear = new Date().getFullYear();
         </a>
         <!-- LinkedIn -->
         <a
-          class="text-slate-400 hover:text-blue-500 transition-colors"
+          class="text-white"
           href="https://www.linkedin.com/company/ieeesbipb"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="LinkedIn"
+          aria-label="LinkedIn: @ieeesbipb"
         >
           <svg
-            class="w-5 h-5"
+            class="w-5 h-5 shrink-0"
+            aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
@@ -106,14 +83,15 @@ const currentYear = new Date().getFullYear();
         </a>
         <!-- TikTok -->
         <a
-          class="text-slate-400 hover:text-blue-500 transition-colors"
+          class="text-white"
           href="https://www.tiktok.com/@ieeesbipb"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="TikTok"
+          aria-label="TikTok: @ieeesbipb"
         >
           <svg
-            class="w-5 h-5"
+            class="w-5 h-5 shrink-0"
+            aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
@@ -125,14 +103,15 @@ const currentYear = new Date().getFullYear();
         </a>
         <!-- Medium -->
         <a
-          class="text-slate-400 hover:text-blue-500 transition-colors"
+          class="text-white"
           href="https://ieeesbipb.medium.com/"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Medium"
+          aria-label="Medium: @ieeesbipb"
         >
           <svg
-            class="w-5 h-5"
+            class="w-5 h-5 shrink-0"
+            aria-hidden="true"
             fill="currentColor"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +136,7 @@ const currentYear = new Date().getFullYear();
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="1"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
@@ -168,7 +147,7 @@ const currentYear = new Date().getFullYear();
             <div class="text-white font-medium text-sm">Email</div>
             <a
               href="mailto:ieee-student@apps.ipb.ac.id"
-              class="text-slate-400 hover:text-blue-500 transition-colors text-xs break-all"
+              class="text-slate-400 text-xs break-all"
             >
               ieee-student@apps.ipb.ac.id
             </a>
@@ -182,7 +161,7 @@ const currentYear = new Date().getFullYear();
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="1"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
@@ -194,9 +173,7 @@ const currentYear = new Date().getFullYear();
           <div>
             <div class="text-white font-medium text-sm">Location</div>
             <div class="text-slate-400 text-xs leading-relaxed">
-              Hosted by Computer Science
-              <br />
-              IPB University
+              Jl. Meranti, Kampus IPB Darmaga Bogor 16680
             </div>
           </div>
         </div>
@@ -209,7 +186,7 @@ const currentYear = new Date().getFullYear();
     class="max-w-6xl mx-auto mt-8 pt-5 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-2 text-xs text-slate-500 relative z-10"
   >
     <div>
-      © {currentYear} IEEE Student Branch IPB University. All rights reserved.
+      © {currentYear} IEEE Student Branch IPB University.
     </div>
     <div>by Tech and Information IEEE SB IPB</div>
   </div>

@@ -18,7 +18,7 @@ export function getPostHref(post: { slug: string; externalUrl?: string }): strin
   return normalizeLinkedInPostUrl(post.externalUrl) || `/posts/${post.slug}`;
 }
 
-/** Activities use the compact image/title/date layout, regardless of their source. */
+/** Activities use their own card and are excluded from homepage/related recommendations. */
 export function isActivityPost(post: { type?: string; category?: { slug?: string } }): boolean {
   return post.category?.slug?.trim().toLowerCase() === 'activities' || post.type?.trim().toLowerCase() === 'activities';
 }

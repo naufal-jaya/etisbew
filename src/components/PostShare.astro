@@ -1,0 +1,223 @@
+---
+interface Props {
+  title: string;
+  author: string;
+}
+const { title, author } = Astro.props;
+---
+
+<post-share data-title={title} data-author={author}>
+  <div class="share-options" id="post-share-options" role="group" aria-label="Share this article" hidden>
+    <button type="button" data-copy>Copy</button>
+    <a data-app="whatsapp" target="_blank" rel="noopener noreferrer">WhatsApp <span aria-hidden="true">↗</span></a>
+    <a data-app="x" target="_blank" rel="noopener noreferrer">X <span aria-hidden="true">↗</span></a>
+    <a data-app="linkedin" target="_blank" rel="noopener noreferrer" aria-describedby="linkedin-share-note">LinkedIn <span aria-hidden="true">↗</span></a>
+    <p id="linkedin-share-note">LinkedIn copies the message for you to paste into your post.</p>
+  </div>
+  <button type="button" data-toggle aria-label="Share this post" aria-expanded="false" aria-controls="post-share-options" class="share-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send" aria-hidden="true">
+      <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" />
+      <path d="m21.854 2.147-10.94 10.939" />
+    </svg>
+    <span class="share-label">Share</span>
+  </button>
+  <p class="share-status" role="status" hidden></p>
+</post-share>
+
+<style>
+  post-share {
+    position: fixed;
+    left: max(16px, env(safe-area-inset-left, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 60;
+  }
+  .share-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .share-button:focus-visible {
+    outline: 2px solid #000;
+    outline-offset: 3px;
+  }
+  .share-label { display: none; }
+  .share-options {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 220px;
+    max-width: calc(100vw - 32px);
+    padding: 8px;
+    background: #000;
+    color: #fff;
+  }
+  .share-options[hidden] { display: none; }
+  .share-options a, .share-options button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 0;
+    background: #000;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .share-options a:hover, .share-options button:hover { background: #262626; }
+  .share-options a:focus-visible, .share-options button:focus-visible {
+    outline: 1px solid #fff;
+    outline-offset: -2px;
+  }
+  .share-options p { margin: 8px 12px; font-size: 11px; line-height: 1.4; }
+
+  .share-status {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    margin: 0;
+    padding: 8px 12px;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+  }
+  @media (min-width: 768px) {
+    post-share { left: 24px; bottom: 24px; }
+    .share-button { width: auto; padding: 0 18px; }
+    .share-label { display: inline; }
+  }
+</style>
+
+<script>
+  import { getShareContent } from '../utils/sharePost';
+
+  class PostShare extends HTMLElement {
+    private events?: AbortController;
+    private statusTimer?: ReturnType<typeof setTimeout>;
+    private positionFrame = 0;
+    private sizeObserver?: ResizeObserver;
+
+    private trackFooter(signal: AbortSignal) {
+      this.sizeObserver?.disconnect();
+      cancelAnimationFrame(this.positionFrame);
+      const footer = document.querySelector('footer');
+      if (!footer) return;
+
+      const updatePosition = () => {
+        this.positionFrame = 0;
+        const bottomInset = parseFloat(getComputedStyle(this).bottom) || 0;
+        const buttonBottom = window.innerHeight - bottomInset;
+        const offset = Math.min(0, footer.getBoundingClientRect().top - 16 - buttonBottom);
+        this.style.transform = `translateY(${offset}px)`;
+      };
+      const schedulePosition = () => {
+        if (!this.positionFrame) this.positionFrame = requestAnimationFrame(updatePosition);
+      };
+      window.addEventListener('scroll', schedulePosition, { passive: true, signal });
+      window.addEventListener('resize', schedulePosition, { passive: true, signal });
+      window.visualViewport?.addEventListener('resize', schedulePosition, { passive: true, signal });
+      this.sizeObserver = new ResizeObserver(schedulePosition);
+      this.sizeObserver.observe(document.documentElement);
+      this.sizeObserver.observe(footer);
+      updatePosition();
+    }
+
+    private setOpen(open: boolean) {
+      if (open) {
+        const status = this.querySelector<HTMLElement>('[role="status"]');
+        if (status) status.hidden = true;
+      }
+      const options = this.querySelector<HTMLElement>('.share-options');
+      if (options) options.hidden = !open;
+      this.querySelector('[data-toggle]')?.setAttribute('aria-expanded', String(open));
+    }
+
+    connectedCallback() {
+      this.events?.abort();
+      this.events = new AbortController();
+      const { signal } = this.events;
+      this.trackFooter(signal);
+      const content = getShareContent(this.dataset.title || '', this.dataset.author || '', window.location.href);
+      const toggle = this.querySelector<HTMLButtonElement>('[data-toggle]');
+      toggle?.addEventListener('click', () => {
+        this.setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+      }, { signal });
+
+      this.querySelectorAll<HTMLAnchorElement>('[data-app]').forEach((link) => {
+        const app = link.dataset.app as keyof typeof content.links;
+        link.href = content.links[app];
+        link.addEventListener('click', () => {
+          // Keep navigation synchronous so browsers allow the composer to open.
+          if (app === 'linkedin') {
+            this.copyMessage(content.message, 'Message copied. Paste it into your LinkedIn post.');
+          }
+          this.setOpen(false);
+        }, { signal });
+      });
+      this.querySelector('[data-copy]')?.addEventListener('click', () => {
+        this.copyMessage(content.message, 'Message copied');
+        this.setOpen(false);
+      }, { signal });
+      document.addEventListener('pointerdown', (event) => {
+        if (event.target instanceof Node && !this.contains(event.target)) this.setOpen(false);
+      }, { signal });
+      this.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          this.setOpen(false);
+          toggle?.focus();
+        }
+      }, { signal });
+      this.addEventListener('focusout', (event) => {
+        if (!(event.relatedTarget instanceof Node) || !this.contains(event.relatedTarget)) this.setOpen(false);
+      }, { signal });
+    }
+
+    private async copyMessage(message: string, success: string) {
+      try {
+        await navigator.clipboard.writeText(message);
+        this.showStatus(success);
+      } catch {
+        this.showStatus('Copy unavailable. Select the message below.');
+        const status = this.querySelector<HTMLElement>('[role="status"]');
+        if (status) status.textContent += ` ${message}`;
+        clearTimeout(this.statusTimer);
+      }
+    }
+
+    private showStatus(message: string) {
+      const status = this.querySelector<HTMLElement>('[role="status"]');
+      if (!status) return;
+      clearTimeout(this.statusTimer);
+      status.textContent = message;
+      status.hidden = false;
+      this.statusTimer = setTimeout(() => { status.hidden = true; }, 6000);
+    }
+
+    disconnectedCallback() {
+      this.events?.abort();
+      this.sizeObserver?.disconnect();
+      cancelAnimationFrame(this.positionFrame);
+      clearTimeout(this.statusTimer);
+    }
+  }
+  if (!customElements.get('post-share')) customElements.define('post-share', PostShare);
+</script>

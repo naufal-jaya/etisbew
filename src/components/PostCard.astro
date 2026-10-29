@@ -1,5 +1,6 @@
 ---
 import ActivityCard from "./ActivityCard.astro";
+import PostCategoryLabel from "./PostCategoryLabel.astro";
 import { getPostHref, isActivityPost } from "../utils/postLinks";
 import { responsiveImage } from "../sanity/image";
 import type { PostItem } from "../data/posts";
@@ -8,26 +9,7 @@ interface Props {
   post: PostItem;
 }
 const { post } = Astro.props;
-function getContrastColor(hexColor?: string): string {
-  if (!hexColor || !hexColor.startsWith("#")) return "#000000";
-  const hex = hexColor.replace("#", "");
-  const r = parseInt(
-    hex.length === 3 ? hex[0] + hex[0] : hex.substring(0, 2),
-    16,
-  );
-  const g = parseInt(
-    hex.length === 3 ? hex[1] + hex[1] : hex.substring(2, 4),
-    16,
-  );
-  const b = parseInt(
-    hex.length === 3 ? hex[2] + hex[2] : hex.substring(4, 6),
-    16,
-  );
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-  return brightness > 145 ? "#000000" : "#ffffff";
-}
 const catColor = post.category?.color || "#1338BE";
-const catTextColor = getContrastColor(catColor);
 const catSlug = post.category?.slug || "tech-insight";
 ---
 
@@ -50,14 +32,7 @@ const catSlug = post.category?.slug || "tech-insight";
       loading="lazy"
     />
     <!-- Category Badge overlay on thumbnail -->
-    <div class="absolute top-1 left-2 z-10">
-      <span
-        class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 shadow-sm inline-block"
-        style={`background-color: ${catColor}; color: ${catTextColor};`}
-      >
-        {post.type}
-      </span>
-    </div>
+    <PostCategoryLabel label={post.type} color={catColor} />
   </div>
 
   <!-- Title -->
@@ -103,22 +78,6 @@ const catSlug = post.category?.slug || "tech-insight";
       aspect-ratio: 1;
       margin: 0;
       align-self: start;
-    }
-    a.post-grid-card > div:first-child > div {
-      top: auto;
-      bottom: 2;
-      left: 0;
-      max-width: 100%;
-      line-height: 1;
-    }
-    a.post-grid-card > div:first-child span {
-      font-size: 8px;
-      padding: 4px;
-      letter-spacing: 0;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
     a.post-grid-card > h2 {
       margin: 0;

@@ -35,7 +35,10 @@ export const linkedinPostSchema = defineType({
       name: 'title', title: 'Title', type: 'string',
       validation: (Rule) => Rule.required(),
     }),
-
+    defineField({
+      name: 'summary', title: 'Excerpt', type: 'text', rows: 3,
+      description: 'A short preview displayed below the title and date on desktop cards.',
+    }),
   ],
   preview: {
     select: { title: 'title', summary: 'summary', subtitle: 'externalUrl', media: 'coverImage' },

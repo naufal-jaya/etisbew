@@ -3,14 +3,17 @@ import type { PostItem } from '../data/posts';
 import { getPostHref, normalizeLinkedInPostUrl } from '../utils/postLinks';
 import { responsiveImage } from '../sanity/image';
 import PostDate from './PostDate.astro';
+import PostCategoryLabel from './PostCategoryLabel.astro';
 const { post } = Astro.props as { post: PostItem };
 const href = getPostHref(post);
 const isLinkedIn = Boolean(normalizeLinkedInPostUrl(post.externalUrl));
+const catColor = post.category?.color || '#F59E0B';
 ---
 <activity-post-card class="post-grid-card activity-card" data-linkedin={isLinkedIn ? "" : undefined} data-category-slug={post.category?.slug || "activities"} role="article" aria-label={post.title}>
-  <a href={href} class="card-link" data-preview-trigger>
+  <a href={href} class="card-link" data-preview-trigger target={isLinkedIn ? "_blank" : undefined} rel={isLinkedIn ? "noopener noreferrer" : undefined}>
     <figure class="cover">
       <img {...responsiveImage(post.image, '(max-width: 639px) 104px, (max-width: 1023px) 45vw, 440px')} alt={post.alt || post.title} loading="lazy" />
+      <PostCategoryLabel label={post.type} color={catColor} />
       {isLinkedIn && (
       <span class="desktop-overlay" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10" /></svg>
@@ -20,29 +23,36 @@ const isLinkedIn = Boolean(normalizeLinkedInPostUrl(post.externalUrl));
     </figure>
     <h2>{post.title}</h2>
     <div class="date"><PostDate date={post.publishedAt} /></div>
+    <p class="excerpt">{post.summary || `Read the full post about ${post.title}...`}</p>
   </a>
   {isLinkedIn && (
   <div class="mobile-overlay" data-mobile-actions hidden role="group" aria-label="LinkedIn post actions">
-    <a href={href} class="open-button" data-open-link>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10" /></svg>
-      Open in LinkedIn
-    </a>
-    <button type="button" class="close-button" data-close-preview aria-label="Close LinkedIn preview">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18" /></svg>
-    </button>
+    <div class="mobile-actions">
+      <a href={href} class="open-button" data-open-link target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10" /></svg>
+        Open in LinkedIn
+      </a>
+      <button type="button" class="close-button" data-close-preview aria-label="Close LinkedIn preview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18" /></svg>
+      </button>
+    </div>
   </div>
   )}
 </activity-post-card>
 <style>
-  .activity-card { display: block; position: relative; width: 100%; min-width: 0; color: #171717; background: white; }
+  .activity-card { display: block; position: relative; width: 100%; min-width: 0; align-self: start; color: #171717; background: white; }
   .card-link { display: block; color: inherit; text-decoration: none; }
   .cover { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 0 0 12px; overflow: hidden; }
-  .cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .cover img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); transition: transform 500ms; }
+  .card-link:hover .cover img { transform: scale(1); }
   h2 { margin: 0 0 8px; font-size: 16px; font-weight: 700; line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
-  .date { color: #737373; font-size: 12px; }
+  .card-link:hover h2 { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px; }
+  .date { color: #737373; font-size: 12px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb; }
+  .excerpt { margin: 0; color: #525252; font-size: 12px; line-height: 1.625; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
   svg { width: 20px; height: 20px; flex-shrink: 0; }
-  .desktop-overlay { position: absolute; inset: 0; background: rgb(255 255 255 / 70%); display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 180ms; color: black; font-size: 14px; font-weight: 600; }
-  .mobile-overlay { position: absolute; inset: 0; z-index: 10; background: rgb(255 255 255 / 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+  .desktop-overlay { position: absolute; z-index: 2; inset: 0; background: rgb(255 255 255 / 70%); display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 180ms; color: black; font-size: 14px; font-weight: 600; }
+  .mobile-overlay { position: absolute; inset: 0; z-index: 10; background: rgb(255 255 255 / 70%); display: grid; place-items: center; padding: 12px; }
+  .mobile-actions { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
   .mobile-overlay[hidden] { display: none; }
   .open-button, .close-button { display: flex; align-items: center; justify-content: center; gap: 8px; background: black; color: white; border: 0; cursor: pointer; }
   .open-button { min-height: 44px; padding: 10px 14px; font-size: 13px; font-weight: 600; }
@@ -73,10 +83,10 @@ const isLinkedIn = Boolean(normalizeLinkedInPostUrl(post.externalUrl));
       -webkit-line-clamp: 3;
       overflow-wrap: anywhere;
     }
-    .date { min-width: 0; font-size: 10px; align-self: start; }
-    .mobile-overlay { gap: 4px; }
+    .date { min-width: 0; font-size: 10px; align-self: start; margin: 0; padding: 0; border: 0; }
+    .excerpt { display: none; }
   }
-  @media (prefers-reduced-motion: reduce) { .desktop-overlay { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .desktop-overlay, .cover img { transition: none; } }
 </style>
 <script>
   class ActivityPostCard extends HTMLElement {

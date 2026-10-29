@@ -47,10 +47,10 @@ Feel free to check [our documentation](https://docs.astro.build) or jump into ou
 In Sanity Studio, create a **LinkedIn Posts** document:
 
 1. Paste the full HTTPS LinkedIn post URL (`/posts/...` or `/feed/update/...`).
-2. Enter **Title**, set **Published Date**, and upload the **Cover** image (optional image description).
+2. Enter **Title**, set **Published Date**, upload the **Cover** image (optional image description), and optionally add an **Excerpt**.
 3. Publish the document and rebuild/redeploy the Astro website.
 
-There is no preview-text or author input. Activities is assigned automatically using its existing CMS color. Cards show only a 16:9 cover, title, and date; LinkedIn cards retain the hover/tap link controls.
+Activities is assigned automatically using its existing CMS color. Cards include the category label, cover, title, date, divider, and excerpt, matching regular post cards without an author byline. On mobile, compact cards hide the excerpt like other post cards. LinkedIn cards retain the hover/tap link controls.
 
 LinkedIn cards use the existing layouts and open the original LinkedIn post. They do not create local article pages. Activities posts (including LinkedIn posts) are excluded from featured, recent, and related-post recommendations; they remain available in the main posts listing and Activities filter. Existing articles keep their local links.
 
