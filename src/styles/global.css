@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --color-deep-navy: #0A1A2F;
+}
+
+.bg-deep-navy {
+  background-color: #0A1A2F;
+}
+
+.circuit-pattern {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 40px 40px;
+}
+
+@font-face {
+  font-family: 'Agency FB';
+  src: url('/fonts/agency-fb-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Agency FB';
+  src: url('/fonts/agency-fb-bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

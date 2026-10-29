@@ -1,0 +1,42 @@
+---
+interface Props {
+  label: string;
+  color: string;
+}
+const { label, color } = Astro.props;
+const hex = color.replace('#', '');
+const fullHex = hex.length === 3 ? hex.split('').map((part) => part + part).join('') : hex;
+const [r, g, b] = [0, 2, 4].map((offset) => parseInt(fullHex.slice(offset, offset + 2), 16));
+const textColor = (r * 299 + g * 587 + b * 114) / 1000 > 145 ? '#000' : '#fff';
+---
+
+<div class="post-category-label">
+  <span style={`background-color: ${color}; color: ${textColor};`}>{label}</span>
+</div>
+
+<style>
+  .post-category-label { position: absolute; top: 4px; left: 8px; z-index: 1; }
+  span {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 10px;
+    line-height: 1.5;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+  }
+  @media (max-width: 639px) {
+    .post-category-label { top: auto; bottom: 2px; left: 0; max-width: 100%; line-height: 1; }
+    span {
+      font-size: 8px;
+      padding: 4px;
+      letter-spacing: 0;
+      line-height: 1;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+</style>

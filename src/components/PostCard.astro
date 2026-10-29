@@ -1,0 +1,114 @@
+---
+import ActivityCard from "./ActivityCard.astro";
+import PostCategoryLabel from "./PostCategoryLabel.astro";
+import { getPostHref, isActivityPost } from "../utils/postLinks";
+import { responsiveImage } from "../sanity/image";
+import type { PostItem } from "../data/posts";
+import PostDate from "./PostDate.astro";
+interface Props {
+  post: PostItem;
+}
+const { post } = Astro.props;
+const catColor = post.category?.color || "#1338BE";
+const catSlug = post.category?.slug || "tech-insight";
+---
+
+{(isActivityPost(post) || post.externalUrl) ? <ActivityCard post={post} /> : (
+
+<a
+  href={getPostHref(post)}
+  class="post-grid-card flex flex-col group cursor-pointer w-full"
+  data-category-slug={catSlug}
+  aria-label={post.title}
+>
+  <!-- Thumbnail -->
+  <div
+    class="relative w-full aspect-[440/248] overflow-hidden mb-3 bg-neutral-900 block rounded-none"
+  >
+    <img
+      {...responsiveImage(post.image, "(max-width: 639px) 104px, (max-width: 1023px) 45vw, 440px")}
+      alt={post.title}
+      class="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-100 transition-transform duration-500"
+      loading="lazy"
+    />
+    <!-- Category Badge overlay on thumbnail -->
+    <PostCategoryLabel label={post.type} color={catColor} />
+  </div>
+
+  <!-- Title -->
+  <h2
+    class="text-sm sm:text-base font-bold leading-snug mb-1 md:mb-2 line-clamp-2 text-neutral-950 group-hover:underline decoration-2 underline-offset-2"
+  >
+    {post.title}
+  </h2>
+
+  <!-- Author & Published Date -->
+  <div
+    class="flex justify-between items-center text-[10px] sm:text-xs text-neutral-500 mb-2 border-b border-gray-200 pb-2"
+  >
+    <span class="font-medium text-neutral-700">by {post.author}</span>
+    <span><PostDate date={post.publishedAt} /></span>
+  </div>
+
+  <!-- Summary / Excerpt -->
+  <p
+    class="text-[11px] sm:text-xs text-neutral-600 line-clamp-3 leading-relaxed"
+  >
+    {post.summary || `Read the full post about ${post.title}...`}
+  </p>
+</a>
+
+)}
+
+<style>
+  /* Compact news rows keep mobile browsing readable and dense. */
+  @media (max-width: 639px) {
+    a.post-grid-card {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      grid-template-rows: minmax(0, 60px) auto;
+      column-gap: 12px;
+      row-gap: 4px;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e5e5;
+      align-content: start;
+    }
+    a.post-grid-card > div:first-child {
+      grid-row: 1 / 3;
+      aspect-ratio: 1;
+      margin: 0;
+      align-self: start;
+    }
+    a.post-grid-card > h2 {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      -webkit-line-clamp: 3;
+      max-height: 54.6px;
+      min-height: 0;
+      overflow: hidden;
+      overflow-wrap: anywhere;
+    }
+    a.post-grid-card > div:nth-of-type(2) {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 2px;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      min-width: 0;
+      font-size: 10px;
+      overflow: hidden;
+    }
+    a.post-grid-card > div:nth-of-type(2) > span {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    a.post-grid-card > p {
+      display: none;
+    }
+  }
+</style>

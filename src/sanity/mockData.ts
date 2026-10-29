@@ -1,0 +1,79 @@
+export interface PartnerItem {
+  name: string;
+  logo: any;
+}
+
+export interface MilestoneItem {
+  year: string;
+  description: string;
+  floatingImages?: any[];
+}
+
+export const fallbackPartners: PartnerItem[] = [
+  // Row 1
+  { name: 'Caffeine Singapore', logo: '/partners/caffeine.png' },
+  { name: 'IEEE UB Student Branch', logo: '/partners/ieee-ub.png' },
+  { name: 'Saga University', logo: '/partners/saga-university.png' },
+  { name: 'CTSS', logo: '/partners/ctss.png' },
+  { name: 'Green Welfare .id', logo: '/partners/green-welfare.png' },
+
+  // Row 2
+  { name: 'CTSS', logo: '/partners/ctss.png' },
+  { name: 'Green Welfare .id', logo: '/partners/green-welfare.png' },
+  { name: 'Caffeine Singapore', logo: '/partners/caffeine.png' },
+  { name: 'IEEE UB Student Branch', logo: '/partners/ieee-ub.png' },
+  { name: 'Saga University', logo: '/partners/saga-university.png' },
+];
+
+export const fallbackMilestones: MilestoneItem[] = [
+  {
+    year: '2022',
+    description:
+      'Inisiasi awal perintisan IEEE Student Branch di IPB University melalui penggalangan minat mahasiswa teknik dan sains serta penyusunan visi awal komunitas.',
+    floatingImages: [
+      { url: '/history-bg-1.png', alt: 'IEEE Inisiasi Awal 2022' },
+      { url: '/history-bg-2.png', alt: 'Diskusi Mahasiswa IPB' },
+      { url: '/history-bg-3.png', alt: 'Perintisan Komunitas' },
+    ],
+  },
+  {
+    year: '2023',
+    description:
+      'Pembentukan Student Branch Formation Committee, perumusan AD/ART dan program kerja perdana, serta koordinasi intensif bersama IEEE Indonesia Section.',
+    floatingImages: [
+      { url: '/history-bg-3.png', alt: 'Pembentukan Formatur 2023' },
+      { url: '/history-bg-4.png', alt: 'Koordinasi IEEE Section' },
+      { url: '/history-bg-1.png', alt: 'Konsolidasi Tim' },
+    ],
+  },
+  {
+    year: '2024',
+    description:
+      'Inisiasi pembentukan IEEE SB IPB dengan berbagai kolaborasi awal, workshop teknologi perdana, serta peletakan fondasi komunitas riset dan inovasi mahasiswa.',
+    floatingImages: [
+      { url: '/history-bg-1.png', alt: 'IEEE Workshop 2024' },
+      { url: '/history-bg-2.png', alt: 'Peresmian Komunitas' },
+    ],
+  },
+  {
+    year: '2025',
+    description:
+      'Ekspansi kemitraan strategis internasional dan penyelenggaraan hackathon skala nasional dengan ratusan inovator muda dari berbagai universitas terkemuka.',
+    floatingImages: [
+      { url: '/history-bg-3.png', alt: 'IEEE Event 2025 group photo' },
+      { url: '/history-bg-4.png', alt: 'Community Workshop' },
+    ],
+  },
+  {
+    year: '2026',
+    description:
+      'IEEE SB IPB beli cilor di warung mang ujang dengan kebanggaan yang tak terhingga, bahkan rektor pun turut memberi apresiasi atas pencapaian ini luar biasa ini',
+    floatingImages: [
+      { url: '/history-bg-1.png', alt: 'IEEE SB IPB celebration' },
+      { url: '/history-bg-2.png', alt: 'Award ceremony' },
+      { url: '/history-bg-3.png', alt: 'Campus activity' },
+      { url: '/history-bg-4.png', alt: 'Campus activity 2' },
+      { url: '/history-bg-1.png', alt: 'Campus activity 3' },
+    ],
+  },
+];

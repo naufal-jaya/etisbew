@@ -1,0 +1,171 @@
+---
+import SiteIcons from "../../components/SiteIcons.astro";
+import { isActivityPost } from "../../utils/postLinks";
+import { responsiveImage } from "../../sanity/image";
+import "../../styles/global.css";
+import PostCard from "../../components/PostCard.astro";
+import PostDate from "../../components/PostDate.astro";
+import BackArrow from "../../components/BackArrow.astro";
+import PostHeader from "../../components/PostHeader.astro";
+import Footer from "../../components/Footer.astro";
+import PostShare from "../../components/PostShare.astro";
+import { getAllPosts, type PostItem } from "../../data/posts";
+import { renderPortableTextToHtml } from "../../sanity/portableText";
+
+export async function getStaticPaths() {
+  const allPosts = await getAllPosts();
+  return allPosts.filter((post) => !post.externalUrl).map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: PostItem;
+}
+
+const { post } = Astro.props;
+const allPosts = await getAllPosts();
+
+// Sample three distinct posts, always excluding the current article.
+const candidates = allPosts.filter((candidate) => candidate.slug !== post.slug && !isActivityPost(candidate));
+for (let index = candidates.length - 1; index > 0; index--) {
+  const randomIndex = Math.floor(Math.random() * (index + 1));
+  [candidates[index], candidates[randomIndex]] = [candidates[randomIndex], candidates[index]];
+}
+const relatedPosts = candidates.slice(0, 3);
+
+const articleHtml = renderPortableTextToHtml(post.content);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SiteIcons />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{post.title} - IPB University IEEE Student Branch</title>
+    <meta
+      name="description"
+      content={post.summary ||
+        `Read ${post.title} by ${post.author} on IPB University IEEE Student Branch.`}
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .article-body p {
+        margin-bottom: 1.25rem;
+        line-height: 1.8;
+      }
+      .article-body h2 {
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+      }
+      .article-body h3 {
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+      .article-body blockquote {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-black antialiased">
+    <main class="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-8 md:py-12">
+      <div class="w-full max-w-6xl mx-auto flex flex-col">
+        <PostHeader backHref="/posts" backLabel="Posts" />
+
+        <!-- Post Header Section -->
+        <div class="mb-6">
+          <!-- Main Post Title -->
+          <h1
+            class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-neutral-950 mb-4 sm:mb-6"
+          >
+            {post.title}
+          </h1>
+
+          <!-- Metadata byline -->
+          <div
+            class="flex flex-col items-start sm:flex-row sm:flex-wrap sm:justify-between sm:items-center text-xs sm:text-sm text-neutral-500 pb-2 border-b border-neutral-200 gap-1"
+          >
+            <div class="flex items-center gap-2">
+              <span class="text-neutral-900">{post.type} by {post.author}</span>
+            </div>
+            <span class="text-neutral-900"
+              >Published on <PostDate date={post.publishedAt} /></span
+            >
+          </div>
+        </div>
+
+        <!-- Main Featured Image -->
+        <figure class="w-full lg:w-1/2 mx-auto mb-10">
+          <div
+            class="w-full aspect-[16/9] bg-neutral-950 overflow-hidden shadow-sm"
+          >
+            <img
+              {...responsiveImage(post.image, "(max-width: 1023px) 100vw, 50vw")}
+              alt={post.alt || post.title}
+              class="w-full h-full object-cover"
+              loading="eager"
+            />
+          </div>
+          {
+            post.caption && (
+              <figcaption class="text-xs sm:text-sm text-neutral-500 mt-2 text-right">
+                {post.caption}
+              </figcaption>
+            )
+          }
+        </figure>
+
+        <!-- Post Content -->
+        <article
+          class="article-body max-w-none text-neutral-800 text-sm sm:text-base leading-relaxed mb-16"
+        >
+          {
+            articleHtml ? (
+              <div set:html={articleHtml} />
+            ) : (
+              <p class="text-neutral-500 italic">
+                Full post content is being prepared. Check back soon for
+                updates!
+              </p>
+            )
+          }
+        </article>
+
+        <!-- Related Posts Section -->
+        {
+          relatedPosts.length > 0 && (
+            <section class="border-t border-neutral-200 pt-10 mt-6">
+              <h2 class="text-lg sm:text-xl font-bold text-neutral-900 mb-6">
+                Read other posts
+              </h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-6">
+                {relatedPosts.map((related) => (
+                  <PostCard post={related} />
+                ))}
+              </div>
+            </section>
+          )
+        }
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <Footer />
+    <PostShare title={post.title} author={post.author} />
+  </body>
+</html>
